@@ -10,17 +10,17 @@ import { SandpackCSS } from './blog/[slug]/sandpack';
 import Script from 'next/script';
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://leerob.io'),
+  metadataBase: new URL('https://www.enolcasielles.com'),
   title: {
-    default: 'Lee Robinson',
-    template: '%s | Lee Robinson',
+    default: 'Enol Casielles',
+    template: '%s | Enol Casielles',
   },
   description: 'Developer, writer, and creator.',
   openGraph: {
-    title: 'Lee Robinson',
+    title: 'Enol Casielles',
     description: 'Developer, writer, and creator.',
-    url: 'https://leerob.io',
-    siteName: 'Lee Robinson',
+    url: 'https://www.enolcasielles.com',
+    siteName: 'Enol Casielles',
     locale: 'en_US',
     type: 'website',
   },
@@ -36,12 +36,11 @@ export const metadata: Metadata = {
     },
   },
   twitter: {
-    title: 'Lee Robinson',
+    title: 'Enol Casielles',
     card: 'summary_large_image',
   },
   verification: {
-    google: 'eZSdmzAXlLkKhNJzfgwDqWORghxnJ8qR9_CHdAh5-xw',
-    yandex: '14d2e73487fa6c71',
+    google: '', //TODO(enol): cambiar este valor cuando se integre google analytics
   },
 };
 

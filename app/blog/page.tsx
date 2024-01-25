@@ -1,11 +1,9 @@
 import Link from 'next/link';
-import { Suspense } from 'react';
-import ViewCounter from './view-counter';
 import { getBlogPosts } from 'app/db/blog';
 
 export const metadata = {
-  title: 'Blog',
-  description: 'Read my thoughts on software development, design, and more.',
+  title: 'Enol Casielles Blog',
+  description: 'Creo artículos de cosas que aprendo en mi día a día como desarrollador web.',
 };
 
 export default function BlogPage() {
@@ -13,8 +11,8 @@ export default function BlogPage() {
 
   return (
     <section>
-      <h1 className="font-medium text-2xl mb-8 tracking-tighter">
-        read my blog
+      <h1 className="font-medium text-3xl mb-8 tracking-tighter">
+        Artículos del blog
       </h1>
       {allBlogs
         .sort((a, b) => {
@@ -28,14 +26,18 @@ export default function BlogPage() {
         .map((post) => (
           <Link
             key={post.slug}
-            className="flex flex-col space-y-1 mb-4"
+            className="flex flex-col space-y-4 mb-4"
             href={`/blog/${post.slug}`}
           >
             <div className="w-full flex flex-col">
-              <p className="text-neutral-900 dark:text-neutral-100 tracking-tight">
+              <span className="text-xl text-neutral-900 dark:text-neutral-100 tracking-tight">
                 {post.metadata.title}
-              </p>
+              </span>
+              <span className='text-base text-neutral-500 dark:text-neutral-500 tracking-tight'>
+                {post.metadata.publishedAt}
+              </span>
             </div>
+            <hr className='bg-neutral-500 h-[1px] border-0'/>
           </Link>
         ))}
     </section>
