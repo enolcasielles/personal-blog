@@ -19,9 +19,7 @@ export async function generateMetadata({
     summary: description,
     image,
   } = post.metadata;
-  let ogImage = image
-    ? `https://www.enolcasielles.com${image}`
-    : `https://www.enolcasielles.com/og?title=${title}`;
+  let ogImage = `https://www.enolcasielles.com${image}`;
 
   return {
     title,
@@ -100,9 +98,7 @@ export default function Blog({ params }) {
             datePublished: post.metadata.publishedAt,
             dateModified: post.metadata.publishedAt,
             description: post.metadata.summary,
-            image: post.metadata.image
-              ? `https://www.enolcasielles.com${post.metadata.image}`
-              : `https://www.enolcasielles.com/og?title=${post.metadata.title}`,
+            image: `https://www.enolcasielles.com${post.metadata.image}`,
             url: `https://www.enolcasielles.com/blog/${post.slug}`,
             author: {
               '@type': 'Person',
