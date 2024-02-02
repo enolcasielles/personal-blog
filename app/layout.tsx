@@ -7,7 +7,7 @@ import { Analytics } from '@vercel/analytics/react';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import { PreloadResources } from './preload';
 import { SandpackCSS } from './blog/[slug]/sandpack';
-import Script from 'next/script';
+import { GoogleAnalytics } from '@next/third-parties/google'
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://www.enolcasielles.com'),
@@ -67,6 +67,7 @@ export default function RootLayout({
         <main className="flex-auto min-w-0 mt-6 flex flex-col px-2 md:px-0">
           <Navbar />
           {children}
+          <GoogleAnalytics gaId='G-9HGPDV0ZJ7' />
           <Analytics />
           <SpeedInsights />
           <PreloadResources />
