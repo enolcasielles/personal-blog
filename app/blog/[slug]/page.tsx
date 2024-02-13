@@ -1,9 +1,7 @@
 import type { Metadata } from 'next';
-import { Suspense, cache } from 'react';
 import { notFound } from 'next/navigation';
 import { CustomMDX } from 'app/components/mdx';
 import { getBlogPosts } from 'app/db/blog';
-import { unstable_noStore as noStore } from 'next/cache';
 
 export async function generateMetadata({
   params,
@@ -45,37 +43,26 @@ export async function generateMetadata({
   };
 }
 
+export async function generateStaticParams() {
+  let posts = getBlogPosts();
+  return posts.map((post) => ({
+    slug: post.slug,
+  }))
+}
+
 function formatDate(date: string) {
-  noStore();
-  let currentDate = new Date();
   if (!date.includes('T')) {
     date = `${date}T00:00:00`;
   }
   let targetDate = new Date(date);
 
-  let yearsAgo = currentDate.getFullYear() - targetDate.getFullYear();
-  let monthsAgo = currentDate.getMonth() - targetDate.getMonth();
-  let daysAgo = currentDate.getDate() - targetDate.getDate();
-
-  let formattedDate = '';
-
-  if (yearsAgo > 0) {
-    formattedDate = `${yearsAgo}y ago`;
-  } else if (monthsAgo > 0) {
-    formattedDate = `${monthsAgo}mo ago`;
-  } else if (daysAgo > 0) {
-    formattedDate = `${daysAgo}d ago`;
-  } else {
-    formattedDate = 'Today';
-  }
-
-  let fullDate = targetDate.toLocaleString('en-us', {
+  let fullDate = targetDate.toLocaleString('es-es', {
     month: 'long',
     day: 'numeric',
     year: 'numeric',
   });
 
-  return `${fullDate} (${formattedDate})`;
+  return `${fullDate}`;
 }
 
 export default function Blog({ params }) {
@@ -111,11 +98,9 @@ export default function Blog({ params }) {
         {post.metadata.title}
       </h1>
       <div className="flex justify-between items-center mt-2 mb-8 text-sm max-w-[650px]">
-        <Suspense fallback={<p className="h-5" />}>
-          <p className="text-sm text-neutral-600 dark:text-neutral-400">
-            {formatDate(post.metadata.publishedAt)}
-          </p>
-        </Suspense>
+        <p className="text-sm text-neutral-600 dark:text-neutral-400">
+          {formatDate(post.metadata.publishedAt)}
+        </p>
       </div>
       <article className="prose prose-quoteless prose-neutral dark:prose-invert">
         <CustomMDX source={post.content} />
