@@ -25,21 +25,23 @@ export default function BlogPage() {
           return 1;
         })
         .map((post, i) => (
-          <Link
-            key={post.slug}
-            className="flex flex-col space-y-4 mb-4"
-            href={`/blog/${post.slug}`}
-          >
-            <hr className='bg-neutral-500 h-[1px] border-0 mb-4 mt-4'/>
-            <div className="w-full flex flex-col">
-              <span className="text-xl text-neutral-900 dark:text-neutral-100 tracking-tight">
-                {post.metadata.title}
-              </span>
-              <span className='text-base text-neutral-500 dark:text-neutral-500 tracking-tight'>
-                {post.metadata.publishedAt}
-              </span>
-            </div>
-          </Link>
+          <>
+              <hr className='bg-neutral-500 h-[1px] border-0 mb-4 mt-4'/>
+              <div className="w-full flex flex-col">
+                <Link
+                  key={post.slug}
+                  className="flex flex-col space-y-4 mb-4"
+                  href={`/blog/${post.slug}`}
+                >
+                    <span className="text-xl text-neutral-900 dark:text-neutral-100 tracking-tight hover:text-blue-400 dark:hover:text-blue-400">
+                      {post.metadata.title}
+                    </span>
+                </Link>
+                <span className='text-base text-neutral-500 dark:text-neutral-500 tracking-tight'>
+                  {post.metadata.publishedAt}
+                </span>
+              </div>
+          </>
         ))}
     </section>
   );
