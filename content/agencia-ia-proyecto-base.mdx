@@ -14,11 +14,11 @@ En este artículo, exploraremos este concepto y plantearemos una solución en Ty
 
 ### Motivación del proyecto
 
-El mundo de la IA avanza a pasos gigantescos. Cada día aparecen nuevos modelos, herramientas, estudios de investigación, etc. Una de las vertientes que está ganando cada vez más fuerza es este concepto de Agentes que interactúan entre sí. Actualmente existen varios proyectos de código abierto que han implementado esta solución y que están totalmente a nuestro alcance para ser utilizados. Algunos de los más conocidos son el proyecto [AutoGen](https://microsoft.github.io/autogen/) de Microsoft, el framework [CrewAI](https://www.crewai.com/) o [Agency Swarm](https://github.com/VRSEN/agency-swarm), que es desarrollado por el creador de contenido [VRSEN](https://www.youtube.com/@vrsen), quien está sacando vídeos continuamente acerca de este enfoque de agencias de IA. El proyecto que desarrollaremos en este tutorial coge muchos de los conceptos que se aplican en este último framework.
+El mundo de la IA avanza a pasos gigantescos. Cada día aparecen nuevos modelos, herramientas, estudios de investigación, etc. Una de las vertientes que está ganando cada vez más fuerza es el concepto de Agentes que interactúan entre sí. Actualmente existen varios proyectos de código abierto que han implementado esta solución y que están totalmente a nuestro alcance para ser utilizados. Algunos de los más conocidos son el proyecto [AutoGen](https://microsoft.github.io/autogen/) de Microsoft, el framework [CrewAI](https://www.crewai.com/) o [Agency Swarm](https://github.com/VRSEN/agency-swarm), que es desarrollado por el creador de contenido [VRSEN](https://www.youtube.com/@vrsen), quien está sacando vídeos continuamente acerca de este enfoque de agencias de IA. El proyecto que desarrollaremos en este tutorial coge muchos de los conceptos que se aplican en este último framework.
 
-Entonces, si sabemos que existen varias herramientas a nuestro alcance, ¿qué sentido tiene desarrollar un "mini framework" que haga algo parecido a estas herramientas? Simplemente, por entender los conceptos y el funcionamiento interno de estas tecnologías. Si estás buscando utilizar una solución basada en agencias de IA para tu proyecto te recomiendo encarecidamente que utilices alguna de estas herramientas. Si por el contrario buscas, al igual que yo, entender como se puede implementar algo así te animo a que sigas todo el tutorial donde veremos y explicaremos cada una de las partes.
+Entonces, si sabemos que existen varias herramientas a nuestro alcance, ¿qué sentido tiene desarrollar un "mini framework" que haga algo parecido a estas herramientas? Simplemente, por entender los conceptos y el funcionamiento interno de estas tecnologías. Si estás buscando utilizar una solución basada en agencias de IA para tu proyecto te recomiendo encarecidamente que utilices alguna de estas herramientas. Si por el contrario buscas, al igual que yo, entender como se puede construir algo así, te animo a que sigas adelante con el artículo donde veremos y explicaremos todo en detalle.
 
-Dicho esto, vamos al lío 🚀
+Dicho lo cual, vamos al lío 🚀
 
 ***
 
@@ -26,7 +26,7 @@ Dicho esto, vamos al lío 🚀
 
 Una Agencia de IA es una estructura compleja diseñada para coordinar y optimizar la interacción entre múltiples asistentes de inteligencia artificial. Este marco de trabajo integra varios componentes clave que permiten una funcionalidad avanzada y una colaboración efectiva entre los agentes. A continuación, describiremos cada uno de estos componentes y su función dentro de la agencia:
 
-#### Agente
+#### Agente (Agent)
 
 Un agente es un asistente de IA que realiza tareas específicas basadas en una descripción detallada de sus responsabilidades y las instrucciones de cómo llevarlas a cabo. Cada agente puede equiparse con diversas herramientas personalizadas para expandir su capacidad de acción más allá de sus funciones predeterminadas. En nuestra implementación, utilizaremos los [asistentes de OpenAI](https://platform.openai.com/docs/assistants/overview).
 
@@ -34,11 +34,11 @@ Un agente es un asistente de IA que realiza tareas específicas basadas en una d
 
 La agencia también definirá una misión, que podemos considerar como unas instrucciones globales. Todo agente será consciente de la misión de la agencia, para que sepa el objetivo final de lo que hace.
 
-#### Herramienta
+#### Herramienta (Tool)
 
 Las herramientas son extensiones funcionales que permiten a los agentes realizar tareas que exceden sus capacidades iniciales. Estas pueden incluir acciones como enviar correos electrónicos, realizar búsquedas en la web o crear y almacenar documentos. Al definir una herramienta, se especifica su funcionalidad, lo que puede hacer y los parámetros necesarios para su ejecución. Toda herramienta contará con un método `run`, donde se implementa la tarea asignada. Finalmente, las herramientas se asignarán a los agentes, quienes comprenderán su funcionamiento y las utilizarán cuando sea necesario. Con "utilizarlas" nos referimos a invocar el método `run` con los parámetros necesarios.
 
-#### Hilo
+#### Hilo (Thread)
 
 Para facilitar la comunicación entre agentes, se define el concepto de "hilos". Estos son objetos que contienen un agente emisor y otro receptor, funcionando como canales por los cuales los agentes pueden interactuar entre sí. Al crear una agencia, además de especificar los agentes que la conforman, se deberá definir las comunicaciones que pueden existir entre ellos. Los hilos serán los encargados de registrar esta información.
 
@@ -71,7 +71,7 @@ Para cumplir con los requisitos anteriores, hemos optado por la siguiente arquit
 
 #### Monorepo con Typescript y pnpm
 
-La modularidad es importante y buscamos un entorno de trabajo ágil y eficiente. Por ello, hemos elegido una arquitectura de monorepo, similar a la que se describe en [este artículo](/monorepo), donde se explica cómo construir un monorepo utilizando herramientas como pnpm. Además, en este caso nos apoyaremos también en la herramienta [turborepo](https://turbo.build/repo) para facilitar la creación y gestión del proyecto.
+La modularidad es importante y buscamos un entorno de trabajo ágil y eficiente. Por ello, hemos elegido una arquitectura de monorepo, similar a la que se describe en <a href="/blog/monorepo" target="_blank">este artículo</a>, donde se explica cómo construir un monorepo utilizando herramientas como pnpm. Además, en este caso nos apoyaremos también en la herramienta [turborepo](https://turbo.build/repo) para facilitar la creación y gestión del proyecto.
 
 #### Python o Typescript
 
@@ -96,7 +96,7 @@ Este paquete incluye las siguientes partes:
 * **Clases Base:** Se definen las clases fundamentales para la creación de un agente (`Agent`) y una herramienta (`Tool`), así como las clases para los hilos (`Thread`) y los mensajes (`Message`) que facilitan la comunicación entre agentes.
 * **Clase Agencia:** Se presenta como una clase abstracta. En ella se implementa la funcionalidad necesaria para la ejecución de la agencia, pero se delega a quien la extienda los siguientes aspectos:
   * Definición de los agentes que conforman la agencia.
-  * Comunicación entre los diferentes agentes.
+  * Definición de las diferentes comunicaciones que puede existir entre los diferentes agentes.
   * Definición de una carpeta donde se pueda persistir la información de la agencia, garantizando que no se pierda su estado frente a un reinicio de la ejecución.
 * **API Rest:** Una característica destacada de nuestra agencia es que levantará un servidor Express para permitir la interacción con sus objetos a través de una API, facilitando así el acceso a sus datos o la interacción con ella. La aplicación `web` se conectará a esta API para comunicarse con la agencia.
 * **Server Sent Events:** La aplicación `web` necesitará poder recibir los mensajes que se van generando y mostrarlos según se produzcan. Por ello, además de la API Rest, necesitamos un mecanismo que permita el envío de datos del servidor al cliente. Para resolver esto, hemos optado por implementar [Server Sent Events](https://developer.mozilla.org/es/docs/Web/API/Server-sent_events/Using_server-sent_events). Cuando la web cargue un hilo, habilitará un mecanismo de escucha. Cuando la agencia genere un nuevo mensaje, lo emitirá al cliente a través de este mecanismo. De esta forma, mantenemos los mensajes actualizados y en tiempo real en la web.
@@ -114,7 +114,7 @@ No profundizaremos en la explicación de esta parte en particular. Se trata de u
 
 Cuando la pantalla de un hilo se carga, se verifica si el usuario forma parte de dicho hilo. En caso afirmativo, se habilita un campo de texto en la parte inferior junto con un botón de enviar, lo que permite al usuario enviar mensajes en ese hilo específico.
 
-Los detalles de la implementación se encuentran disponibles en el repositorio de GitHub mencionado al final del artículo. Sin embargo, dado que este tema se aleja del propósito principal de este artículo, considero que no es necesario profundizar en los detalles.
+La implementación se encuentran disponibles en el repositorio de GitHub mencionado al final del artículo. Sin embargo, dado que este tema se aleja del propósito principal de este artículo, considero que no es necesario profundizar en los detalles de esta implementación.
 
 ***
 
@@ -196,7 +196,7 @@ export class Message {
 
 #### Tool
 
-Definimos la clase `Tool` para representar las diferentes herramientas que se asignan a los agentes para dotarles de funcionalidades. Por un lado define las propiedades que OpenAI necesita para la creación de la herramienta: el nombre, la descripción y la definición de los parámetros que puede recibir. Por otro lado define un método abstracto `run`que será el que cada `Tool` deberá utilizar para la implementación que realice. Como veremos más adelante, el sistema estará preparado para que, cuando un agente deduzca que una herramienta ha de ser ejecutada, se invoque este método `run` en ella con los parámetros que el agente nos indique.
+Definimos la clase `Tool` para representar las diferentes herramientas que se asignan a los agentes para dotarles de funcionalidades. Por un lado define las propiedades que OpenAI necesita para la creación de la herramienta: el nombre, la descripción y la definición de los parámetros que puede recibir. Por otro lado define un método abstracto `run`que será el que cada `Tool` deberá implementar para ejecutar las tareas que deba realizar. Como veremos más adelante, el sistema estará preparado para que, cuando un agente deduzca que una herramienta ha de ser ejecutada, se invoque este método `run` en ella con los parámetros que el agente nos indique.
 
 ```tsx
 export abstract class Tool {
@@ -218,9 +218,9 @@ export abstract class Tool {
 
 La clase `Thread` es fundamental en el sistema, ya que facilita la comunicación entre agentes permitiendo el intercambio de mensajes entre ellos. Esta clase es responsable de interactuar con OpenAI para enviar mensajes y gestionar las respuestas recibidas.
 
-Destacan varias propiedades en esta clase, entre las que se encuentran `senderAgent` y `recipientAgent`, que son objetos de tipo `Agent` y representan los dos agentes (o usuarios) involucrados en la comunicación. Además, cuenta con la propiedad `messages`, que es una lista de objetos de tipo `Message` y se utiliza para almacenar los mensajes generados durante la comunicación.
+Destacan varias propiedades en esta clase, entre las que se encuentran `senderAgent` y `recipientAgent`, que son objetos que representan los dos agentes (o usuarios) involucrados en la comunicación. Además, cuenta con la propiedad `messages`, que es una lista de objetos de tipo `Message` y se utiliza para almacenar los mensajes generados durante la comunicación.
 
-En cuanto a los métodos, por un lado tenemos `init`, el cual se encarga de inicializar el `Thread` en OpenAI. Al igual que con los agentes, este método utiliza la propiedad `id` para determinar si el registro ya existe y solo necesita ser recuperado, o si, por el contrario, no existe y debe crearse en OpenAI. Veremos más adelante como `Agency` creará estos objetos `Thread` con id o no, en función de la información que tenga en su capa de persistencia.
+En cuanto a los métodos, por un lado tenemos `init`, el cual se encarga de inicializar el `Thread` en OpenAI. Al igual que con los agentes, este método utiliza la propiedad `id` para determinar si el registro ya existe y solo necesita ser recuperado, o si, por el contrario, no existe y debe crearse en OpenAI. Veremos más adelante como `Agency` creará estos objetos `Thread` con id o no, para indicar si ya existe o no en función de la información que tenga en su capa de persistencia.
 
 ```tsx
   async init() {
@@ -297,7 +297,7 @@ Cuando el `run` alcance un estado que nos permita manejar la respuesta, actuarem
       return content.text.value;
     } else {
       throw new Error(
-        "What should I do when the response is not text (image_field)?",
+        "Framework does not support messages different than text yet.",
       );
     }
   }
@@ -309,20 +309,27 @@ Sin embargo, los asistentes de OpenAI no siempre proporcionan una respuesta dire
   private async processAction() {
     const toolsToExecute =
       await this.run.required_action.submit_tool_outputs.tool_calls;
-    this.addNewMessage(
-      MessageType.Action,
-      "Acción requerida. Ejecutando las siguientes tools: " +
-        toolsToExecute.map((t) => t.function.name).join(","),
-      true,
-    );
     const toolsResults = [];
     for (const toolToExecute of toolsToExecute) {
+      this.addNewMessage(
+        MessageType.Action,
+        `Acción requerida. Ejecutando la tool ${toolToExecute.function.name} con parámetros ${toolToExecute.function.arguments}`,
+        true,
+      );
       const toolName = toolToExecute.function.name;
       const tool = this.recipientAgent.tools.find((t) => t.name === toolName);
-      const toolResult = await tool.run({
-        ...JSON.parse(toolToExecute.function.arguments),
-        callerAgent: this.recipientAgent,
-      });
+      const toolResult = tool
+        ? await tool.run({
+            ...JSON.parse(toolToExecute.function.arguments),
+            callerAgent: this.recipientAgent,
+          })
+        : "ERROR: no existe ninguna herramienta con el nombre que has indicado. Inténtalo de nuevo con el nombre correcto. La lista de herramientas disponibles es la siguiente: " +
+          this.recipientAgent.tools.map((t) => t.name).join(", ");
+      this.addNewMessage(
+        MessageType.Action,
+        `${toolToExecute.function.name} completada. Respuesta: ${toolResult.toString()}`,
+        true,
+      );
       toolsResults.push({
         tool_call_id: toolToExecute.id,
         output: toolResult.toString(),
@@ -338,19 +345,40 @@ Sin embargo, los asistentes de OpenAI no siempre proporcionan una respuesta dire
   }
 ```
 
-Este método básicamente extrae la información de la respuesta para determinar qué herramienta debe ejecutarse. Luego, busca esta herramienta entre los objetos `Tool` del agente y la ejecuta, enviándole los parámetros indicados por el asistente. Una vez que la ejecución de la herramienta ha finalizado, enviamos la respuesta de vuelta al asistente, actualizando el estado del método `run` para que el bucle principal pueda continuar su proceso, esperando un nuevo estado válido y comprobándolo.
+Este método básicamente extrae la información de la respuesta para determinar qué herramientas deben ejecutarse. A continuación recorre cada una de estas herramientas y realiza las siguientes acciones:
 
-En el bucle principal, también gestionamos el caso en el que el estado no sea ni `completed` ni `requires_action`. En este caso, OpenAI nos indica que ha ocurrido algún tipo de error. A veces, esto puede deberse simplemente a un mal funcionamiento de la API en ese momento. Por eso, establecemos un mecanismo de reintento. Cuando llegamos a esta parte del código, hacemos una pausa de 30 segundos en la ejecución y volvemos a intentar el proceso desde el principio. Si después de 3 intentos el problema persiste, finalizamos con un mensaje manual de error.
+* Guarda el mensaje para registrar que se va a ejecutar una herramienta.
+* Busca esta herramienta a partir de su nombre dentro de las herramientas del agente y la ejecuta para obtener un resultado. En caso de que no encuentre la herramienta, directamente genera un resultado de error.&#x20;
+* Guarda un nuevo mensaje para registrar el resultado de la invocación de dicha herramienta
 
-Para concluir, es importante mencionar que al igual que la clase `Agent`, la clase `Thread` también utiliza un patrón *Observer* para informar a un delegado cuando se añade un nuevo mensaje. Esto se realiza a través de la interfaz `ThreadDelegate`. Más adelante, veremos cómo la clase `Agency` se registrará como delegado y ejecutará ciertas acciones cuando se produzca este evento.
+Cuando finalice la invocación de todas las herramientas indicadas por el agente, se le envía los resultados obtenidos a OpenAI, para que el asistente sepa como ha de continuar su ejecución. Este último paso también actualizará el objeto `run`, lo que hará que el bucle principal pueda continuar su proceso.
 
-Podemos concluir que la clase `Thread` es una pieza clave en nuestro sistema, ya que es donde reside toda la interacción con OpenAI para el envío de mensajes, la gestión de respuestas y la invocación de posibles herramientas.
+Volviendo al bucle principal, también gestionamos el caso en el que el estado no sea ni `completed` ni `requires_action`. En este caso, OpenAI nos indica que ha ocurrido algún tipo de error. A veces, esto puede deberse simplemente a un mal funcionamiento de la API en ese momento. Por eso, establecemos un mecanismo de reintento. Cuando llegamos a esta parte del código, hacemos una pausa de 30 segundos en la ejecución y volvemos a intentar el proceso desde el principio. Si después de 3 intentos el problema persiste, finalizamos con un mensaje manual de error.
+
+Para concluir, es importante mencionar que al igual que la clase `Agent`, la clase `Thread` también utiliza un patrón *Observer* para informar a un delegado cuando se añade un nuevo mensaje. Esto se realiza a través de la interfaz `ThreadDelegate`. El método privado `addNewMessage` utiliza este delegado para enviarle el mensaje que se acaba de registrar. Más adelante, veremos cómo la clase `Agency` se registrará como delegado y ejecutará ciertas acciones cuando se produzca este evento.
+
+```tsx
+  private addNewMessage(type: MessageType, content: string, inverse = false) {
+    const message: Message = {
+      id: Math.random().toString(),
+      date: new Date(),
+      type,
+      content,
+      from: inverse ? this.recipientAgent : this.senderAgent,
+      to: inverse ? this.senderAgent : this.recipientAgent,
+    };
+    this.messages.push(message);
+    this.delegate.onNewMessage(this, message);
+  }
+```
+
+Podemos concluir este apartado mencionando que la clase `Thread` es una pieza clave en nuestro sistema, ya que es donde reside toda la interacción con OpenAI para el envío de mensajes, la gestión de respuestas y la invocación de posibles herramientas.
 
 #### Api
 
 Como veíamos anteriormente, un requisito que tenemos es el de habilitar la exposición de los datos de la agencia y permitir la interacción con ella a través de una API Rest. La clase `Api` asume esta responsabilidad.
 
-Esta clase se apoya en la librería [Express](https://expressjs.com/) para crear una simple API Rest con los endpoints que necesitamos. A través del constructor obligamos a que reciba la instancia de la clase Agency, que la usará para acceder a los datos de la misma. También permitimos desde el constructor elegir el puerto en el que se quiere exponer esta API.&#x20;
+Esta clase se apoya en la librería [Express](https://expressjs.com/) para crear una simple API Rest con los endpoints que necesitamos. A través del constructor obligamos a que reciba la instancia de la clase `Agency`, que la usará para acceder a los datos de la misma. También permitimos desde el constructor elegir el puerto en el que se quiere exponer esta API.&#x20;
 
 La clase cuenta con un método `init`en el que se inicializará express y se definirán los diferentes endpoints.
 
@@ -391,7 +419,7 @@ La clase cuenta con un método `init`en el que se inicializará express y se def
   }
 ```
 
-Algo a destacar en esta clase es la propiedad `clients`, que será un listado de objetos `SseClient`. Esta es la forma que conseguimos habilitar una comunicación basada en [Server-sent events](https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events). Anteriormente explicamos que esto es importante para poder enviar al cliente los mensajes que se vayan generando y que pueda actualizar la interfaz con cada evento. Para esto nos apoyamos en la librería [express-sse-middleware](https://www.npmjs.com/package/express-sse-middleware) que habilita un middleware de Express para el uso de esta tecnología. En el anterior `init` se puede ver como se inicializa este middleware. Para usar esta funcionalidad dotamos a la API de un endpoint que se encarga de crear un nuevo `SseClient`.
+Algo a destacar en esta clase es la propiedad `clients`, que será un listado de objetos `SseClient` , clase que explicamos enseguida. Esta es la forma que conseguimos habilitar una comunicación basada en [Server-sent events](https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events). Anteriormente explicamos que esto es importante para poder enviar al cliente los mensajes que se vayan generando y que pueda actualizar la interfaz con cada evento. Para esto nos apoyamos en la librería [express-sse-middleware](https://www.npmjs.com/package/express-sse-middleware) que habilita un middleware de Express para el uso de esta tecnología. En el anterior `init` se puede ver como se inicializa este middleware. Para usar esta funcionalidad dotamos a la API de un endpoint que se encarga de crear un nuevo `SseClient`.
 
 ```tsx
     app.get(
@@ -436,7 +464,7 @@ export class SseClient {
 
 La clase `SseClient` cuenta con 2 métodos, uno para enviar un mensaje al cliente y otro para cerrar la comunicación.
 
-La clase `Api` cuenta con otro método `sendMessage`, que recibiendo el id de un `Thread` y el objeto `Message` se encarga de analizar si existe algún cliente conectado a ese hilo y, en ese caso, enviarle el mensaje. Este método es utilizado por la clase Agency para informar de los nuevos mensajes que se generan.
+Volviendo a la clase `Api` , definimos otro método `sendMessage`, que recibiendo el id de un `Thread` y el objeto `Message` se encarga de analizar si existe algún cliente conectado a ese hilo y, en ese caso, enviarle el mensaje. Este método es utilizado por la clase `Agency` para informar de los nuevos mensajes que se generan.
 
 ```tsx
   sendMessage(threadId: string, message: Message) {
@@ -455,24 +483,20 @@ La clase `Api` cuenta con otro método `sendMessage`, que recibiendo el id de un
   }
 ```
 
-Por último, la clase `Api` cuenta con un método `removeSseClient`, responsable de limpiar una conexión. Este método es ejecutado cuando el servidor detecte que un cliente finaliza la comunicación, liberando así los recursos que dejan de ser útiles.
+Por último, la clase `Api` cuenta con un método `removeSseClient`, responsable de limpiar una conexión. Este método es ejecutado cuando el servidor detecte que un cliente finaliza la comunicación, liberando así los recursos que dejan de ser útiles. En el endpoint `/threads/:threadId/sseClient`que veíamos un poco más arriba, se puede ver como se llama a este método cuando se detecta un cierre en la conexión.
 
 ```tsx
-    app.get(
-      "/threads/:threadId/sseClient",
-      async (req: Request, res: Response) => {
-        try {
-          const { threadId } = req.params;
-          const sseClient = new SseClient(threadId, res.sse());
-          this.clients.push(sseClient);
-          req.on("close", () => {
-            this.removeSseClient(threadId);
-          });
-        } catch (err) {
-          res.status(500).send({ error: err });
-        }
-      },
+  removeSseClient(threadId: string) {
+    if (!this.clients) return;
+    const sseClient = this.clients.find(
+      (client) => client.threadId === threadId,
     );
+    if (!sseClient) return;
+    sseClient.close();
+    this.clients = this.clients.filter(
+      (client) => client.threadId !== threadId,
+    );
+  }
 ```
 
 #### Agency
@@ -485,7 +509,7 @@ La clase `Agency` será una clase abstracta que tendrá propiedades y métodos p
 * El método `getAgentCommunications`, que, al pasarle un agente, debería indicarnos con qué otros agentes puede comunicarse.
 * El método `getDBPath`, que deberá devolver la ruta de una carpeta en la que la agencia podrá guardar la información necesaria para asegurar la persistencia de datos. Esto es clave ya que así esta clase gestiona la persistencia de datos pero el espacio en el que se almacenan es responsabilidad de quien la utilice.
 
-Continuamos con las propiedades de esta clase. Por un lado, tenemos el nombre y la misión de la agencia: `name` y `mission`. Estas propiedades se pueden definir desde el constructor. La clase inicializará una instancia de `User` para representar al usuario, como ya hemos explicado. Además, contará con propiedades para registrar el listado de agentes (`Agent`) o hilos (`Thread`). Además, contará con una propiedad para registrar la ruta en la que se persisten los datos, `dbPath`, y una instancia de la clase `Api`.
+Continuamos con las propiedades de esta clase. Por un lado, tenemos el nombre y la misión de la agencia: `name` y `mission`. Estas propiedades se pueden definir desde el constructor. La clase inicializará una instancia de `User` para representar al usuario que utiliza la agencia. Además, contará con propiedades para registrar el listado de agentes (`Agent`) o hilos (`Thread`). También contará con una propiedad para registrar la ruta en la que se persisten los datos, `dbPath`, y una instancia de la clase `Api`.
 
 ```tsx
 export abstract class Agency implements ThreadDelegate, AgentDelegate {
@@ -563,14 +587,14 @@ Continuamos con el método `run`. Aquí será donde se lleva a cabo la definici�
 
 Básicamente lo que este método hace es inicializar los agentes y los hilos. Como comentamos, nos apoyamos en los métodos abstractos para que la aplicación nos de los detalles. También vemos como se utilizan métodos privados para comprobar si cierto agente o hilo existe ya o no, lo cual permitirá decidir si ha de crearse desde cero o usar el existente. Lo mismo para la carga de los mensajes generados en anteriores ejecuciones.
 
+A continuación vamos a ver los métodos que se utilizan para implementar el mecanismo de persistencia de datos. Como veremos estamos guardando ficheros JSON en la carpeta que la clase hija nos ha especificado. Este mecanismo de persistencia de datos es **muy básico y poco robusto.** Sería mucho más interesante implementar una base de datos que registre esta información, pero por simplicidad se ha optado por esta solución. Una muy clara mejora de este proyecto es la migración de esta parte a un mecanismo basado en una base de datos convencional.
+
 ```tsx
   private getSavedAgentId(agent: Agent): string {
-    const agentsDataStr = fs.readFileSync(
+    const agentsDataStr = this.readFileContentOrCreate(
       path.resolve(this.dbPath, "./agents.json"),
-      "utf-8",
     );
-    if (!agentsDataStr) return null;
-    const agentsData = JSON.parse(agentsDataStr);
+    const agentsData = agentsDataStr ? JSON.parse(agentsDataStr) : [];
     const agentData = agentsData.find((a: any) => a.name === agent.name);
     return agentData ? agentData.id : null;
   }
@@ -578,12 +602,10 @@ Básicamente lo que este método hace es inicializar los agentes y los hilos. Co
 
 ```tsx
   private getSavedThreadId(senderAgent: User, recipientAgent: User): string {
-    const threadsDataStr = fs.readFileSync(
+    const threadsDataStr = this.readFileContentOrCreate(
       path.resolve(this.dbPath, "./threads.json"),
-      "utf-8",
     );
-    if (!threadsDataStr) return null;
-    const threadsData = JSON.parse(threadsDataStr);
+    const threadsData = threadsDataStr ? JSON.parse(threadsDataStr) : [];
     const threadData = threadsData.find(
       (t: any) =>
         t.senderAgent === senderAgent.id &&
@@ -595,12 +617,10 @@ Básicamente lo que este método hace es inicializar los agentes y los hilos. Co
 
 ```tsx
   private getSavedMessages(threadId: string): Message[] {
-    const messagesDataStr = fs.readFileSync(
+    const messagesDataStr = this.readFileContentOrCreate(
       path.resolve(this.dbPath, "./messages.json"),
-      "utf-8",
     );
-    if (!messagesDataStr) return [];
-    const messagesData = JSON.parse(messagesDataStr);
+    const messagesData = messagesDataStr ? JSON.parse(messagesDataStr) : [];
     const messages = messagesData
       .filter((m: any) => m.threadId === threadId)
       .map((message: any) => {
@@ -621,7 +641,7 @@ Básicamente lo que este método hace es inicializar los agentes y los hilos. Co
   }
 ```
 
-Cuando se ha completado la inicialización de todas las entidades, invocamos al método `saveAgentsAndThreads`, lo cual persisite el estado actual de los agentes e hilos, asegurando que tengamos siempre todo correctamente sincronizado.
+Cuando se ha completado la inicialización de todas las entidades, invocamos al método `saveAgentsAndThreads`, lo cual persiste el estado actual de los agentes e hilos, asegurando que tengamos siempre todo correctamente sincronizado.
 
 ```tsx
   private saveAgentsAndThreads(): void {
@@ -661,11 +681,10 @@ Cuando estos métodos `initApi` y `run` se hayan ejecutado, la agencia estará t
 
 Simplemente recupera el `Thread` y ejecuta su método `send`.
 
-Esta case agencia también expone los métodos `getThread` y `getAgentByName`, que serán utilizados por `Api` para obtener un hilo o un agente.
+Esta clase `Agency` también expone los métodos `getThread` y `getAgentByName`, que serán utilizados por `Api` para obtener un hilo o un agente.
 
 ```tsx
   getThread(senderAgentName: string, recipientAgentName: string) {
-    console.log("getThread", senderAgentName, recipientAgentName);
     return this.threads.find(
       (thread) =>
         thread.senderAgent.name === senderAgentName &&
@@ -678,7 +697,7 @@ Esta case agencia también expone los métodos `getThread` y `getAgentByName`, q
   }
 ```
 
-Continuamos con la implementación de las interfaces. ¿Recordáis cuando explicamos las clases `Agent` o `Thread` y mencionamos que utilizaban un patrón *Observer*? Pues bien, esta clase `Agency` será la responsable de implementar esta funcionalidad y registrarse como delegado. Si observamos cómo se crea un agente o un hilo, veremos que se envía la instancia de esta clase `Agency` a la propiedad `delegate`. Además, en la definición de la clase `Agency`, especificamos que implementará los métodos de `ThreadDelegate` y `AgentDelegate`. Por último, en la parte inferior de la clase, llevamos a cabo estas implementaciones. Básicamente, utilizamos este mecanismo para poder persistir los datos cuando un agente se actualiza o un hilo guarda un nuevo mensaje.
+Continuamos con la implementación de las interfaces. ¿Recordáis cuando explicamos las clases `Agent` o `Thread` y mencionamos que utilizaban un patrón *Observer*? Pues bien, esta clase `Agency` será la responsable de implementar esta funcionalidad y registrarse como delegado. Si nos fijamos en el método `run`, cuando se crea un agente o un hilo, veremos que se envía la instancia de esta clase `Agency` a la propiedad `delegate`. Además, en la definición de la clase `Agency`, especificamos que implementará los métodos de `ThreadDelegate` y `AgentDelegate`. Por último, en la parte inferior de la clase, llevamos a cabo estas implementaciones. Básicamente, utilizamos este mecanismo para poder persistir los datos cuando un agente se actualiza o un hilo guarda un nuevo mensaje.
 
 ```tsx
   /**
@@ -687,11 +706,10 @@ Continuamos con la implementación de las interfaces. ¿Recordáis cuando explic
   onNewMessage(thread: Thread, message: Message): void {
     if (!this.api) return;
     this.api.sendMessage(thread.id, message);
-    const messagesDataStr = fs.readFileSync(
+    const messagesDataStr = this.readFileContentOrCreate(
       path.resolve(this.dbPath, "./messages.json"),
-      "utf-8",
     );
-    const messages = JSON.parse(messagesDataStr);
+    const messages = messagesDataStr ? JSON.parse(messagesDataStr) : [];
     messages.push({
       id: message.id,
       threadId: thread.id,
@@ -784,12 +802,11 @@ Creamos esta clase extendiendo de `Tool`y especificando su nombre, descripción 
 export class TalkToAgent extends Tool {
   senderAgent: Agent;
   agency: Agency;
-
   constructor({ senderAgent, agency }: Props) {
     super({
       name: "TalkToAgent",
       description:
-        "Utiliza esta herramienta para comunicarte con otros agentes. Debes especificar el nombre del agente y el mensaje que le quieres enviar. Para continuar el diálogo, invoca esta herramienta nuevamente con el agente destinatario deseado y tu mensaje de seguimiento. Eres responsable de transmitir las respuestas del agente destinatario de vuelta al usuario, ya que el usuario no tiene acceso directo a estas respuestas. Sigue interactuando con la herramienta para una interacción continua hasta que la tarea esté completamente resuelta.",
+        "Utiliza esta herramienta para facilitar la comunicación directa y sincrónica entre agentes especializados dentro de la agencia. Cuando envíes un mensaje usando esta herramienta, recibirás una respuesta exclusivamente del agente destinatario designado. Para continuar el diálogo, invoca esta herramienta nuevamente con el agente destinatario deseado y tu mensaje de seguimiento. Recuerda, la comunicación aquí es sincrónica; el agente destinatario no realizará ninguna tarea después de la respuesta. Eres responsable de transmitir las respuestas del agente destinatario de vuelta al usuario, ya que el usuario no tiene acceso directo a estas respuestas. Sigue interactuando con la herramienta para una interacción continua hasta que la tarea esté completamente resuelta.",
       parameters: {
         type: "object",
         properties: {
@@ -801,10 +818,10 @@ export class TalkToAgent extends Tool {
           message: {
             type: "string",
             description:
-              "Por favor, especifica la tarea que el agente destinatario debe completar.",
+              "Por favor, especifica la tarea que el agente destinatario debe completar. Concéntrate en aclarar en qué consiste la tarea, en lugar de proporcionar instrucciones exactas.",
           },
         },
-        required: ["recipient", "message"],
+        required: ["message"],
       },
     });
     this.senderAgent = senderAgent;
@@ -812,26 +829,26 @@ export class TalkToAgent extends Tool {
   }
 
   async run(parameters: RunProps): Promise<string> {
-    console.log("TalkToAgent.run", parameters);
     const senderName = this.senderAgent.name;
     const recipientName = parameters.recipient;
     const message = parameters.message;
     const thread = this.agency.getThread(senderName, recipientName);
-    if (!thread) throw new Error("Thread not found");
+    if (!thread) return "ERROR: No puedes comunicarte con ese agente.";
     return await thread.send(message);
   }
 }
+
 ```
 
-En el `run` lo que hacemos es utilizar el método `getThread` de la agencia para recuperar el hilo que conecta a los 2 agentes. Seguidamente agregamos un nuevo mensaje en él y devolvemos su respuesta.
+En el constructor definimos la descripción de esta herramienta, para que OpenAI sepa como utilizarla y del mismo modo explicamos como funcionan los 2 parámetros que tiene. Por otro lado, en el `run`, lo que hacemos es utilizar el método `getThread` de la agencia para recuperar el hilo que conecta a los 2 agentes. Seguidamente agregamos un nuevo mensaje en él y devolvemos su respuesta.
 
 ***
 
 ### Implementación de la app `back`
 
-Vamos con la última parte del monorepo, la app `back`, que será la encargada de construir la agencia. Como ya hemos mencionado, este artículo trata de explicar las directrices para la construcción de las agencias, pero no de construir ninguna agencia en particular. En posteriores artículos crearemos ejemplos de agencias a partir de este marco de trabajo. En estos ejemplos será en esta parte back donde trabajaremos principalmente, definiendo agentes, herramientas, etc. A pesar de esto, sí que considero necesario finalizar el artículo viendo un ejemplo de como se puede utilizar todo lo mencionado. Por ello vamos a construir una mini agencia que nos permita poner las cosas en funcionamiento.
+Vamos con la última parte del monorepo, la app `back`, que será la encargada de construir la agencia. Como ya hemos mencionado, este artículo trata de explicar las directrices para la construcción de las agencias, pero no de construir ninguna agencia en particular. En posteriores artículos crearemos ejemplos de agencias a partir de este marco de trabajo. En estos ejemplos será en esta parte `back` donde trabajaremos principalmente, definiendo agentes, herramientas, etc. A pesar de esto, sí que considero necesario finalizar el artículo viendo un ejemplo de como se puede utilizar todo lo mencionado. Por ello vamos a construir un "mini proyecto" que nos permita poner las cosas en funcionamiento.
 
-Vamos a construir una agencia que ayude al usuario a resolver operaciones matemáticas básicas. Es un ejemplo que nunca tendría sentido para un caso real, cualquier asistente por si solo haría a la perfección lo que vamos a plantear. Pero nos sirve como ejemplo para entender como funciona la agencia.
+Para ello, vamos a construir una agencia que ayude al usuario a resolver operaciones matemáticas básicas. En un caso real, nunca tendría sentido utilizar una agencia para esto; cualquier asistente por si solo haría a la perfección lo que vamos a plantear. Pero nos sirve para ilustrar como funciona la agencia.
 
 Vamos a definir 2 agentes, uno principal (`MainAgent`) que interactuará con el usuario y otro secundario (`MathAgent`) que será al que se le delegarán los cálculos matemáticos que se necesiten hacer. Es decir, cuando `MainAgent` detecte que la conversación requiera de realizar una operación matemática, en lugar de realizarla por sí mismo, enviará un mensaje a `MathAgent` pidiéndole que realice dicha operación y `MainAgent` utilizará la respuesta que este le de para continuar su conversación.
 
@@ -1017,23 +1034,46 @@ run();
 
 #### Pruebas
 
-Para finalizar vamos a ver a nuestra agencia en funcionamiento. Para ello tenemos que ponernos en la raíz del monorepo y ejecutar `pnpm run dev`, con lo que haremos que tanto la web como el back inicien en mode de desarrollo. Tras esto podemos abrir en el navegador la url `http://localhost:3000` y cargar la web que nos permite interactuar con la agencia.
+Para finalizar vamos a ver a nuestra agencia en funcionamiento. Para ello tenemos que ponernos en la raíz del monorepo y ejecutar `pnpm run dev`, con lo que haremos que tanto la web como el back inicien en modo de desarrollo. Tras esto podemos abrir en el navegador la url `http://localhost:3000` para cargar la web que nos permite interactuar con la agencia.
 
-IMAGEN 1, AGENCIA EN BLANCO
+<Image
+  alt={`Configuración eslint`}
+  src={`/blog/agencia-ia-proyecto-base/imagen1.png`}
+  width={1280}
+  height={672}
+/>
 
-Vamos a hacer una primera prueba sencilla para ver que todo funciona. Abrimos la conversación con MainAgent y, tras un saludo, le decimos que nos diga cuanto es 5 por 3.&#x20;
+Vamos a hacer una primera prueba sencilla para ver que todo funciona. Abrimos la conversación con `MainAgent` y, tras un saludo, le decimos que nos diga cuanto es 5 por 3.&#x20;
 
-IMAGEN PRUEBA 1. SALUDO Y 5 x 3
+<Image
+  alt={`Configuración eslint`}
+  src={`/blog/agencia-ia-proyecto-base/imagen2.png`}
+  width={1280}
+  height={672}
+/>
 
-En la imagen podemos ver lo que ha sucedido. En cuanto el agente ha detectado que la conversación implica una operación matemática a ejecutado la tool `TalkToAgent` para enviarle la pregunta a MathAgent. Si ahora abrimos la conversación entre `MainAgent` y `MathAgent`. Este último recibe una pregunta que implica una operación matemática, por lo que deduce que debe usar la tool `Operation` para resolver dicha operación. Seguidamente responde a `MainAgent` con la solución y este último, a partir de dicha respuesta, nos responde a nosotros.
+En la imagen podemos ver lo que ha sucedido. En cuanto el agente ha detectado que la conversación implica una operación matemática ha ejecutado la tool `TalkToAgent` para enviarle la pregunta a `MathAgent`. Si ahora abrimos la conversación entre `MainAgent` y `MathAgent`vemos como este último recibe la pregunta y, como implica una operación matemática, deduce que debe usar la tool `Operation` para resolver dicha operación. Seguidamente responde a `MainAgent` con la solución y este último, a partir de dicha respuesta, nos responde a nosotros.
 
 Como podemos ver todo funciona según lo esperado. Tenemos 2 agentes que se pueden comunicar entre ellos y que pueden utilizar herramientas cuando consideren que es necesario.
 
-Vamos con una segunda prueba un poco más interesante para ver el poder de esta tecnología. Vamos a borrar las conversaciones actuales y empezar una nueva. Para borrarlas tenemos que eliminar los ficheros de la carpeta `/back/src/agency/db`. (Sí, se que deberíamos de implementar un mejor mecanismo para limpiar la caché, por el momento tenemos que hacerlo así). A continuación vamos a iniciar una nueva conversación con MainAgent. En este caso le vamos proponer que nos resuelva un problema matemático.
+Vamos con una segunda prueba un poco más interesante para ver el poder de esta tecnología. Vamos a borrar las conversaciones actuales y empezar una nueva. Para borrarlas tenemos que eliminar los ficheros de la carpeta `/back/src/maths-agency/.db`. (Sí, se que deberíamos de implementar un mejor mecanismo para limpiar la caché, por el momento tenemos que hacerlo así). A continuación vamos a iniciar una nueva conversación con `MainAgent`. En este caso le vamos proponer que nos resuelva un problema matemático.
 
-IMAGEN PRUEBA 2. Saludo + problema de los trenes
+<Image
+  alt={`Configuración eslint`}
+  src={`/blog/agencia-ia-proyecto-base/imagen3.png`}
+  width={1280}
+  height={672}
+/>
+---------
+<Image
+  alt={`Configuración eslint`}
+  src={`/blog/agencia-ia-proyecto-base/imagen4.png`}
+  width={1280}
+  height={672}
+/>
 
-Como podemos ver, en ningún momento le hemos dicho directamente que tiene que resolver una operación matemática. El agente deduce por sí mismo que para contestar a esa pregunta tiene que usar operaciones matemáticas por lo que la delega a MathAgent. Y este último deduce de la pregunta las operaciones debe de realizar y las delega a su tool Operation. Este funcionamiento es muy potente ya que, cuando lo llevemos a problemas complejos, nos da la posibilidad de crear agentes a los que solo debemos de decirle lo que pueden hacer y como han de hacerlo, pero dejando que ellos mismos decidan cuando han de realizar las acciones que consideren. Y como vemos es algo que son capaces de hacer muy bien.
+Como podemos ver, en ningún momento le hemos dicho directamente que tiene que resolver una operación matemática. El agente deduce por sí mismo que para contestar a esa pregunta tiene que usar operaciones matemáticas por lo que la delega a `MathAgent`. Y este último deduce de la pregunta las operaciones debe de realizar y las delega a su tool `Operation`. Este funcionamiento es muy potente ya que, cuando lo llevemos a problemas complejos, nos da la posibilidad de crear agentes a los que solo debemos de decirle lo que pueden hacer y como han de hacerlo, pero dejando que ellos mismos decidan cuando han de realizar las acciones que consideren. Y como podemos ver es algo que son capaces de hacer muy bien.
+
 
 ***
 
@@ -1041,11 +1081,13 @@ Como podemos ver, en ningún momento le hemos dicho directamente que tiene que r
 
 En este artículo, hemos explorado y explicado una posible solución para la creación de agencias de IA utilizando TypeScript y un enfoque de monorepo que nos permite extender y utilizar este software de manera ágil y eficiente.
 
-Aquí dejo el enlace al repositorio en GitHub donde está implementado este proyecto y todo lo comentado en el artículo. Decir que este repositorio cuenta con varias ramas:
+Aquí dejo el [enlace al repositorio](https://github.com/enolcasielles/ai-agency-typescript/tree/maths-agency) en GitHub donde está implementado este proyecto y todo lo comentado en el artículo. Decir que este repositorio cuenta con varias ramas:
 
-* La rama `blog-building-base` contiene el código exacto que se presenta en este artículo. Mantendremos esta rama en su estado actual para que los lectores puedan ver la implementación tal como se explica en el artículo.
-* La rama `starter`contiene los componentes principales del proyecto, como la interfaz web o el paquete `agency`. En el momento de redactar este artículo, las ramas `blog-building-base` y `starter` estarán alineadas. Sin embargo, a medida que se realicen mejoras en el marco de trabajo base, estas se irán incorporando a la rama `starter`. La idea de esta rama es proporcionar un punto de partida para la creación de nuevas agencias.
+* La rama `maths-agency` contiene el código exacto que se presenta en este artículo. Mantendremos esta rama en su estado actual para que los lectores puedan ver la implementación tal como se explica en el artículo.
+* La rama `base` contiene los componentes principales del proyecto, como la interfaz web o el paquete `agency`. En el momento de redactar este artículo, las ramas `maths-agency` y `base` estarán totalmente alineadas. Sin embargo, a medida que se realicen mejoras en el marco de trabajo base, estas se irán incorporando a la rama `base`. La idea de esta rama es proporcionar un punto de partida para la creación de nuevas agencias.
 
-Además de estas dos ramas, habrá otras que contendrán diferentes implementaciones de agencias y se corresponderán con artículos posteriores.
+Además de estas dos ramas, puede que haya otras que contendrán diferentes implementaciones de agencias y se corresponderán con artículos posteriores.
 
-Espero que este artículo haya sido de su interés y animo a cualquier persona que desee colaborar en este proyecto o proponer cualquier idea a que se ponga en contacto conmigo.
+Espero que este artículo haya sido de su interés y te ayude a entender un poco mejor este concepto de agencias de IA. Como hemos mencionado el principio, la implementación aquí realizada es básica y no la aconsejo para llevar un proyecto a producción. Las librerías o frameworks que hemos mencionado al principio implementan este concepto de una forma mucho más robusta y dotan de un montón de herramientas extra que nos permiten abordar problemas complejos de una forma mucho más sencilla. **No reinventes la rueda** (como he hecho yo) a no ser que sea puramente por cuestiones de aprendizaje.
+
+Por último despedirme diciendo que, si alguien que esté probando este proyecto detecta algún tipo de problema o, si quiere proponer realizar algún tipo de propuesta o idea basada en este concepto, solo tiene que contactarme y estoy más que abierto para ayudar o comentar lo que sea 😉

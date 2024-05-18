@@ -94,15 +94,16 @@ export default function Blog({ params }) {
           }),
         }}
       />
-      <h1 className="title font-medium text-2xl tracking-tighter max-w-[650px]">
+      <h1 className="title font-medium text-4xl tracking-tighter">
         {post.metadata.title}
       </h1>
-      <div className="flex justify-between items-center mt-2 mb-8 text-sm max-w-[650px]">
-        <p className="text-sm text-neutral-600 dark:text-neutral-400">
+      <div className="flex justify-between items-center mt-2 mb-8 text-sm">
+        <p className="text-lg text-neutral-600 dark:text-neutral-400">
           {formatDate(post.metadata.publishedAt)}
         </p>
       </div>
-      <article className="prose prose-quoteless prose-neutral dark:prose-invert">
+      <div className="h-[1px] bg-gray-500 mb-8"></div>
+      <article className="prose prose-quoteless prose-neutral dark:prose-invert max-w-[1200px]">
         <CustomMDX source={post.content} />
       </article>
     </section>
