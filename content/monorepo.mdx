@@ -8,43 +8,43 @@ summary: >-
 
 ## Construyendo un Monorepo en Typescript utilizando pnpm
 
-En este artículo vamos a explicar lo que es un Monorepo, porqué es interesante utilizarlos para ciertos tipos de proyectos y cómo podemos construir uno utilizando pnpm.
+En este artículo, explicaremos qué es un Monorepo, por qué es beneficioso utilizarlo en ciertos tipos de proyectos y cómo podemos construir uno utilizando `pnpm`
 
 ### ¿Qué es un monorepo?
 
-Un monorepo, como su nombre indica, es un repositorio que contiene múltiples paquetes o partes de un sistema. Pensemos por ejemplo en una arquitectura básica de un proyecto web. Podríamos tener por un lado un proyecto de front y por otro lado un proyecto de back. Ambos serían totalmente independientes entre sí, contando con su propio repositorio, código fuente, dependencias, etc.&#x20;
+Un monorepo, como su nombre indica, es un **repositorio único** que contiene múltiples paquetes o partes de un sistema. Pensemos, por ejemplo, en una arquitectura básica de un proyecto web. Podríamos tener, por un lado, un proyecto de frontend y, por otro, un proyecto de backend. Ambos serían totalmente independientes entre sí, contando con su propio repositorio, código fuente, dependencias, etc.
 
-Por el contrario cuando trabajamos con un monorepo estos 2 proyectos estarían bajo el mismo repositorio, seguirían siendo totalmente independientes pero tendríamos la capacidad de, en los escenarios que queramos, compartir ciertas cosas entre ellos.
+Por el contrario, cuando trabajamos con un monorepo, estos dos proyectos estarían bajo el mismo repositorio. Seguirían siendo totalmente independientes en términos de despliegue y ejecución, pero tendríamos la capacidad de compartir ciertos elementos entre ellos cuando sea necesario.
 
 ### ¿Cuando es interesante utilizarlos?
 
-Para ilustrar bien esto, vamos a imaginar que el ejemplo del apartado anterior tenemos que extenderlo y crear un tercer proyecto. Este proyecto será otra frontal que utilizará otro tipo de usuario, por ejemplo un panel de administración. No sería de extrañar que este nuevo front comparta componentes de UI con el otro front, ¿verdad?&#x20;
+Para ilustrar esto mejor, imaginemos que en el ejemplo anterior tenemos que extenderlo y crear un tercer proyecto. Este proyecto será otro frontend que utilizará otro tipo de usuario, por ejemplo, un panel de administración. No sería de extrañar que este nuevo frontend comparta componentes de UI con el otro frontend, ¿verdad?
 
-¿Como solucionamos esto cuando trabajamos en una arquitectura multirepo? Pues probablemente copiando estos componentes al nuevo proyecto, lo cual nos fuerza a que, a partir de este momento, tengamos que mantener componentes que son totalmente iguales en 2 sitios diferentes.&#x20;
+¿Cómo solucionamos esto cuando trabajamos en una arquitectura multirepo? Probablemente copiando estos componentes al nuevo proyecto, lo cual nos obliga a mantener componentes idénticos en dos lugares diferentes.
 
-Tendría mucho más sentido que esos componentes puedan estar en algún sitio que ambos proyectos puedan utilizar, sin necesidad de tenerlos duplicados. Algo como por ejemplo un paquete externo que los 2 proyectos importen. Pues bien, este es el tipo de cosas que un enfoque monorepo nos permite hacer de forma sencilla y organizada.
+Tendría mucho más sentido que esos componentes estén en algún sitio donde ambos proyectos puedan utilizarlos, sin necesidad de duplicarlos. Algo como un paquete externo que ambos proyectos importen. Pues bien, un enfoque monorepo nos habilita el hacer esto de una forma sencilla y organizada.
 
-Cuando estos 2 proyectos viven bajo el mismo monorepo, podemos añadir un tercer proyecto que se encargue de implementar estos componentes comunes y que sea importado por ambos frontales.
+Cuando estos dos proyectos viven bajo el mismo monorepo, podemos añadir un tercer proyecto (o paquete) que se encargue de implementar estos componentes comunes y que sea importado por ambos frontends.
 
-### ¿Me das otro ejemplo?
+### Otro ejemplo
 
-Otro ejemplo interesante es cuando quieres compartir clases o modelos entre front y back. Frecuentemente ocurre que en el back defines unas clases con los modelos de respuesta que las diferentes llamadas devolverán y, a su vez, en el front defines otras clases para gestionar la respuesta.&#x20;
+Otro ejemplo interesante es cuando queremos compartir clases o modelos entre el frontend y el backend. Frecuentemente, en el backend se definen clases con los modelos de respuesta que los diferentes endpoints devolverán y, a su vez, en el frontend defines también modelos para gestionar la respuesta.
 
-Estas clases seguramente sean duplicadas en amos proyectos por lo que tendría mucho más sentido si se encuentran en un paquete independiente y que ambos proyectos puedan importar. De nuevo un caso que una arquitectura monorepo nos permite implementar y mantener de forma sencilla.
+Estas clases probablemente sean duplicadas en ambos proyectos, por lo que tendría mucho más sentido si se encuentran en un paquete independiente que ambos proyectos puedan importar. De nuevo, un caso que una arquitectura monorepo nos permite implementar y mantener de forma sencilla.
 
 ### ¿Cómo puedo construir un monorepo?
 
-Vista un poco la teoría y la justificación de porqué es interesante este enfoque vamos a ver cómo podemos construir uno en Typescript utilizando la herramienta pnpm, que es una alternativa a npm que por su diseño y funcionamiento encaja mucho mejor para la construcción de este tipo de arquitecturas.
+Vista la teoría y la justificación de por qué es interesante este enfoque, vamos a ver cómo podemos construir uno en TypeScript utilizando la herramienta `pnpm`, que es una alternativa a npm que, por su diseño y funcionamiento, encaja mucho mejor para la construcción de este tipo de arquitecturas.
 
-Para empezar, nos ponemos en la carpeta de trabajo ycreamos un nuevo proyecto vacío utilizando pnpm.
+Para empezar, nos ubicamos en la carpeta de trabajo y creamos un nuevo proyecto vacío utilizando `pnpm`.
 
 ```txt
 pnpm init
 ```
 
-> Has de tener pnpm instalado en tu máquina. En su [web oficial](https://pnpm.io/installation) puedes ver como instalarlo
+> Debes tener pnpm instalado en tu máquina. En su [web oficial](https://pnpm.io/installation) puedes ver como instalarlo
 
-Esto nos creará en la carpeta el típico `package.json`. Hasta este punto lo que tenemos es un proyecto de node estándar gestionado por pnpm. Para convertirlo a un proyecto monorepo lo que tenemos que hacer es crear un fichero `pnpm-workspace.yaml`
+Esto nos creará el típico `package.json` en la carpeta. Hasta este punto, lo que tenemos es un proyecto de Node estándar gestionado por `pnpm`. Para convertirlo a un proyecto monorepo, tenemos que crear un archivo `pnpm-workspace.yaml`
 
 ```txt
 packages:
@@ -52,31 +52,31 @@ packages:
   - "packages/*"
 ```
 
-Este fichero lo que hace es especificar en que rutas estarán los distintos paquetes de nuestro monorepo. En esta caso definimos 2 posibles carpetas,  `apps` y `packages` por lo que podemos aprovechar ya para crear estas 2 carpetas en nuestro proyecto, que de momento las dejamos vacías. &#x20;
+Este archivo especifica en qué rutas estarán los distintos paquetes de nuestro monorepo. En este caso, definimos dos posibles carpetas, `apps` y `packages`, por lo que podemos aprovechar ya para crear estas dos carpetas en nuestro proyecto, que de momento las dejamos vacías.
 
-> Hacemos esta distinción de carpetas para diferenciar las aplicaciones de lo que son los paquetes que van a ser utilizados por estas aplicaciones. Esto no es obligatorio, para el monorepo no hay distinción alguna entre lo que es una app y lo que es un paquete, la hacemos nosotros por la diferencia conceptual de lo que representan. A partir de ahora cuando hablemos de un paquete será aplicable a cualquiera de los 2 tipos, ya que realmente, es así en la terminología utilizada en un monorepo con pnpm.
+> Hacemos esta distinción de carpetas para diferenciar las aplicaciones de los paquetes que van a ser utilizados por estas aplicaciones. Esto no es obligatorio; para el monorepo no hay distinción alguna entre lo que es una app y lo que es un paquete. La hacemos nosotros por la diferencia conceptual de lo que representan. A partir de ahora, cuando hablemos de un paquete, será aplicable a cualquiera de los dos tipos, ya que realmente, es así en la terminología utilizada en un monorepo con pnpm
 
-Como ya hemos comentado cada uno de los paquetes serán entidades independientes, nuevos proyectos pnpm que contarán con su `package.json`, con su listado de dependencias, scripts personalizados, etc, etc. Pero lo que es importante destacar es que al estar en el monorepo será este quien se encargue de gestionar las dependencias de cada uno de ellos. Esto quiere decir que, cuando instalamos una dependencia en alguno de los paquetes, será el monorepo quien la instalará y quien decidirá que el alcance de dicha dependencia es para dicho paquete y no para el resto. Ahora bien, ¿qué pasa si instalamos una dependencia en el paquete raíz? Recordemos que el paquete raíz no deja de ser un proyecto pnpm también, por lo que perfectamente se puede instalar algo a este nivel. Pues bien, lo que pasará es que dicha dependencia estará disponible en todos los paquetes.
+Como ya hemos comentado, cada uno de los paquetes será una entidad independiente, nuevos proyectos pnpm que contarán con su `package.json`, con su listado de dependencias, scripts personalizados, etc. Pero lo importante es que al estar en el monorepo, será este quien se encargue de gestionar las dependencias de cada uno de ellos. Esto quiere decir que, cuando instalamos una dependencia en alguno de los paquetes, será el monorepo quien la instalará y quien decidirá que el alcance de dicha dependencia es para dicho paquete y no para el resto. Ahora bien, ¿qué pasa si instalamos una dependencia en el paquete raíz? Recordemos que el paquete raíz no deja de ser un proyecto pnpm también, por lo que se puede instalar algo a este nivel. Pues bien, lo que pasará es que dicha dependencia estará disponible en todos los paquetes.
 
-Por lo general no querremos instalar dependencias en raíz pero sí que es habitual hacer alguna excepción. Por ejemplo, algo que yo suelo hacer es instalar el typescript y configurar el eslint a este nivel de raíz. La razón de hacer esto es que sé seguro que todos los paquetes se van a escribir en Typescript y que quiero unificar las reglas de escritura de código en todos ellos. Pero esto no tiene porqué ser así, es una decisión totalmente de cultura de ingeniería del proyecto.
+Por lo general, no querremos instalar dependencias en raíz, pero sí es habitual hacer alguna excepción. Por ejemplo, algo que suelo hacer es instalar TypeScript y configurar eslint a este nivel de raíz. La razón de hacer esto es que sé seguro que todos los paquetes se van a escribir en TypeScript y quiero unificar las reglas de escritura de código en todos ellos. Pero esto no tiene por qué ser así; es una decisión totalmente de la cultura de ingeniería del proyecto.
 
 ### Instalando dependencias globales
 
-Dicho lo anterior vamos a configurar estas dependencias visibles para todos los paquetes. Para ello simplemente nos tenemos que ubicar en la raíz del proyecto y ejecutar:
+Dicho lo anterior, vamos a configurar estas dependencias visibles para todos los paquetes. Para ello, simplemente nos ubicamos en la raíz del proyecto y ejecutamos:
 
 ```txt
 pnpm install typescript eslint -w
 ```
 
-Importante destacar el uso de la flag -w. Cuando tratas de instalar algo en la raíz del monorepo, por defecto pnpm te lanza un warning para que tengas en cuenta que estás en raíz. Como no es lo habitual instalar dependencias a este nivel, pnpm considera que puede ser un error y te advierte. Con la flag -w indicas que eres consciente de ello y que quieres instalarlo en raíz, evitando que te salte el aviso. Este comportamiento también puede ser evitado estableciendo un ajuste en el proyecto, lo veremos más adelante.
+Es importante destacar el uso de la flag -w. Cuando tratas de instalar algo en la raíz del monorepo, por defecto `pnpm` te lanza una advertencia para que tengas en cuenta que estás en raíz. Como no es lo habitual instalar dependencias a este nivel, `pnpm` considera que puede ser un error y te advierte. Con la flag -w indicas que eres consciente de ello y que quieres instalarlo en raíz, evitando que te salte el aviso. Este comportamiento también puede ser evitado estableciendo un ajuste en el proyecto, lo veremos más adelante.
 
-Una vez hemos hecho esto ya podemos ver como estas 2 dependencias se instalan y aparecen en en el `package.json` de raíz. Vamos a proceder ahora a configurar `eslint`, para ello vamos a utilizar el configurador que la propia dependencia nos ofrece. Pero antes de hacer esto es importante que tengamos en cuenta algo. Como decíamos antes pnpm bloquea las instalaciones a nivel raíz si no llevan la flag -w. El configurador de `eslint`, a pesar de que sí permite la instalación usando pnpm, no utilizará esta flag -w, por lo que no podrá finalizar correctamente. ¿Cómo podemos solucionar esto? Estableciendo un ajuste que le indique a pnpm que ignore este warning. Esto se hace creando un fichero `.npmrc` e insertando la siguiente línea:
+Una vez hecho esto, ya podemos instalar estas dos dependencias y ver como aparecen en el `package.json` de raíz. Vamos a proceder ahora a configurar `eslint`, para ello vamos a utilizar el configurador que la propia dependencia nos ofrece. Pero antes de hacer esto es importante que tengamos en cuenta algo. Como decíamos antes, `pnpm` bloquea las instalaciones a nivel raíz si no llevan la flag -w. El configurador de `eslint`, a pesar de que sí permite la instalación usando `pnpm`, no utilizará esta flag -w, por lo que no podrá finalizar correctamente. ¿Cómo podemos solucionar esto? Estableciendo un ajuste a nivel proyecto que le indique a `pnpm` que ignore esta advertencia. Esto se hace creando un archivo `.npmrc` e insertando la siguiente línea:
 
 ```txt
 ignore-workspace-root-check=true
 ```
 
-Con esto el warning será ignorado y se podrá instalar en raíz sin la flag -w. Procedemos entonces a la configuración del eslint:
+Con esto, la advertencia será ignorada y se podrá instalar en raíz sin la flag -w. Procedemos entonces a la configuración del `eslint`:
 
 ```txt
 pnpm eslint --init
@@ -109,27 +109,27 @@ El resultado de este configurador será la instalación de las dependencias nece
 
 ```
 
-En este punto tenemos todo listo para empezar a crear paquetes en el monorepo 🚀
+En este punto, tenemos todo listo para empezar a crear paquetes en el monorepo 🚀
 
 ### Definiendo el proyecto
 
-Antes de empezar con la implementación de los diferentes paquetes, vamos a explicar brevemente el proyecto que a modo de ejemplo vamos a abordar. Será algo muy sencillo ya que lo que queremos es focalizar en como funciona el monorepo y no en la aplicación en sí mismo. Por esa razón no voy a entrar en detalle en nada referente a la implementación de la aplicación. Solo mencionar que será la típica App lista de tareas, con un front hecho con `React + Vite` y una Api hecha con `Express`, ambos proyectos en Typescript.&#x20;
+Antes de empezar con la implementación de los diferentes paquetes, vamos a explicar brevemente el proyecto que, a modo de ejemplo, vamos a abordar. Será algo muy sencillo ya que queremos centrarnos en cómo funciona el monorepo y no en la aplicación en sí misma. Por esa razón, no voy a entrar en detalle en nada referente a la implementación de la aplicación. Solo mencionar que será la típica App de lista de tareas, con un frontend hecho con `React + Vite` y una API hecha con `Express`, ambos proyectos en TypeScript.
 
 Además, para ilustrar mejor como usar un monorepo, crearemos un paquete llamado `core` que será consumido por ambas apps y que definirá clases o tipos que ambos puedan necesitar.
 
-> En el enlace al repo que dejo al final del artículo podéis ver la implementación completa de cada parte.
+> En el enlace al repo que dejo al final del artículo, podéis ver la implementación completa de cada parte
 
 ### Creando el primer paquete
 
-Vamos a empezar con la creación de la app para el front. Nos vamos a la carpeta `app` y creamos un proyecto React usando Vite:
+Vamos a empezar con la creación de la app para el frontend. Nos vamos a la carpeta `apps` y creamos un proyecto en React usando Vite:
 
 ```txt
 pnpm create vite@latest front -- --template react-ts
 ```
 
-Seguimos las instrucciones del configurador para crear el proyecto React con Typescript e instalar todos los paquetes necesarios. Si tras instalarlo nos vamos a `apps/front` y hacemos `pnpm run dev` deberíamos poder lanzar correctamente el proyecto React en ejecución. Vamos a hacer ahora algunas modificaciones para adaptarlo mejor al monorepo.
+Seguimos las instrucciones del configurador para crear el proyecto React con TypeScript e instalar todos los paquetes necesarios. Si tras instalarlo, nos vamos a `apps/front` y hacemos `pnpm run dev`, deberíamos poder lanzar correctamente el proyecto React en ejecución. Vamos a hacer ahora algunas modificaciones para adaptarlo mejor al monorepo.
 
-Antes que nada, vamos a decirle a vite que utilice el puerto 3000 para nuestro front, en lugar de una aleatorio como hace por defecto. Nos vamos al `vite.config.ts` y agregamos el siguiente objeto `server`:
+Antes que nada, vamos a decirle a Vite que utilice el puerto 3000 para nuestro frontend, en lugar de uno aleatorio como hace por defecto. Nos vamos al `vite.config.ts` y agregamos el siguiente objeto `server`:
 
 ```txt
 import { defineConfig } from 'vite'
@@ -144,7 +144,7 @@ export default defineConfig({
 })
 ```
 
-A continuación vamos a adaptar el proyecto un poco mejor para vivir en el monorepo. La instalación por defecto de Vite configurará su propio typescript y eslint, pero como hemos comentado, nosotros queremos usar el del monorepo. Por tanto lo que haremos es desinstalar localmente estas dependencias y eliminar todos los ficheros. Nos vamos al `package.json` y eliminamos las siguientes dependecias:
+A continuación, vamos a adaptar el proyecto un poco mejor para vivir en el monorepo. La instalación por defecto de Vite configurará su propio TypeScript y eslint, pero como hemos comentado, nosotros queremos usar el del monorepo. Por tanto, lo que haremos es desinstalar localmente estas dependencias y eliminar todos los archivos. Nos vamos al `package.json` y eliminamos las siguientes dependencias:
 
 ```txt
 typescript
@@ -153,19 +153,20 @@ eslint
 @typescript-eslint/parser
 ```
 
-> En el momento de escribir este artículo estas eran las dependencias relacionadas con typescript o eslint que vite instalaba por defecto. Puede que en tu caso esto cambie un poco según la versión de Vite utilizada, asegúrate de eliminar todas aquellas que tengan que ver con estas herramientas.
+> En el momento de escribir este artículo, estas eran las dependencias relacionadas con TypeScript o eslint que Vite instalaba por defecto. Puede que en tu caso esto cambie un poco según la versión de Vite utilizada. Asegúrate de eliminar todas aquellas que tengan que ver con estas herramientas.
 
-Una vez eliminadas en el `package.json` ejecutamos `pnpm install` en `apps/front` para que la desinstalación se lleve a cabo. Por último eliminamos el fichero `.eslintrc `para que no utilice la configuración de eslint que ahí se indica. Tras hacer esto nuestro proyecto front ya debería coger las reglas de eslint definidas en raíz.&#x20;
+Una vez eliminadas en el `package.json`, ejecutamos `pnpm install` en `apps/front` para que la desinstalación se lleve a cabo. Por último, eliminamos el archivo `.eslintrc` para que no utilice la configuración de `eslint` que ahí se indica. Tras hacer esto, nuestro proyecto frontend ya debería usar las reglas de `eslint` definidas en raíz.
 
-Ahora bien, sí que es cierto que, según el tipo de proyecto Typescript en el que estemos, quizá nos interese tener alguna configuración diferente. Por ejemplo, este paquete front es una aplicación con React y en este caso es muy común instalar el plugin de eslint para React `eslint-plugin-react` , pero no tiene sentido que instalemos este plugin en raíz y que nuestro proyecto `api` también estaría expuesto a lo que dicte este plugin. Por tanto aquí vamos a ver otro tema interesante que es como se puede adaptar la configuración de eslint para cada proyecto.&#x20;
+Ahora bien, es cierto que, según el tipo de proyecto TypeScript en el que estemos, quizá nos interese tener alguna configuración diferente. Por ejemplo, este paquete frontend es una aplicación con React y, en este caso, es muy común instalar el plugin de eslint para React `eslint-plugin-react`. No tiene sentido que instalemos este plugin en raíz y que nuestro proyecto `api` también esté expuesto a lo que dicte este plugin. Por tanto, vamos a ver cómo se puede adaptar la configuración de `eslint` para cada proyecto.
 
-Primero instalamos a este nivel `front` el paquete con el plugin mencionado
+Primero, instalamos a este nivel `front` el paquete con el plugin mencionado.
 
 ```txt
+cd apps/front
 pnpm install -D eslint-plugin-react
 ```
 
-Luego creamos otro fichero `.eslintrc.json` a nivel `front` y agregamos en él lo siguiente:
+Luego creamos otro fichero `.eslintrc.json` a nivel `front` y agregamos lo siguiente:
 
 ```txt
 {
@@ -180,11 +181,11 @@ Luego creamos otro fichero `.eslintrc.json` a nivel `front` y agregamos en él l
 }
 ```
 
-Así le estamos indicando lo siguiente. Por un lado que utilice dicho plugin para React. Por otro lado que extienda de la configuración que tenemos definida en raíz. Y por último que extienda también de lo que nos define el propio plugin. Finalmente, al igual que hemos hecho en raíz, definimos unas reglas personalizadas que por el momento estarán vacías.
+Así le estamos indicando lo siguiente: por un lado, que utilice dicho plugin para React; por otro lado, que extienda la configuración que tenemos definida en raíz; y por último, que extienda también lo que nos define el propio plugin. Finalmente, al igual que hemos hecho en raíz, definimos unas reglas personalizadas, por el momento vacías.
 
-&#x20;Si utilizas VSCode y la extensión para eslint, en este momento te deberían aparecer errores en tus archivos. Por ejemplo, podemos abrir el `App.tsx` y ver como hay varios errores de sintaxis. Esto es debido a que ahora la configuración de eslint es la que viene de Standard, la guía de estilos que decidimos elegir cuando configuramos eslint en raíz, extendida además por la del plugin de React que le acabamos de añadir. Entonces tenemos que adaptar nuestro código para cumplir con esto. Tenemos 2 opciones para abordarlo: arreglar los errores que nos indica o modificar las reglas definidas. Esto de nuevo ya es una decisión que has de tomar según como quieras afrontar tu desarrollo.
+Si utilizas VSCode y la extensión para `eslint`, en este momento deberían aparecer errores en tus archivos. Por ejemplo, podemos abrir el `App.tsx` y ver cómo hay varios errores de sintaxis. Esto se debe a que ahora la configuración de `eslint` es la que viene de Standard, la guía de estilos que decidimos elegir cuando configuramos `eslint` en raíz, extendida además por la del plugin de React que le acabamos de añadir. Entonces, tenemos que adaptar nuestro código para cumplir con esto. Tenemos dos opciones para abordarlo: arreglar los errores que nos indica o modificar las reglas definidas. Esto, de nuevo, es una decisión que has de tomar según cómo quieras afrontar tu desarrollo.
 
-En mi caso lo que haré será una mezcla de ambas opciones. Añadiré las siguientes 3 reglas a la configuración de eslint en raíz:
+En mi caso, lo que haré será una mezcla de ambas opciones. Añadiré las siguientes tres reglas a la configuración de eslint en raíz:
 
 ```txt
 {
@@ -208,17 +209,18 @@ Y añadiré la siguiente a la configuración del proyecto front:
 }
 ```
 
-Y una vez hecho esto corregiré el resto de errores o warnings que eslint me indique.
+Una vez hecho esto, corregiré el resto de errores o advertencias que eslint me indique.
 
-En este punto ya tenemos todo listo para crear nuestra App. Como decía anteriormente no vamos  a entrar en detalles de la implementación, puedes ir al repo y ver como está hecho.
+En este punto, ya tenemos todo listo para crear nuestra App. Como decía anteriormente, no vamos a entrar en detalles de la implementación. Puedes ir al repo y ver cómo está hecho.
 
 ### Creando otro paquete para la Api
 
-Ahora que ya hemos visto como crear y adaptar un proyecto al monorepo vamos a hacer lo mismo para la Api. Como habíamos dicho implementaremos una Api usando Express.
+Ahora que ya hemos visto cómo crear y adaptar un proyecto al monorepo, vamos a hacer lo mismo para la API. Como habíamos dicho, implementaremos una API usando Express.
 
 Nos vamos a la carpeta `apps` y creamos un nuevo directorio llamada `api`. En este caso no usaremos ningún generador. Entramos en la carpeta `api` y creamos un nuevo proyecto pnpm vacío.
 
 ```txt
+cd apps
 mkdir api && cd api && pnpm init
 ```
 
@@ -229,13 +231,13 @@ pnpm add express
 pnpm add -D @types/express @types/node nodemon ts-node
 ```
 
-Básicamente lo que estamos haciendo es instalar express y como dependencias de desarrollo:
+Básicamente, lo que estamos haciendo es instalar Express y como dependencias de desarrollo:
 
-* Los tipos de express y node
-* nodemon, que es una herramienta que nos permite fácilmente hacer que el servidor se recargue al guardar cambios en los ficheros&#x20;
-* ts-node, que básicamente digamos que nos permite ejecutar directamente el typescript
+* Los tipos de Express y Node
+* Nodemon, que es una herramienta que nos permite recargar el servidor al guardar cambios en los archivos
+* ts-node, que nos permite ejecutar directamente código Typescript
 
-Agregamos un fichero `nodemon.json` en raíz para especificar como ha de funcionar esta herramienta
+Agregamos un fichero `nodemon.json` en raíz para especificar como debe funcionar esta herramienta.
 
 ```txt
 {
@@ -245,9 +247,9 @@ Agregamos un fichero `nodemon.json` en raíz para especificar como ha de funcion
 }
 ```
 
-Lo que aquí le estamos diciendo es que ha de escuchar a los ficheros en la carpeta `src` con extensión .ts para que, cada vez que se guarde uno de ellos, ejecute ts-node en el fichero principal. Con eso lo que conseguimos es ejecutar directamente la api con typescript (ts-node se encarga por debajo de todo) y hacer que se recargue con cada cambio (nodemon se encarga)
+Así le estamos indicando es que debe escuchar a los archivos en la carpeta `src` con extensión .ts para que, cada vez que se guarde uno de ellos, ejecute `ts-node` en el archivo principal. Con eso, conseguimos ejecutar directamente la API con Typescript (ts-node se encarga por debajo de todo) y hacer que se recargue con cada cambio (nodemon se encarga)
 
-Agregamos también el fichero `tsconfig.json` para indicar como se ha de realizar el transpilado a javascript, así como algunas reglas de linting.
+Agregamos también el fichero `tsconfig.json` para indicar como se ha de realizar el transpilado a Javascript, así como algunas reglas de linting.
 
 ```txt
 {
@@ -270,7 +272,7 @@ Agregamos también el fichero `tsconfig.json` para indicar como se ha de realiza
 
 ```
 
-Por último creamos los scripts en el package.json para realizar el dev, el build y el start.
+Por último creamos los scripts en el `package.json` para realizar el dev, el build y el start.
 
 ```txt
 {
@@ -286,13 +288,16 @@ Por último creamos los scripts en el package.json para realizar el dev, el buil
 
 ### Creando un paquete compartido
 
-Lo siguiente que vamos a hacer es crear el paquete `core`, en el que implementaremos aquellas cosas que puedan ser comunes en ambas aplicaciones front y api. Creamos una nueva carpeta en `packages` llamada `core` y estando en ella creamos de nuevo un proyecto pnpm básico.&#x20;
+Lo siguiente que vamos a hacer es crear el paquete `core`, en el que implementaremos aquellas cosas que puedan ser comunes en ambas aplicaciones frontend y API. Creamos una nueva carpeta en `packages` llamada `core` y, estando en ella, creamos de nuevo un proyecto `pnpm` básico.
 
 ```txt
+cd packages
+mkdir core
+cd core
 pnpm init
 ```
 
-A continuación creamos el `tsconfig.json` para especificar a typescript como ha de realizar el compilado a javascript.
+A continuación creamos el `tsconfig.json` para especificar a Typescript como ha de realizar el compilado a Javascript.
 
 ```txt
 {
@@ -320,9 +325,9 @@ A continuación creamos el `tsconfig.json` para especificar a typescript como ha
 
 ```
 
-> Esta configuración es similar  a la del proyecto api. En este caso como sistema de módulos usamos ESNext que lo hará más compatible para ser importado por las diferentes apps. Además agregamos algunas propiedades que permiten generar las declaraciones de tipos y los ficheros de mapas entre el código fuente y el código compilado. Esto es interesando ya que ayuda el IDE a entender la estructura del paquete y facilita cosas como ir a la definición de aquello que el paquete exporte cuando lo estamos usando en otro paquete.
+> Esta configuración es similar a la del proyecto API. En este caso, como sistema de módulos, usamos ESNext que lo hará más compatible para ser importado por las diferentes apps. Además, agregamos algunas propiedades que permiten generar las declaraciones de tipos y los archivos de mapas entre el código fuente y el código compilado. Esto es interesante ya que ayuda al IDE a entender la estructura del paquete y facilita cosas como ir a la definición de aquello que el paquete exporte cuando lo estamos usando en otro paquete
 
-Creamos también en este paquete un `nodemon.json` para poder realizar el compilado en modo desarrollo:
+Creamos también un `nodemon.json` para poder realizar el compilado en modo desarrollo:
 
 ```txt
 {
@@ -332,7 +337,7 @@ Creamos también en este paquete un `nodemon.json` para poder realizar el compil
 }
 ```
 
-Y finalmente agregamos los scripts para hacer el build y el dev en el package.json
+Y finalmente, agregamos los scripts para hacer el build y el dev en el `package.json`
 
 ```txt
 {
@@ -346,7 +351,7 @@ Y finalmente agregamos los scripts para hacer el build y el dev en el package.js
 
 ```
 
-Y con esto ya tenemos también listo este paquete para escribir el código que necesitemos.&#x20;
+Y con esto ya tenemos también listo este paquete para escribir el código que necesitemos.
 
 ### Importando el paquete
 
@@ -356,13 +361,13 @@ Lo único que tenemos que hacer ahora es importar el paquete `core` en las apps.
 pnpm add core@workspace:^
 ```
 
-De esta forma lo que estamos indicando es que instale un paquete llamado `core` y que se encuentra en el workspace, para que lo busque directamente del monorepo y no en repositorios externos.
+De esta forma, indicamos que instale un paquete llamado `core` que se encuentra en el workspace, para que lo busque directamente del monorepo y no en repositorios externos.
 
-Una vez hecho esto ya podremos utilizar en nuestras apps aquellos componentes que `core` exporte.
+Una vez hecho esto, ya podremos utilizar en nuestras apps aquellos componentes que `core` exporte.
 
 ### Scripts en paralelo
 
-Para ir finalizando este artículo vamos a ver una cosa interesante de los monorepos que aún no hemos comentado, la posibilidad de ejecutar todos los scripts a la vez y en paralelo. Si nos fijamos, los 3 paquetes tienen un script dev. Es muy posible que cuando estemos desarrollando queramos tener levantados estos entornos de desarrollo en los 3 paquetes. Pues pnpm nos permite hacer esto de una forma muy sencilla. Simplemente tenemos que ir al package.json de raíz y definir ahí el siguiente script dev
+Para ir finalizando este artículo, vamos a ver una característica interesante de los monorepos que aún no hemos comentado: la posibilidad de ejecutar todos los scripts a la vez y en paralelo. Si nos fijamos, los tres paquetes tienen un script dev. Es muy posible que cuando estemos desarrollando, queramos tener levantados estos entornos de desarrollo en los tres paquetes. Pnpm nos permite hacer esto de una forma muy sencilla. Simplemente tenemos que ir al package.json de raíz y definir ahí el siguiente script dev:
 
 ```txt
 {
@@ -374,9 +379,9 @@ Para ir finalizando este artículo vamos a ver una cosa interesante de los monor
 }
 ```
 
-Esto lo que hace es buscar todos los scripts dev que haya en cada uno de los paquetes que conforman el monorepo y ejecutarlos en paralelo.
+Esto busca todos los scripts dev que haya en cada uno de los paquetes que conforman el monorepo y los ejecuta en paralelo.
 
-Otra cosa interesante que nos ofrece pnpm  es la de poder filtrar un script a solo ciertos paquetes. Esto se hace utilizando el flag --filter. Esto nos da juego a que creemos scripts con las operaciones más habituales de desarrollo que podamos necesitar. Por ejemplo podríamos configurar para levantar cada una de las apps por separado o las 2 a la vez pero sin el paquete core
+Otra cosa interesante que nos ofrece `pnpm` es la posibilidad de filtrar un script a solo ciertos paquetes. Esto se hace utilizando la flag `--filter`. Esto nos permite crear scripts con las operaciones más habituales de desarrollo que podamos necesitar. Por ejemplo, podríamos configurar para levantar cada una de las apps por separado o las dos a la vez pero sin el paquete `core`.
 
 ```txt
 { 
@@ -394,8 +399,8 @@ Otra cosa interesante que nos ofrece pnpm  es la de poder filtrar un script a so
 
 ### Fin
 
-Espero que este artículo sirva como una introducción para empezar a trabajar con monorepos en typescript usando pnpm. He tratado de realizar paso a paso la configuración que yo suelo utilizar para trabajar con este tipo de arquitecturas en proyectos typescript. Creo que puede servir como una buena base con la que empezar a construir proyectos usando este enfoque.&#x20;
+Espero que este artículo sirva como una introducción para empezar a trabajar con monorepos en TypeScript usando pnpm. He tratado de realizar paso a paso la configuración que suelo utilizar para trabajar con este tipo de arquitecturas en proyectos TypeScript. Creo que puede servir como una buena base con la que empezar a construir proyectos usando este enfoque.
 
-En los siguientes artículos del blog utilizaremos esto como base para crear ciertos proyectos y/o explicar algunas técnicas de desarrollo que suelo utilizar en mi día a día.
+En posteriores artículos del blog, utilizaremos esto como base para crear ciertos proyectos y/o explicar algunas técnicas de desarrollo que suelo utilizar en mi día a día.
 
-Por último, dejo por aquí el [link](https://github.com/enolcasielles/monorepo) al repo en github en el que está implementado todo lo que hemos ido haciendo.
+Por último, dejo por [aquí](https://github.com/enolcasielles/monorepo) el link al repositorio en github en el que está implementado todo lo que hemos ido haciendo en este artículo.

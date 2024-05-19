@@ -19,7 +19,7 @@ export function Navbar() {
           <Link href="/">
             <div className='flex items-center gap-4'>
               <Image width={40} height={40} src="/ec-logo.svg" alt="ec-logo" className='rounded-full'/>
-              <span className='font-bold text-2xl'>Enol Casielles</span>
+              <span className='hidden md:block font-bold text-2xl'>Enol Casielles</span>
             </div>
           </Link>
           <div className='flex flex-row items-center'>
@@ -29,7 +29,7 @@ export function Navbar() {
                   <Link
                     key={path}
                     href={path}
-                    className="transition-all hover:text-blue-400 flex align-middle relative py-1 px-2"
+                    className="transition-all text-blue-400 flex align-middle relative py-1 px-2"
                   >
                     {name}
                   </Link>
