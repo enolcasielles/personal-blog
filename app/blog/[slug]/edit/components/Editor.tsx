@@ -1,55 +1,55 @@
 'use client'
 
-import { BlockTypeSelect, BoldItalicUnderlineToggles, CodeToggle, CreateLink, InsertAdmonition, InsertCodeBlock, InsertImage, ListsToggle, MDXEditor, MDXEditorMethods, Separator, UndoRedo, directivesPlugin, headingsPlugin, imagePlugin, linkDialogPlugin, listsPlugin, quotePlugin, thematicBreakPlugin, toolbarPlugin } from '@mdxeditor/editor'
+import { MDXEditor, MDXEditorMethods } from '@mdxeditor/editor'
 import '@mdxeditor/editor/style.css'
-import {FC} from 'react'
+import {FC, useState} from 'react'
+import { ALL_PLUGINS } from './boilerplate'
 
 interface EditorProps {
+  slug: string
   markdown: string
   editorRef?: React.MutableRefObject<MDXEditorMethods | null>
 }
 
-/**
- * Extend this Component further with the necessary plugins or props you need.
- * proxying the ref is necessary. Next.js dynamically imported components don't support refs. 
-*/
-const Editor: FC<EditorProps> = ({ markdown, editorRef }) => {
+
+const Editor: FC<EditorProps> = ({ slug, markdown, editorRef }) => {
+  const [content, setContent] = useState(markdown)
+
+  const saveContent = async () => {
+    try {
+      const response = await fetch('/api/saveContent', {
+        method: 'POST',
+        body: JSON.stringify({ slug, content }),
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
+      const json = await response.json()
+      if (json.success) {
+        alert('Content saved')
+      } else {
+        alert('Error saving content')
+      }
+    } catch (e) {
+      alert('Error saving content')
+    }
+  }
+
   return (
-    <MDXEditor 
-      ref={editorRef} 
-      markdown={markdown} 
-      plugins={[
-        headingsPlugin(), 
-        listsPlugin(), 
-        quotePlugin(), 
-        thematicBreakPlugin(),
-        listsPlugin(),
-        linkDialogPlugin(),
-        imagePlugin(),
-        directivesPlugin(),
-        toolbarPlugin({
-          toolbarContents: () => (
-            <>
-              {' '}
-              <UndoRedo />
-              <Separator />
-              <BoldItalicUnderlineToggles />
-              <CodeToggle />
-              <Separator />
-              <ListsToggle />
-              <Separator />
-              <BlockTypeSelect />
-              <Separator />
-              <CreateLink />
-              <InsertImage />
-              <Separator />
-              <InsertCodeBlock />
-              <InsertAdmonition />
-            </>
-          )
-        })
-      ]} 
-    />
+    <>
+      <div className='mb-4 flex justify-end'>
+        <button onClick={saveContent} className='bg-blue-500 hover:bg-blue-400 px-4 py-2 rounded-full font-bold'>Guardar</button>
+      </div>
+      <MDXEditor
+        ref={editorRef}
+        className='bg-white'
+        contentEditableClassName='prose'
+        markdown={markdown}
+        plugins={ALL_PLUGINS}
+        onChange={(value) => setContent(value)}
+      />
+    </>
+    
   )
 }
 
