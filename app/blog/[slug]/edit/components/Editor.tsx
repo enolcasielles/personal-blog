@@ -26,7 +26,7 @@ const Editor: FC<EditorProps> = ({ slug, markdown, editorRef }) => {
       })
       const json = await response.json()
       if (json.success) {
-        alert('Content saved')
+        
       } else {
         alert('Error saving content')
       }

@@ -1,0 +1,142 @@
+---
+title: Arquitectura Hexagonal con Typescript y pnpm
+publishedAt: '2024-08-30'
+summary: Este artículo explica como crear un proyecto Web utilizando una Clean Arquitectura y un enfoque monorepo para la separación de capas
+---
+
+En un articulo anterior <a href="/blog/monorepo" target="_blank">Cómo crear un Monorepo con TypeScript y pnpm</a>, exploré el proceso de configuración de un monorepo usando pnpm y TypeScript. Este enfoque permite gestionar múltiples paquetes dentro de un mismo proyecto, garantizando una estructura más organizada y fácil de mantener a medida que el código crece.
+
+Ahora, vamos un paso más allá aplicando el concepto de Arquitectura Hexagonal dentro de este monorepo. Este patrón, también conocido como "Arquitectura de Puertos y Adaptadores", nos permite crear aplicaciones modulares y desacopladas, donde la lógica de negocio se mantiene independiente de detalles de implementación, como la base de datos o el framework de la aplicación.
+
+## ¿Por qué una arquitectura hexagonal?
+
+La principal ventaja de la arquitectura hexagonal es la independencia de las capas. En este enfoque, la lógica de negocio está en el centro de la arquitectura, sin estar acoplada a la infraestructura externa como bases de datos, API externas o frameworks. Los componentes externos, como las bases de datos o los controladores HTTP, actúan como adaptadores conectados a los puertos definidos en la capa de negocio.
+
+### Ventajas clave de la arquitectura hexagonal:
+
+* **Desacoplamiento**: Separa claramente la lógica de negocio de las infraestructuras y dependencias externas.
+* **Testabilidad**: Facilita la creación de pruebas unitarias al aislar la lógica de negocio de los detalles de implementación.
+* **Escalabilidad**: Añadir nuevas funcionalidades o cambiar componentes es mucho más sencillo, ya que las diferentes partes del sistema no dependen directamente unas de otras.
+
+## Monorepo y Arquitectura Hexagonal: Un enfoque eficiente
+
+Usar un monorepo para implementar una arquitectura hexagonal tiene varias ventajas. Al gestionar las diferentes capas como paquetes independientes, nos aseguramos de que cada uno mantenga su propia responsabilidad y que las dependencias entre ellas estén claramente definidas. Esto nos permite escalar el proyecto sin temor a crear dependencias circulares o acoplamientos no deseados.
+
+## Proyecto de ejemplo
+
+Antes de entrar en detalle sobre la arquitectura, quiero explicar brevemente el proyecto de ejemplo que he construido para ilustrar este concepto. Este proyecto es un **gestor de una tienda online,** que incluye la gestión de productos y usuarios. Por un lado, contamos con una API para realizar operaciones CRUD sobre los productos y usuarios. Por otro lado, creamos una web que permite a los usuarios acceder a su cuenta para visualizar o gestionar su catálogo de productos.
+
+La API se construye utilizando NestJS mientras que la web se implementa en NextJS. Veremos como el uso de esta arquitectura nos permite fácilmente reutilizar piezas de código entre ambos proyectos.
+
+Puedes acceder directamente al <a href="https://github.com/enolcasielles/next-nest-clean-arquitecture" target="_blank">repositorio del proyecto</a>  para ver la implementación realizada
+
+## Implementación
+
+He organizado las capas de la arquitectura hexagonal en tres paquetes independientes dentro del monorepo:
+
+### Domain
+
+Este paquete define las entidades del sistema, que representan los objetos clave del dominio, como `User` o `Product`. Además, aquí se encuentran los modelos que estructuran la comunicación entre las diferentes partes del sistema, así como los contratos de los repositorios que establecen cómo deben comportarse las implementaciones. Esta capa es totalmente independiente, sin dependencias de otros paquetes, y actúa como el núcleo de la aplicación.
+
+### Application
+
+Esta capa define la lógica de negocio, también conocida como los casos de uso de la aplicación. Aquí se encuentran todas las operaciones que la aplicación puede realizar, como la creación, actualización, eliminación y búsqueda de productos y usuarios. Cada caso de uso actúa como un orquestador que coordina las entidades y las reglas de negocio para cumplir con una operación específica. Esta capa depende de `Domain` para acceder a las entidades y los contratos de los repositorios, pero no conoce las implementaciones concretas de estos repositorios. Esto permite cambiar las implementaciones sin afectar la lógica de negocio.
+
+### Database
+
+Este paquete implementa la conexión con la base de datos y proporciona las clases concretas que cumplen con los contratos definidos en `Domain`. Aquí se encapsulan todos los detalles de cómo interactuar con la base de datos, incluyendo consultas, almacenamiento y recuperación de información. He optado por usar Prisma como librería ORM para dicha gestión con todas las operaciones que conlleva, como migraciones, definición del esquema, etc. Es este paquete el que se encarga de encapsular toda esta implementación.
+
+## Aplicaciones api y web
+
+Ahora vamos a ver las 2 aplicaciones que he creado para poner a prueba la arquitectura, como comentaba anteriormente.
+
+### API (NestJS)
+
+Esta aplicación NestJS depende de los tres paquetes anteriores (domain, application y database). Aquí es donde la magia ocurre: mediante `providers` y el uso de `factories`, se inyectan las dependencias a los casos de uso definidos en application, pasando como contexto las implementaciones concretas de los repositorios de database. Un ejemplo de cómo se implementa esto en el módulo de productos (`products.module.ts`):
+
+```tsx
+@Module({
+  controllers: [ProductsController],
+  providers: [
+    ProductsService,
+    {
+      provide: CreateProductUseCase,
+      useFactory: () =>
+        new CreateProductUseCase({
+          productsRepository: DI.productsRepository,
+        }),
+    },
+    // Otros casos de uso
+  ],
+})
+export class ProductsModule {}
+```
+
+Aquí usamos `useFactory` para controlar la inyección de dependencias, garantizando que el repositorio correcto sea pasado a los casos de uso. La constante `DI` se encarga de la inversión de dependencias, relacionando la implementación de cada repositorio realizada en `database` con el contrato que cada caso de uso exige cumplir para sus dependencias.
+
+```tsx
+import { ProductsRepository, UsersRepository } from '@marketplace/database';
+
+export const DI = {
+  usersRepository: new UsersRepository(),
+  productsRepository: new ProductsRepository(),
+};
+```
+
+### Web (NextJS)
+
+La aplicación NextJS se encarga de implementar la web que utilizará el usuario para interactuar con el sistema. Las páginas, utilizando el concepto de SSR que NextJS nos proporciona, se renderizan en el servidor antes de enviarlas al cliente, asegurando una mejor experiencia de usuario. Similar a la API, también se apoya en los casos de uso definidos en `application` para manejar la lógica de negocio desde el lado del servidor, lo cual permite reutilizar la lógica central de la aplicación tanto en la web como en la API, asegurando consistencia y un mantenimiento más sencillo.
+
+Lo interesante de este enfoque es la reutilización de lógica entre ambas aplicaciones. En web, tenemos una pantalla que muestra el listado de productos del usuario, mientras que en API hay un endpoint que devuelve ese mismo listado. Ambas aplicaciones disparan el mismo caso de uso definido en el paquete application y utilizan la misma implementación del repositorio que se define en database, gracias a la constante DI.&#x20;
+
+Aquí un ejemplo del código en web, donde se usa el caso de uso para obtener los productos del usuario:
+
+```tsx
+import { GetProductsUseCase } from "@marketplace/application";
+import { DI } from "@/di";
+import getUserId from "@/app/utils/get-user-id";
+import handleActionsError from "@/app/utils/handle-actions-error";
+
+export const getProductsAction = async () => {
+  return handleActionsError(async () => {
+    const userId = await getUserId();
+    return await new GetProductsUseCase({
+      productsRepository: DI.productsRepository,
+      usersRepository: DI.usersRepository,
+    }).execute({ userId: userId, query: {} });
+  });
+};
+```
+
+Mientras que en la API, el controlador de NestJS invoca el mismo caso de uso desde el servicio:
+
+```tsx
+async getProducts(userId: string, query: GetProductsRequest) {
+  const response = await this.getProductsUseCase.execute({
+    userId,
+    query,
+  });
+  return response;
+}
+```
+
+## Inyección de dependencias con DI
+
+Para manejar la inversión de dependencias, he centralizado las instancias de los repositorios en una constante DI, donde se crean las instancias de los repositorios de usuarios y productos. De esta manera, mantenemos el control sobre las dependencias y podemos asegurar que todo esté correctamente vinculado:
+
+```tsx
+import { ProductsRepository, UsersRepository } from '@marketplace/database';
+
+export const DI = {
+  usersRepository: new UsersRepository(),
+  productsRepository: new ProductsRepository(),
+};
+```
+
+Esta estrategia de centralización facilita la escalabilidad del sistema, ya que, en caso de cambios o nuevas dependencias, solo es necesario ajustar la constante DI sin tocar el resto de la aplicación.
+
+## Conclusión
+
+La combinación de un monorepo y una arquitectura hexagonal no solo garantiza la independencia de las capas, sino que también facilita el desarrollo, la escalabilidad y el mantenimiento del proyecto. Además, la posibilidad de reutilizar lógica entre diferentes aplicaciones (como en este caso, entre API y web) asegura consistencia y reduce el esfuerzo de mantenimiento. El uso de NestJS y NextJS permite construir aplicaciones robustas y escalables, mientras que el patrón hexagonal asegura que la lógica de negocio permanezca intacta y desacoplada de las implementaciones concretas.&#x20;
+
+Puedes encontrar la implementación detallada en el siguiente repositorio de GitHub: <a href="https://github.com/enolcasielles/next-nest-clean-arquitecture" target="_blank">next-nest-clean-arquitecture</a>
