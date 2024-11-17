@@ -16,13 +16,13 @@ export const metadata: Metadata = {
     default: 'Enol Casielles',
     template: '%s | Enol Casielles',
   },
-  description: 'Developer, writer, and creator.',
+  description: 'Desarrollador de software. Especializado en desarrollo web, arquitectura de software e inteligencia artificial. Fundador de mooviment.com.',
   openGraph: {
     title: 'Enol Casielles',
-    description: 'Developer, writer, and creator.',
+    description: 'Desarrollador de software con más de 10 años de experiencia en startups. Especializado en desarrollo web, arquitectura de software e inteligencia artificial. Fundador de mooviment.com.',
     url: 'https://www.enolcasielles.com',
     siteName: 'Enol Casielles',
-    locale: 'en_US',
+    locale: 'es_ES',
     type: 'website',
   },
   robots: {
@@ -39,6 +39,7 @@ export const metadata: Metadata = {
   twitter: {
     title: 'Enol Casielles',
     card: 'summary_large_image',
+    description: 'Desarrollador de software con más de 10 años de experiencia en startups. Especializado en desarrollo web, arquitectura de software e inteligencia artificial.',
   },
   verification: {
     google: '', //TODO(enol): cambiar este valor cuando se integre google analytics

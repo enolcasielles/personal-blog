@@ -1,48 +1,55 @@
-import Link from 'next/link';
-import { getBlogPosts } from 'app/db/blog';
+import Image from "next/image";
+import ExperienceTimeline from "./components/experience-timeline";
+import { experiences } from "./data/experience";
 
-export const metadata = {
-  title: 'Enol Casielles Blog',
-  description: 'Creo artículos de cosas que aprendo en mi día a día como desarrollador web.',
-};
-
-export default function BlogPage() {
-  let allBlogs = getBlogPosts();
-
+export default function Page() {
   return (
-    <section>
-      <h1 className="font-medium text-4xl mb-4 tracking-tighter">
-        Blog
+    <section className="max-w-4xl mx-auto">
+      <h1 className="font-bold text-5xl mb-8 tracking-tighter bg-gradient-to-r from-black to-gray-500 dark:from-white dark:to-gray-400 bg-clip-text text-transparent">
+        Sobre mí
       </h1>
-      <p className='mb-8 text-lg prose prose-neutral dark:prose-invert'>Un blog sobre Desarrollo Web, Inteligencia Artifical y Tecnología en general</p>
-      {allBlogs
-        .sort((a, b) => {
-          if (
-            new Date(a.metadata.publishedAt) > new Date(b.metadata.publishedAt)
-          ) {
-            return -1;
-          }
-          return 1;
-        })
-        .map((post, i) => (
-          <>
-              <hr className='bg-neutral-500 h-[1px] border-0 mb-4 mt-4'/>
-              <div className="w-full flex flex-col">
-                <Link
-                  key={post.slug}
-                  className="flex flex-col space-y-4 mb-4"
-                  href={`/blog/${post.slug}`}
-                >
-                    <span className="text-xl text-neutral-900 dark:text-neutral-100 tracking-tight hover:text-blue-400 dark:hover:text-blue-400">
-                      {post.metadata.title}
-                    </span>
-                </Link>
-                <span className='text-base text-neutral-500 dark:text-neutral-500 tracking-tight'>
-                  {post.metadata.publishedAt}
-                </span>
-              </div>
-          </>
-        ))}
+      
+      <div className="h-[2px] w-full bg-gradient-to-r from-black to-transparent dark:from-white mb-12"></div>
+      
+      <div className="grid grid-cols-1 md:grid-cols-[300px_1fr] gap-12 mb-20">
+        <div className="flex flex-col items-center space-y-6">
+          <div className="relative w-64 h-64 overflow-hidden rounded-full  hover:scale-105 transition-transform duration-300">
+            <Image 
+              fill
+              alt="enol-photo" 
+              src="/ec-photo.png" 
+              className="object-cover"
+              sizes="(max-width: 768px) 100vw, 300px"
+            />
+          </div>
+          
+          <div className="text-center">
+            <h2 className="font-bold text-2xl mb-2">Enol Casielles</h2>
+            <span className="inline-block px-4 py-2 bg-gray-100 dark:bg-gray-800 rounded-full text-sm font-medium">
+              Full Stack Developer
+            </span>
+          </div>
+        </div>
+
+        <div className="space-y-6">
+          <p className="text-lg leading-relaxed prose prose-neutral dark:prose-invert">
+            Soy un desarrollador de software con más de 10 años de experiencia, especializado en la creación y desarrollo de productos digitales. Mi trayectoria está estrechamente ligada al mundo de las startups, donde he fundado proyectos exitosos como
+            <a 
+              href="https://www.mooviment.com" 
+              target="_blank" 
+              className="text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300 font-medium transition-colors"
+            >
+              {" "}mooviment.com
+            </a>. He creado este espacio como punto central de mi marca personal, donde comparto conocimientos, experiencias y los proyectos innovadores en los que trabajo.
+          </p>
+          
+          <p className="text-lg leading-relaxed prose prose-neutral dark:prose-invert">
+            He creado este sitio para compartir los proyectos en los que trabajo y los conocimientos que adquiero en mi día a día como desarrollador. Actualmente estoy creando proyectos web que utilicen tecnologías emergentes como la inteligencia artificial. Creo firmemente en el aprendizaje constante y en compartir ese conocimiento para inspirar a otros desarrolladores a crear productos innovadores que resuelvan problemas reales.
+          </p>
+        </div>
+      </div>
+
+      <ExperienceTimeline experiences={experiences} />
     </section>
   );
 }

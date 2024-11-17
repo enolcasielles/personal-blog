@@ -3,8 +3,11 @@ import ThemeModeSelector from './theme-mode-selector';
 import Image from 'next/image';
 
 const navItems = {
-  '/about': {
-    name: 'Sobre mí',
+  '/blog': {
+    name: 'Blog',
+  },
+  '/projects': {
+    name: 'Proyectos',
   },
 };
 
