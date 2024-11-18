@@ -1,6 +1,7 @@
 import Image from "next/image";
 import ExperienceTimeline from "./components/experience-timeline";
 import { experiences } from "./data/experience";
+import SectionCard from "./components/section-card";
 
 export default function Page() {
   return (
@@ -44,8 +45,26 @@ export default function Page() {
           </p>
           
           <p className="text-lg leading-relaxed prose prose-neutral dark:prose-invert">
-            He creado este sitio para compartir los proyectos en los que trabajo y los conocimientos que adquiero en mi día a día como desarrollador. Actualmente estoy creando proyectos web que utilicen tecnologías emergentes como la inteligencia artificial. Creo firmemente en el aprendizaje constante y en compartir ese conocimiento para inspirar a otros desarrolladores a crear productos innovadores que resuelvan problemas reales.
+            Actualmente estoy creando proyectos web que utilicen tecnologías emergentes como la inteligencia artificial. Creo firmemente en el aprendizaje constante y en compartir ese conocimiento para inspirar a otros desarrolladores a crear productos innovadores que resuelvan problemas reales.
           </p>
+        </div>
+      </div>
+
+      <div className="mb-20">
+        <h2 className="font-bold text-3xl mb-8 tracking-tighter">Explora mi contenido</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <SectionCard 
+            title="Blog"
+            description="Artículos sobre desarrollo web, inteligencia artificial y cualquier aprendizaje que me resulte interesante."
+            href="/blog"
+            buttonText="Ver artículos"
+          />
+          <SectionCard 
+            title="Proyectos"
+            description="Descubre los proyectos en los que he trabajado, desde aplicaciones web hasta experimentos con IA."
+            href="/projects"
+            buttonText="Ver proyectos"
+          />
         </div>
       </div>
 
