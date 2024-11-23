@@ -1,0 +1,175 @@
+---
+title: Cómo uso Cursor para ser más productivo en desarrollo web
+publishedAt: '2024-11-22'
+summary: Descubre cómo optimizar tu flujo de trabajo de desarrollo utilizando Cursor, desde la organización de la documentación hasta técnicas avanzadas de programación asistida por IA. Aprende a estructurar tus proyectos, mantener la consistencia del código y maximizar la productividad con herramientas como Composer.
+---
+
+En este artículo, quiero compartir cómo estoy usando **Cursor** para mejorar mi productividad en el desarrollo web. Explicaré desde cómo organizo la documentación del proyecto hasta las técnicas que uso para obtener el máximo beneficio en cada iteración de desarrollo. Vamos a desglosarlo en varias secciones.
+
+
+## La importancia de una buena documentación
+
+Mantener una buena documentación es esencial para que cualquier proyecto se mantenga organizado y pueda ser escalable a largo plazo. En cada repositorio que gestiono, tengo una carpeta llamada `docs` en la raíz del proyecto. Aquí es donde centralizo toda la información y organizo los archivos de documentación de manera que puedan ser fácilmente referenciados cuando trabajo con Cursor. Algunos de los archivos mínimos que suelo incluir son:
+
+* **project.md**: Aquí describo el proyecto sin entrar en cuestiones técnicas, proporcionando un contexto general.
+* **arquitecture.md**: Documento que explica en profundidad la arquitectura del proyecto.
+* **database.md**: Archivo donde detallo el modelo de datos y cualquier aspecto relacionado con la base de datos.
+
+Además, si el proyecto tiene varias partes (por ejemplo, una API y una aplicación web), creo archivos adicionales específicos para cada una. Por ejemplo:
+
+* **api.md** y **web.md**: En cada uno describo los requisitos, las tecnologías a utilizar y cómo organizaremos el código en cada parte.
+
+Mantener esta estructura bien definida es clave poder darle a Cursor toda la información contextual que pueda necesitar.
+
+<Image
+  alt={`Estructura de carpetas de docs`}
+  src={`/blog/using-cursor/imagen1.png`}
+  width={1214}
+  height={860}
+/>
+
+## Creación de la documentación con ChatGPT
+
+Para crear esta documentación, suelo apoyarme en ChatGPT. Abro una nueva conversación con un prompt similar al siguiente:
+
+> Eres un experto en el análisis y planificación de proyectos de software. Tengo una idea en mente que quiero desarrollar. Quiero que me acompañes en todo el proceso, que trabajemos en conjunto en esta idea. \*\*No contestes con respuestas muy largas y genéricas a no ser que te lo pida explícitamente\*\* Quiero que analicemos la idea en conjunto, viendo la mejor forma de abordarla. Puedes y debes poner en duda cualquier cosa que se te ocurra para que ambos le busquemos soluciones. ¿Empezamos?
+
+Un prompt como este ayuda mucho a que el asistente te acompañe en todo el viaje y que conjuntamente lleguemos a una definición del proyecto bastante rigurosa. A partir de aquí ya empiezo a explicarle el proyecto y, a continuación, procedemos a definir cada una de las partes. El objetivo de esta conversación es construir el conjunto de ficheros necesarios que expliquen el proyecto a desarrollar de forma rigurosa. Toda esta documentación la voy volcando en una carpeta \`docs\` en la raíz de mi proyecto.
+
+***
+
+## Partir de un proyecto base
+
+Para mantener un flujo de trabajo coherente y uniforme, suelo partir de un **proyecto base** que ya tiene la estructura de archivos y patrones de diseño que quiero aplicar, con módulos de ejemplo y cualquier utilidad que pueda ser de ayuda. Por ejemplo, [este repo](https://github.com/enolcasielles/next14-starter-project) es el que utilizaría para un proyecto en NextJS simple.
+
+Le doy mucha importancia a que el código que genere la IA siga los patrones de diseño, organización del código, estilos, etc. que a mi me gusta. En este aspecto soy bastante riguroso con no perder la mantenibilidad del código y que la forma de desarrollar sea lo más parecida posible a la que yo seguiría.
+
+He descubierto que Cursor es muy bueno imitando código y siguiendo la forma de programar que le indiques. Por esta razón, veo muy interesante tener en este proyecto base algunos módulos de ejemplo, de diferentes casos de uso comunes. Contando con esto, le puedes pedir a Cursor que implemente cierto requerimiento y preste atención a como ha sido implementado en tal módulo (pasándole como referencia la carpeta en la que se encuentra dicho módulo). ¡Es impresionante como es capaz de adaptarse y seguir el mismo estilo de programación!
+
+***
+
+## Usar .cursorrules
+
+Otro punto muy importante es el fichero `.cursorrules`. Este es un fichero especial que Cursor entiende y que utiliza para mandar instrucciones específicas a los modelos. Este archivo es útil para definir reglas y convenciones de código específicas, de modo que Cursor mantenga consistencia en el estilo y forma de programar.&#x20;
+
+Sí que es cierto que aplicando la metodología mencionada en el punto anterior ya conseguirás que el código generado siga el estilo que quieres, al pedirle que se fije en cierto código que ya tengas. En cualquier caso, es interesante contar con este fichero con las reglas que deseas para garantizar que las siga.
+
+Dejo por aquí [este repo](https://github.com/PatrickJS/awesome-cursorrules) que contiene ficheros .cursorrules para diferentes tipos de proyectos o arquitecturas que se quiera emplear. Muy interesante como punto de partida aunque siempre es conveniente adaptarlo mejor a la forma en la que quieras trabajar.
+
+***
+
+## Empezando a trabajar
+
+En este punto ya tenemos todas las herramientas necesarias para empezar a desarrollar funcionalidad. Ahora ya es cuestión de iterar paso a paso y en cada iteración dejar muy claro a la IA lo que quieres hacer y en que se tiene que basar para conseguirlo. Vamos a ver algunos ejemplos de proyectos reales en los que estoy trabajando.
+
+### Creando un nuevo módulo
+
+<Image
+  alt={`Prompt para crear un nuevo módulo`}
+  src={`/blog/using-cursor/imagen2.png`}
+  width={1280}
+  height={126}
+/>
+
+En este primero ejemplo vemos como agregar un nuevo módulo al proyecto. Como podemos ver, hacemos referencia a un fichero `web.md`, que ya hemos construido en la fase inicial como explicamos anteriormente (con la conversación con ChatGPT) y que contiene un funcional bastante detallado del funcionamiento de la web. Además, hacemos referencia a un módulo `example`, que contiene, en este caso, un ejemplo de pantalla en un proyecto NextJS, con componentes típicos que suelen existir y siguiendo el estilo de programación que a mi me gusta. Finalmente, le explico muy brevemente la funcionalidad que este nuevo módulo debe contener (aunque esto ya lo tendrá en el fichero web.md mucho más detallado).
+
+El resultado de esto es una nueva carpeta llamada `contacts` conteniendo todos los ficheros necesarios que implementan la funcionalidad requerida. Es muy esperable que el resultado no sea perfecto en la primera iteración. Con el resultado que te de, tienes dos formas de proceder: 
+- Seguir la conversación y exlicarle que debe corregir para que vaya mejorando y ajustando lo que sea necesario.
+- Coger tu mismo el control y ajustar directamente el código que te ha generado.
+
+Depende de cada caso concreto será más interesante una opción u otra.
+
+### Agregando funcionalidad a un módulo
+
+<Image
+  alt={`Prompt para crear un nuevo cron`}
+  src={`/blog/using-cursor/imagen3.png`}
+  width={1280}
+  height={295}
+/>
+
+En este otro ejemplo lo que estamos haciendo es agregar funcionalidad a un módulo ya existente, en este caso lo que llamamos `bot`. Lo que se desea es implementar un nuevo Cron que envíe recordatorios por un bot de telegram. Como vemos, le pasamos como referencias un fichero que contiene la arquitectura del proyecto, le pasamos el fichero con los esquemas de Prisma y además la carpeta del módulo donde tiene que operar. Con esto la IA tendrá un contexto muy claro tanto de la base de datos como del requerimiento a desarrollar. El resultado de esto hará lo siguiente:
+
+* Buscar en bot donde se está implementando los Crons y agregar uno nuevo.
+* Crear un nuevo servicio de envío de recordatorios.
+* Implementar el método para la recuperación de los usuarios y realizar el correspondiente envío del mensaje, apoyándose en funcionalidad ya existente si se diera el caso.
+* Modificar el esquema de la base de datos para guardar en el `User` un campo que nos permita tener su id de telegram para poder enviarle el mensaje.
+
+### Requerimientos diversos
+
+Cabe destacar que no hay una técnica mágica que podamos aplicar en todos los casos. Cada requerimiento necesitará de un tipo de información u otra. Hay veces que es más importante darle cierta documentación, otras nos interesa más pasarle un ejemplos de código, otras nos puede interesar más referenciar a una documentación externa, etc.
+
+Lo importante es que nosotros como desarrolladores entendamos bien el requerimiento y, en base a ello y al material del que disponemos, decidamos cual es la mejor forma de darle a la IA lo que necesita para implementarlo. Creo que es algo que a base de experiencia y práctica se va mejorando y vas siendo capaz de entender cual es la mejor forma de operar en cada caso.
+
+***
+
+## Chat VS Composer
+
+Una de las formas más efectivas para avanzar en el desarrollo con Cursor es utilizando **Composer**. Todos los ejemplos que veíamos en el apartado anterior eran con Composer. Esta funcionalidad permite que Cursor trabaje con todos los archivos del proyecto, proponiendo la creación, edición o eliminación de los mismos, para conseguir lo que se le pida. Es la forma más efectiva de avanzar y la que uso en casi todas las ocasiones. Aunque, como ahora te explico, hay veces que me resulta más interesante utilizar Chat.
+
+> Importante mencionar que, cuando uses Composer, es muy buena idea tener el repo limpio, sin cambios por commitear. Esto nos permite tener una visual muy clara de los cambios que Composer va proponiendo. Así puedes fácilmente revisar su propuesta y/o ajustar lo que necesites.
+
+Por otro lado tenemos Chat, que es más ideal para resolver dudas, cuando no entiendes como funciona algo de tu código o incluso preguntas generales (aunque yo para esto prefiero tener ChatGPT en segundo plano). En principio, no es el mejor camino para avanzar el desarrollo como tal, aunque sí hay casos que es interesante. Cuando necesitas desarrollar cierta funcionalidad que sabes que puede ser especial, que se sale un poco de las funcionalidades más comunes y que, por tanto, prefieres tener mayor control sobre lo que la IA hace. En estos casos, utilizar Chat en lugar de Composer suele ser una buena idea. La forma de trabajar en cuanto a los prompts y la comunicación con la IA será la misma, pero iremos viendo el resultado que nos propone, analizando cada paso y aplicando (o no) lo que nos sugiera.
+
+***
+
+## Modelos a utilizar
+
+Por lo general, el modelo que mejores resultados da para tareas de programación es Claude 3.5. Por esta razón, considero que este debe ser el modelo que se utilice en Composer. En cuanto a Chat, sí que veo interesante utilizar otro modelo, por ejemplo gpt-4o o gpt-4o-mini. Como comentábamos en el apartado anterior, Chat se utilizará principalmente para resolver dudas generales o tareas que no impliquen desarrollar código como tal. En estos casos veo interesante no consumir los créditos de Claude y reservarlos para Composer.
+
+Ahora bien, cuando abordamos un "evolutivo controlado" usando Chat, como comentábamos en el apartado anterior, sería interesante seguir usando Claude.
+
+***
+
+## Actualización continua de la documentación
+
+Es fundamental actualizar la documentación a medida que avanzamos en el desarrollo. Como sabemos, en el desarrollo de software las cosas pueden ir cambiando a medida que avanzamos. Reflejar el estado actual en la documentación que tenemos es vital. Tenemos que pensar que la documentación es la única forma que tenemos que de la IA esté al tanto de lo que estamos haciendo y queremos hacer. Y que para que lo haga correctamente tenemos que ser capaces de darle esta información.
+
+Por ello, es importante estar revisando cada poco esta documentación y actualizando lo que sea necesario. La buena parte de esto, es que también le puedes pedir a Cursor que realice esta tarea por ti. Como está avanzando en el desarrollo contigo, en cada paso va a ser capaz de detectar si cierta parte de la documentación ha quedado desactualizada y que por tanto, la debe actualizar en consecuencia.
+
+### Herramienta Git Diff de Cursor
+
+Otra práctica que suelo realizar, es la de mantener un fichero de cambios, el típico `CHANGELOG.md`. Con cada nueva funcionalidad que saquemos, es importante actualizar este fichero, reflejando los cambios que se han ido haciendo en el proyecto. Para esto, Cursor nos ofrece otra herramienta muy interesante que permite meter en el contexto del prompt los cambios que haya en el repo. Se accede a ella como `@Git` y te permite especificar contra que commit o rama quieres comparar. Yo lo que suelo hacer es, cuando he finalizado un evolutivo y estando en la rama correspondiente, le pido que analice los cambios comparando contra la rama principal (Diff With Main Branch) y que actualice el fichero correspondiente:
+
+<Image
+  alt={`Actualizar el changelog`}
+  src={`/blog/using-cursor/imagen4.png`}
+  width={1280}
+  height={167}
+/>
+
+Cuando realice esta actualización, la rama estaría lista para mergear y podríamos dar dicho evolutivo por finalizado.
+
+***
+
+## Un cambio a la vez
+
+Es importante no pedir a Cursor que implemente múltiples evoluciones al mismo tiempo. Trabajar en un solo requisito por iteración evita errores y garantiza que la IA no genere "alucinaciones" o comportamientos inesperados. Con este método, Cursor se enfoca en un único objetivo, logrando una implementación más precisa y confiable.
+
+***
+
+## ¿Qué pasa con la UI?
+
+Puede que en este punto te hayas preguntado cómo controlamos el diseño de la plataforma. Las técnicas que hemos comentado harán que deleguemos en la IA como debe ser la UI de la plataforma. Esto, obviamente, no es lo que querremos, si no tener la capacidad de controlar este aspecto.
+
+Lo normal en cualquier desarrollo, es que se cuente con un diseño que haya que seguir, con un Figma, un XD, o la herramienta que sea. Y que utilicemos la información que esta nos da para implementar el diseño exactamente como se nos indica. Por tanto, lo ideal es que la IA cuente también con esta información para que la pueda utilizar igual que haríamos nosotros como desarrolladores.&#x20;
+
+Este es un tema en el que se está trabajando mucho. Por ejemplo, en [este hilo](https://forum.cursor.com/t/how-to-use-cursor-ai-and-figma-in-the-best-way-possible/13985) del foro de Cursor hablan sobre ello y sobre como poder integrar Figma en Cursor. Yo he estado investigando y probando varias cosas y, al final, el mejor enfoque que he encontrado, a día de hoy, es el que indico a continuación.
+
+### Documento de material gráfico
+
+Primero, contar con una pieza más de la documentación que sean las especificaciones gráficas. Cosas como colores a utilizar, espaciados, tamaños, etc. Todo aquello que venga definido por nuestro material gráfico y que pueda ser explicado con palabra, lo meteríamos en un doc específico.
+
+### Capturas de pantalla
+
+Por otro lado, el uso de capturas de pantalla. Cursor también admite imágenes. Cuando le estemos pidiendo un evolutivo que implique desarrollar nueva UI, podemos adjuntarle al prompt una captura del diseño que debe contener. Esto hará que la IA tenga una buena base sobre la que trabajar la UI que deseamos.
+
+### Propiedades como contexto
+
+Y por último,  una técnica que he probado y que da buenos resultados es la que explican en [este vídeo](https://www.youtube.com/watch?v=SJKkHbjniJw). Básicamente, consiste en utilizar un Plugin para Figma que te permite exportar las propiedades de aquel componente que tengas seleccionado. Esta información se la puedes dar a Cursor como contexto del Prompt y pedirle que implemente el componente siguiendo dichas especificaciones. Podéis ver en el vídeo que el resultado es muy bueno.
+
+***
+
+## Fin
+
+Espero que este artículo te sea útil y te inspire a mejorar tu flujo de trabajo con **Cursor**. Mantener la documentación organizada, partir de un proyecto base, y seguir todas las técnicas que hemos visto, son algunas de las claves para aprovechar al máximo esta herramienta y mejorar la productividad en el desarrollo de tus aplicaciones.
