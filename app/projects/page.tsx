@@ -1,6 +1,6 @@
 import { projects } from "../data/projects";
 import Image from "next/image";
-import Link from "next/link";
+import { Link } from 'next-view-transitions'
 
 export default function ProjectsPage() {
   return (
@@ -25,10 +25,16 @@ export default function ProjectsPage() {
                   alt={project.title}
                   fill
                   className="object-cover group-hover:scale-105 transition-transform duration-300"
+                  style={{viewTransitionName: `image-${project.id}`}}
                 />
               </div>
               <div className="p-6">
-                <h2 className="text-xl font-bold mb-2">{project.title}</h2>
+                <h2 
+                  className="text-xl font-bold mb-2" 
+                  style={{viewTransitionName: `title-${project.id}`}}
+                >
+                  {project.title}
+                </h2>
                 <p className="text-gray-600 dark:text-gray-400 mb-4 line-clamp-2">
                   {project.summary}
                 </p>

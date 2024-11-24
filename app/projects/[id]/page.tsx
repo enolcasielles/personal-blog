@@ -1,8 +1,8 @@
 import { projects } from "../../data/projects";
 import Image from "next/image";
-import Link from "next/link";
+import { Link } from 'next-view-transitions'
 import { notFound } from "next/navigation";
-import { ExternalLink, Code2, BookOpen } from 'lucide-react';
+import { ExternalLink, Code2, BookOpen, ArrowLeft } from 'lucide-react';
 
 interface Props {
   params: {
@@ -19,11 +19,17 @@ export default function ProjectPage({ params }: Props) {
 
   return (
     <section className="max-w-4xl mx-auto">
-      <h1 className="font-bold text-5xl mb-8 tracking-tighter bg-gradient-to-r from-black to-gray-500 dark:from-white dark:to-gray-400 bg-clip-text text-transparent">
-        {project.title}
-      </h1>
+      <Link 
+        href="/projects"
+        className="inline-flex items-center gap-2 mb-8 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition-colors group"
+      >
+        <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-1" />
+        <span>Volver a proyectos</span>
+      </Link>
+
+      {/* 
       
-      <div className="h-[2px] w-full bg-gradient-to-r from-black to-transparent dark:from-white mb-12"></div>
+      */}
 
       <div className="grid grid-cols-1 gap-8 mb-12">
         <div className="relative h-[400px] w-full rounded-xl overflow-hidden">
@@ -32,8 +38,18 @@ export default function ProjectPage({ params }: Props) {
             alt={project.title}
             fill
             className="object-cover"
+            style={{viewTransitionName: `image-${project.id}`}}
           />
         </div>
+
+        <h1 
+          className="font-bold text-5xl mt-8 tracking-tighter bg-gradient-to-r from-black to-gray-500 dark:from-white dark:to-gray-400 bg-clip-text text-transparent"
+          style={{viewTransitionName: `title-${project.id}`}}
+        >
+          {project.title}
+        </h1>
+
+        <div className="h-[2px] w-full bg-gradient-to-r from-black to-transparent dark:from-white"></div>
 
         <div className="prose prose-neutral dark:prose-invert max-w-none">
           <h2>Descripción</h2>
