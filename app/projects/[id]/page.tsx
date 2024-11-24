@@ -45,6 +45,13 @@ export default function ProjectPage({ params }: Props) {
             </>
           )}
 
+          {project.jobTitle && (
+            <>
+              <h2>Responsabilidad</h2>
+              <p>{project.jobTitle}</p>
+            </>
+          )}
+
           <h2>Tecnologías</h2>
           <div className="flex flex-wrap gap-2 not-prose">
             {project.technologies.map((tech) => (
