@@ -61,7 +61,7 @@ export default function Page() {
           />
           <SectionCard 
             title="Proyectos"
-            description="Descubre los proyectos en los que he trabajado, desde aplicaciones web hasta experimentos con IA."
+            description="Descubre los proyectos en los que trabajo, desde aplicaciones web hasta experimentos con IA."
             href="/projects"
             buttonText="Ver proyectos"
           />
