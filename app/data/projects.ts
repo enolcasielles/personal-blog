@@ -1,5 +1,6 @@
 export interface Project {
   id: string;
+  publishedAt: string;
   title: string;
   summary: string;
   description: string;
@@ -16,6 +17,7 @@ export interface Project {
 export const projects: Project[] = [
   {
     id: "memomate",
+    publishedAt: "2024-12-04",
     title: "Memo Mate",
     summary: "MemoMate es un chatbot en Telegram que utiliza OpenAI para gestionar relaciones personales, recordando eventos y contactos mediante procesamiento de lenguaje natural",
     description: "MemoMate es un chatbot en Telegram que te ayuda a mejorar tus relaciones personales. A través de conversación natural, puedes ir contándole cualquier cosa que quieras recordar de tus contactos. El sistema se encargará de identificar el contacto (o de crearlo si no existira) y de guardar la información correspondiente. Así mismo, MemoMate te permite preguntarle cualquier cosa acerca de cualquiera de tus contactos, analizando la información almacenada y devolviendo una respuesta basada en los datos.",
@@ -30,9 +32,11 @@ export const projects: Project[] = [
       "Gestión de Suscripciones con Stripe y control del uso del usuario"
     ],
     repoUrl: "https://github.com/enolcasielles/memo-mate",
+    blogUrl: "/blog/memomate"
   },
   {
     id: "mooviment",
+    publishedAt: "2024-05-01",
     title: "Mooviment",
     summary: "Proyecto de Realidad Aumentada que permite esconder vídeos en una imagen.",
     description: "Plataforma Web y Aplicación Móvil que permite al usuario crear una experiencia de Realidad Aumentada, mediante una imagen y un vídeo, e imprimirla sobre un producto físico.",
@@ -52,6 +56,7 @@ export const projects: Project[] = [
   },
   {
     id: 'ai-agency',
+    publishedAt: "2024-04-15",
     title: 'Framework para agencias de IA',
     summary: 'Framework para la construcción, testeo y puesta en marcha de agencias de inteligencia artificial.',
     description: 'Framework para la construcción, testeo y puesta en marcha de agencias de inteligencia artificial.',

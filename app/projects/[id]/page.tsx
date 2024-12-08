@@ -3,6 +3,48 @@ import Image from "next/image";
 import { Link } from 'next-view-transitions'
 import { notFound } from "next/navigation";
 import { ExternalLink, Code2, BookOpen, ArrowLeft } from 'lucide-react';
+import { Metadata } from "next";
+
+
+export async function generateMetadata({
+  params,
+}): Promise<Metadata | undefined> {
+  let project = projects.find((p) => p.id === params.id);
+  if (!project) {
+    return;
+  }
+
+  let ogImage = `https://www.enolcasielles.com${project.images[0]}`;
+
+  return {
+    title: project.title,
+    description: project.summary,
+    openGraph: {
+      title: project.title,
+      description: project.summary,
+      type: 'article',
+      publishedTime: project.publishedAt,
+      url: `https://www.enolcasielles.com/projects/${project.id}`,
+      images: [
+        {
+          url: ogImage,
+        },
+      ],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: project.title,
+      description: project.summary,
+      images: [ogImage],
+    },
+  };
+}
+
+export async function generateStaticParams() {
+  return projects.map((p) => ({
+    id: p.id,
+  }))
+}
 
 interface Props {
   params: {
