@@ -4,7 +4,7 @@ import PageTitle from 'app/components/page-title';
 
 export const metadata = {
   title: 'Blog',
-  description: 'Creo artículos de cosas que aprendo en mi día a día como desarrollador web.',
+  description: 'Colección de artículos sobre desarrollo web, IA y tecnología en general.',
 };
 
 export default function BlogPage() {

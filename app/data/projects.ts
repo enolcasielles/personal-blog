@@ -16,6 +16,24 @@ export interface Project {
 
 export const projects: Project[] = [
   {
+    id: "fluento",
+    publishedAt: "2024-12-20",
+    title: "Fluento",
+    summary: "Fluento es una aplicación móvil que ofrece una solución para mejorar tu inglés.",
+    description: "Fluento es una aplicación móvil que ofrece una solución para mejorar tu inglés. La idea es explotar la metodología de los ejercicios de traducción inversa. El alumno recibe una frase en español y debe traducirla al inglés, que será evaluada por un modelo de IA. Esta metodología es ampliamente utilizada por reconocidas academias y ha demostrado unos resultados muy satisfactorios. Cuando el usuario realiza esta actividad una y otra vez, mejora su vocabulario, adquiere mayor fluidez a la hora de construir las frases y, en general, adquiere confianza en su capacidad para hablar inglés.",
+    images: ["/projects/fluento/cover-image.png"],
+    customer: "Proyecto Personal",
+    technologies: ["NextJS", "React Native", "Expo", "Open AI"],
+    challenges: [
+      "Desarrollo de un sistema de evaluación de respuestas mediante IA que analice gramática y vocabulario",
+      "Implementación de un algoritmo de adaptación inteligente inspirado en Anki para personalizar el aprendizaje",
+      "Creación de un sistema de reconocimiento de voz y conversión a texto",
+      "Desarrollo de una interfaz móvil intuitiva que facilite la práctica fluida de ejercicios"
+    ],
+    repoUrl: "https://github.com/enolcasielles/es.fluento.next",
+    blogUrl: "/blog/construyendo-fluento-idea"
+  },
+  {
     id: "memomate",
     publishedAt: "2024-12-04",
     title: "Memo Mate",

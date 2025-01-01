@@ -2,6 +2,11 @@ import { projects } from "../data/projects";
 import Image from "next/image";
 import { Link } from 'next-view-transitions'
 
+export const metadata = {
+  title: 'Proyectos',
+  description: 'Proyectos de desarrollo web que he realizado.',
+};
+
 export default function ProjectsPage() {
   return (
     <section className="max-w-4xl mx-auto">
