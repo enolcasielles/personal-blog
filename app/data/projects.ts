@@ -31,7 +31,7 @@ export const projects: Project[] = [
       "Desarrollo de una interfaz móvil intuitiva que facilite la práctica fluida de ejercicios"
     ],
     repoUrl: "https://github.com/enolcasielles/es.fluento.next",
-    blogUrl: "/blog/construyendo-fluento-idea"
+    blogUrl: "/blog/construyendo-fluento-1-idea"
   },
   {
     id: "memomate",

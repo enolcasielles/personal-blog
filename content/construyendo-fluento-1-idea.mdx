@@ -7,8 +7,8 @@ summary: 'En este artículo vamos a ver la idea y presentación del proyecto Flu
 > Este artículo forma parte de la serie "Desarrollando Fluento". Aquí tienes el índice completo:
 >
 > 1. **Idea y presentación del proyecto** (Este artículo)
-> 2. [Arquitectura y Funcionalidad del MVP](/blog/construyendo-fluento-arquitectura)
-> 3. [Implementación del backend](/blog/construyendo-fluento-backend)
+> 2. [Arquitectura y Funcionalidad del MVP](/blog/construyendo-fluento-2-arquitectura)
+> 3. [Implementación del backend](/blog/construyendo-fluento-3-backend)
 > 4. *Próximamente: Algorítmos e implementación de IA*
 
 ¡Hola a todos! Este artículo quiero dedicarlo a presentar la idea en la que estaré trabajando en las próximas semanas, que es la construcción de la plataforma **Fluento**, una aplicación móvil que busca ofrecer una forma eficiente y divertida de mejorar tu inglés. Quiero desarrollar este proyecto en abierto, compartiendo todo el proceso de desarrollo. La idea es ir creando artículos con bastante frecuencia, detallando todo el proceso de desarrollo, las decisiones tomadas para abordarlo así como los posibles problemas que se puedan presentar. Construiré la plataforma desde cero, partiendo de la idea actual en papel y con el objetivo de llegar a lanzar un producto real al mercado.
@@ -17,13 +17,23 @@ summary: 'En este artículo vamos a ver la idea y presentación del proyecto Flu
 
 Fluento es una aplicación móvil que ofrece una solución para mejorar tu inglés. La idea es explotar la metodología de los ejercicios de traducción inversa. El alumno recibe una frase en español y debe traducirla al inglés. Esta metodología es ampliamente utilizada por reconocidas academias y ha demostrado unos resultados muy satisfactorios. Cuando el usuario realiza esta actividad una y otra vez, mejora su vocabulario, adquiere mayor fluidez a la hora de construir las frases y, en general, adquiere confianza para expresarse en inglés.
 
-## ¿Cómo funciona Fluento?
+## ¿Cuales son sus características principales?
 
 La clave de Fluento está en su enfoque:
 
 1. **Traducción inversa en tiempo real**: Escucharás una frase en español y tendrás que decirla en inglés. Simple, ¿verdad? Pero extremadamente efectivo.
 2. **Adaptación inteligente**: Utilizando un algoritmo inspirado en Anki, Fluento aprenderá de tus errores y te hará practicar más aquellas estructuras que te cuestan más trabajo.
 3. **Evaluación mediante IA**: Tu respuesta será evaluada por modelos de IA que se centrarán en la gramática y el vocabulario, permitiéndote concentrarte en lo importante: desarrollar fluidez.
+
+## ¿Cómo funciona Fluento?
+
+El usuario accede a diferentes listas de frases. Una lista contiene un conjunto de unidades. Y cada unidad contiene una frase en español y su correspondiente traducción al inglés. 
+
+Además, cada lista tiene un nivel de dificultad, una temática y un conjunto de estructuras gramaticales. Estos parámetros serán los que determinen las frases que contenga la lista. En base a ellos, se decidirá cosas como el vocabulario a utilizar, las estructuras gramaticales, la longitud de las frases, etc.
+
+Las listas pueden ser públicas o privadas. Las listas públicas son manejadas por la propia plataforma y accesibles para cualquier usuario registrado. En cambio, las listas privadas solo pueden ser creadas por usuarios Premium y serán accesibles solo para ellos.
+
+Cuando un usuario decide practicar una lista, se le seleccionará una unidad para que comience. El usuario recibirá la frase en español y deberá decir la traducción al inglés. La aplicación evaluará la respuesta y, en base a estas respuestas, decidirá la siguiente unidad de forma que el usuario vaya practicando con mayor frecuencia las frases que le cuestan más.
 
 ## ¿Qué viene después?
 
@@ -52,4 +62,4 @@ En los próximos artículos profundizaremos en aspectos específicos del desarro
 
 ***
 
-*Este es el primer artículo de la serie "Desarrollando Fluento". Puedes continuar con el siguiente artículo de la serie:* [Arquitectura y tecnologías](/blog/construyendo-fluento-arquitectura)
+*Este es el primer artículo de la serie "Desarrollando Fluento". Puedes continuar con el siguiente artículo de la serie:* [Arquitectura y tecnologías](/blog/construyendo-fluento-2-arquitectura)

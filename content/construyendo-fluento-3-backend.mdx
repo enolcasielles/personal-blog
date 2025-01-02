@@ -6,14 +6,16 @@ summary: 'En este artículo vamos a ver la implementación del backend de Fluent
 
 > Este artículo forma parte de la serie "Desarrollando Fluento". Aquí tienes el índice completo:
 > 
-> 1. [Idea y presentación del proyecto](/blog/construyendo-fluento-idea)
-> 2. [Arquitectura y Funcionalidad del MVP](/blog/construyendo-fluento-arquitectura)
+> 1. [Idea y presentación del proyecto](/blog/construyendo-fluento-1-idea)
+> 2. [Arquitectura y Funcionalidad del MVP](/blog/construyendo-fluento-2-arquitectura)
 > 3. **Implementación del backend** (Este artículo)
 > 4. *Próximamente: Algorítmos e implementación de IA*
 
 ¡Bienvenidos a un nuevo artículo de la serie *Construyendo Fluento*! En este artículo vamos a ver el diseño e implementación del backend de la plataforma. Veremos tanto los diferentes endpoints que hemos definido para la API Rest como el modelo de base de datos que nos permita gestionar correctamente los requerimientos de la plataforma.
 
-Te recomiendo visitar el [anterior artículo](/bloh/construyendo-fluento-arquitectura) para ver las funcionalidades que habíamos definido para el MVP. Vamos a recorrer cada una de ellas y explicar la implementación realizada.
+Te recomiendo visitar el [anterior artículo](/bloh/construyendo-fluento-2-arquitectura) para ver las funcionalidades que habíamos definido para el MVP. Vamos a recorrer cada una de ellas y explicar la implementación realizada.
+
+También te recomiendo acceder al [repositorio en Github](https://github.com/enolcasielles/fluento/tree/backend) del proyecto en la rama `backend` para ver el código que teníamos en el momento de escribir este artículo. A lo largo del artículo iremos pegando trozos de código relevantes pero sería interesante que puedas ver el código en su totalidad.
 
 ## Login y Registro
 
@@ -22,7 +24,7 @@ Como ya comentamos, usaremos Supabase para la gestión de los usuarios. Por esta
 * POST /auth/login
 * POST /auth/register
 
-El funcionamiento es sencillo. Ambos reciben un body con un email y contraseña. El de registro además recibe un nombre. Con esto y en cada correspondiente servicio utilizamos en cliente de supabase para identificar o registrar al usuario.
+El funcionamiento es sencillo. Ambos reciben un body con un email y contraseña. El de registro además recibe un nombre. Con esto y en cada correspondiente servicio utilizamos el cliente de supabase para identificar o registrar al usuario.
 
 ```tsx
 enum LoginError {
@@ -148,7 +150,7 @@ export const authenticate = async (
 };
 ```
 
-Cada controlador que represente un método privado, lo primero que hará es invocar este método para realizar este verificación, retornando el correspondiente error en caso de producirse. Por ejemplo, el controlador para el GET del Explora:
+Cada controlador que represente un método privado, lo primero que hará es invocar este método para realizar este verificación, retornando el correspondiente error en caso de producirse o el id del usuario en caso de que todo haya salido bien. Por ejemplo, el controlador para el GET del Explora:
 
 ```tsx
 export async function GetExploreController(request: Request) {
@@ -172,7 +174,7 @@ export async function GetExploreController(request: Request) {
 
 ## Explora
 
-Vamos a pasar ahora al Explora. Esta es la sección en la que el usuario puede ver las listas públicas, aquellas que son gestionadas por la propia plataforma y aptas para ser utilizadas por cualquier usuario. El requerimiento en esta parte es recuperar todas estas listas separadas por categorías, para que la app pueda renderizar una vista al usuario que le permita visualizar todo este contenido de una forma amigable. Por ello implementamos el endpoint `GET /explore` que nos devolverá dicha respuesta. Necesitamos por tanto 2 nuevas tablas en nuestra base de datos: Category y List
+Vamos a pasar ahora al Explora. Esta es la sección en la que el usuario puede ver las listas públicas, aquellas que son gestionadas por la propia plataforma y aptas para ser utilizadas por cualquier usuario. El requerimiento en esta parte es recuperar todas estas listas separadas por categorías, para que la app pueda renderizar una vista al usuario que le permita visualizar todo este contenido de una forma amigable. Por ello implementamos el endpoint `GET /explore` que nos devolverá dicha respuesta. Necesitamos por tanto 2 nuevas tablas en nuestra base de datos: `Category` y `List`.
 
 ```
 model Category {
@@ -252,7 +254,7 @@ export async function getExploreService(): Promise<GetExploreResponse> {
 }
 ```
 
-No estamos metiendo paginación ni filtrado. En esta primera versión devolveremos todo el contenido siempre. Al ser un contenido que gestionaremos nosotros mismos esto no tiene porque ser un problema. Incorporaremos estos mecanismos cuando exista cierto volumen que lo requiera.
+Cabe destacar que no estamos metiendo paginación ni filtrado. En esta primera versión devolveremos todo el contenido siempre. Al ser un contenido que gestionaremos nosotros mismos, esto no tiene porque ser un problema. Incorporaremos estos mecanismos cuando exista cierto volumen que lo requiera.
 
 ## Usuario
 
@@ -292,7 +294,7 @@ La gestión de las listas es uno de los pilares fundamentales de este MVP. Vamos
 
 ### Crear lista
 
-Un usuario Premium podrá crear sus propias listas privadas. Para ello implementamos el método `POST /lists`, que se encargará de crear dicha entidad `List` siempre que el usuario autenticado tenga el campo `isPremium` a true.&#x20;
+Un usuario Premium podrá crear sus propias listas privadas. Para ello implementamos el método **POST /lists**, que se encargará de crear dicha entidad `List` siempre que el usuario autenticado tenga el campo `isPremium` a true.&#x20;
 
 ```tsx
 export async function createListService(
@@ -338,13 +340,13 @@ export async function createListService(
 }
 ```
 
-A destacar en este servicio está la creación de las unidades de la lista, que como podemos ver lo delegamos a otro servicio. Esto lo veremos más en detalle en otro artículo, ya que este servicio lo que hace básicamente es invocar la IA para la generación de las frases de la lista. El siguiente artículo será específico para tratar esta parte.&#x20;
+A destacar en este servicio está la creación de las unidades de la lista, que como podemos ver lo delegamos a otro servicio (`generateListUnitsService`). Esto lo veremos más en detalle en otro artículo, ya que este servicio lo que hace básicamente es invocar la IA para la generación de las frases de la lista. El siguiente artículo será específico para tratar esta parte.&#x20;
 
-También es importante destacar en esta punto que este método para la generación de la lista se está efectuando de forma síncrona, lo cual no es conveniente ya que puede requerir cierto tiempo y incluso el reintento si algo falla. Tenemos pendiente implementar un sistema de colas que haremos y explicaremos próximamente.
+También es importante destacar en esta punto que este método para la generación de la lista se está lanzando de forma síncrona, lo cual no es conveniente ya que puede requerir cierto tiempo e incluso necesitar un reintento si algo falla. Tenemos pendiente implementar un sistema de colas que haremos y explicaremos más adelante.
 
 ### Recuperar listas
 
-Para poder mostrar al usuario las listas que ha creado, se implementa el método `GET /lists`, que simplemente recupera y devuelve dichas listas. Al igual que nos ocurría en el explora, aquí deberíamos incorporar un mecanismo de filtrado y paginación, sobre todo lo segundo ya que esto es algo que lo gestiona directamente el usuario y podría darse el caso de que cree muchas listas y que ya sea conveniente entregarlas paginadas. Dejamos pendiente esa tarea por el momento.
+Para poder mostrar al usuario las listas que ha creado, se implementa el método **GET /lists**, que simplemente recupera y devuelve dichas listas. Al igual que nos ocurría en el explora, aquí deberíamos incorporar un mecanismo de filtrado y paginación, sobre todo lo segundo ya que esto es algo que lo gestiona directamente el usuario y podría darse el caso de que cree muchas listas y que sea conveniente entregarlas paginadas. Dejamos pendiente esa tarea por el momento.
 
 ```tsx
 export async function getMyListsService(
@@ -373,7 +375,7 @@ export async function getMyListsService(
 
 ### Detalle de lista
 
-Los usuarios deberán poder acceder a cualquier de las listas y ver su información así como los posibles resultados de su actividad en esa lista, en caso de que la hubiera. Para todo ello implementamos el método `GET /lists/:listId`, que será el responsable de generar esta respuesta.
+Los usuarios deberán poder acceder a cualquier de las listas y ver su información así como los posibles resultados de su actividad en esa lista, en caso de que la hubiera. Para todo ello, implementamos el método **GET /lists/:listId**, que será el responsable de generar esta respuesta.
 
 ```tsx
 export interface GetListDetailResponse {
@@ -396,7 +398,7 @@ export interface GetListDetailResponse {
 
 ```
 
-Para poder dar esta respuesta tenemos que introducir 2 nuevos modelos en nuestra base de datos, una que ya mencionamos: `Session` y uno nuevo: `Result`. `Session` será la tabla que registre la actividad de un usuario en una lista. Result será cada una de las evaluaciones que se realicen dentro de una Session, o dicho de otra forma, cada resultado de un usuario de realizar una unidad dentro de una lista.
+Para poder dar esta respuesta tenemos que introducir 2 nuevos modelos en nuestra base de datos, una que ya mencionamos: `Session` y uno nuevo: `Result`. `Session` será la tabla que registre la actividad de un usuario en una lista. `Result` será cada una de las evaluaciones que se realicen dentro de una `Session`, o dicho de otra forma, cada resultado de un usuario al realizar una unidad dentro de una lista.
 
 ```
 model Session {
@@ -427,9 +429,9 @@ model Result {
 }
 ```
 
-Con estas 2 tablas podremos llevar control de la actividad de cada usuario en las listas que utilice.
+Con estas 2 tablas podremos llevar control de la actividad de cada usuario en las listas que practique.
 
-Por tanto, volviendo a la respuesta del detalle de la lista, lo que tendremos que hacer es recuperar la sesión de la lista e incluir los resultados. Con esto ya tendremos toda la información que necesitamos para poder informar dicho objeto `userProgress`
+Por tanto, volviendo a la respuesta del detalle de la lista, lo que tendremos que hacer es recuperar la sesión de la lista e incluir los resultados. Con esto ya tendremos toda la información que necesitamos para poder generar dicho objeto `userProgress`
 
 ```tsx
 export async function getListDetailService(
@@ -484,20 +486,6 @@ export async function getListDetailService(
       uniqueBestResults.length,
   };
 
-  if (!list) {
-    throw new CustomError({
-      message: "La lista no existe",
-      statusCode: 404,
-    });
-  }
-
-  if (!list.isPublic && list.creatorId !== userId) {
-    throw new CustomError({
-      message: "No tienes permiso para ver esta lista",
-      statusCode: 403,
-    });
-  }
-
   return {
     id: list.id,
     name: list.name,
@@ -516,7 +504,7 @@ export async function getListDetailService(
 
 ### Listas guardadas
 
-Otra funcionalidad complementada en el MVP era la de que el usuario pueda guardar las listas que quiera, para tenerlas más accesibles. Para ello definimos 3 nuevos endpoints:&#x20;
+Otra funcionalidad contemplada en el MVP es que el usuario pueda guardar las listas que quiera, para tenerlas más accesibles. Para ello definimos 3 nuevos endpoints:&#x20;
 
 * **GET /lists/saved**: Recupera las listas guardadas&#x20;
 * **POST /lists/\:listId/save:** Guarda la lista especificada
@@ -526,9 +514,9 @@ La implementación no tiene mayor complejidad. Son simples peticiones a la base 
 
 ### Recuperar la sesión
 
-Por último, para terminar con esta parte de las listas, tenemos un nuevo método que nos permite recuperar la sesión asignada a una lista: `GET /lists/:listId/session`
+Por último, para terminar con esta parte de las listas, tenemos un método que nos permite recuperar la sesión asignada a una lista: **GET /lists/:listId/session**
 
-Básicamente lo que haremos aquí es comprobar si existe dicha sesión y en ese caso devolverla. En caso contrario creamos el registro y lo devolvemos.
+Básicamente, lo que haremos aquí es comprobar si existe dicha sesión y en ese caso devolverla. En caso contrario, creamos el registro y lo devolvemos.
 
 ```tsx
 export async function getListSessionService(
@@ -592,7 +580,7 @@ export async function getListSessionService(
 }
 ```
 
-En la respuesta que damos, destaca el objeto `nextUnit`, que será el que indique la siguiente frase con la que el usuario debe practicar.
+En la respuesta que damos, destaca el objeto `nextUnit`, que será el que indique la siguiente frase que el usuario debe practicar.
 
 ```tsx
 export interface GetListSessionResponse {
@@ -614,17 +602,17 @@ export interface GetListSessionResponse {
 }
 ```
 
-Para ello, en el servicio contamos con una última llamada a un método que la genera. Este método será el que implemente el algoritmo basado en Anki para generar la siguiente unidad que tenga mayor interés para el usuario en el momento actual, basado en la actividad que ha ido realizando hasta entonces. Esto, al igual que la implementación de la IA, lo veremos en detalle en el siguiente artículo. En este punto quedémonos con que tenemos un método que nos devuelve dicha información.
+Para ello, podemos ver que en el servicio contamos con una última llamada al método `generateNextUnit`. Este método será el que implemente el algoritmo basado en Anki para generar la siguiente unidad que tenga mayor interés para el usuario en el momento actual, basado en la actividad que ha ido realizando hasta entonces. Esto, al igual que la implementación de la IA, lo veremos en detalle en el siguiente artículo. En este punto quedémonos con que tenemos un método que nos devuelve dicha información.
 
 ## Práctica
 
-Y para terminar, vamos a ver la parte en la que el usuario practica en una de las listas, que a nivel modelo de datos nos estamos refiriendo a ello como la sesión de una lista. Terminamos el anterior punto con un método que nos permitía recuperar la sesión de una lista. Esta llamada será la que la app deberá hacer cuando el usuario quiera empezar a practicar. A partir de la información obtenida en el nextUnit, podría realizar la primera iteración en la lista.
+Y para terminar, vamos a ver la parte en la que el usuario practica en una de las listas. Terminamos el anterior punto con un método que nos permitía recuperar la sesión de una lista. Esta llamada será la que la app tendrá que hacer cuando el usuario quiera empezar a practicar. A partir de la información obtenida en el `nextUnit`, podrá realizar la primera iteración en la lista.
 
 Ahora bien, para que el usuario pueda iterar correctamente por las diferentes unidades debemos incorporar 2 métodos más.
 
 ### Evaluar respuesta
 
-Cuando el usuario finalice una unidad y, por tanto, tengamos el audio con su respuesta, deberemos evaluar dicha respuesta y emitir una puntuación. Para esto implementamos el método `POST /sessions/:sessionId/units/:unitId/evaluate` que recibe como body el fichero de audio. Este método realizará 2 cosas: convertir el audio a texto y, posteriormente, comparar dicho texto con la respuesta correcta para devolver un score. Para estas 2 acciones, usaremos de nuevo modelos de IA que detallaremos en el siguiente artículo.
+Cuando el usuario finalice una unidad y, por tanto, tengamos el audio con su respuesta, deberemos evaluar dicha respuesta y emitir una puntuación. Para esto implementamos el método **POST /sessions/:sessionId/units/:unitId/evaluate** que recibe como body el fichero de audio. Este método realizará 2 cosas: convertir el audio a texto y, posteriormente, comparar dicho texto con la respuesta correcta para devolver un score. Para estas 2 acciones, usaremos de nuevo modelos de IA que detallaremos en el siguiente artículo.
 
 ```tsx
 export async function evaluateAnswerService(
@@ -678,7 +666,9 @@ export async function evaluateAnswerService(
 
 ### Enviar la puntuación
 
-El anterior método nos permitía calcular la puntuación obtenida en la unidad pero no se encarga de guardar la información en el sistema. Para esto creamos el endpoint `POST /sessions/:sessionId/units/:unitId/evaluate` que será el que crea el registro Result y ejecuta de nuevo el algoritomo que nos da la siguiente unidad. Este enfoque realmente no tiene mucho sentido. Lo natural es que el anterior endpoint, el que calcula la evaluación, se encargue también de esto y no necesitemos separarlo en 2. Pero hay una razón clara de hacerlo así. En esta primera versión de la app, la evaluación de la respuesta del usuario la haremos en el back, como hemos visto. Pero la idea a futuro es poder llevar esta evaluación directamente al lado del cliente, ejecutando modelos de IA directamente en el dispositivo y evitando el coste que esto supone. Cuando eso sea así, necesitaremos recibir en el back el resultado de la evaluación realizada para poder registrarla y continuar. Por esa razón mantenemos ya esta implementación en 2 pasos, pensando en esta migración a futuro.
+El anterior método nos permitía calcular la puntuación obtenida en la unidad pero no se encarga de guardar la información en el sistema. Para esto creamos el endpoint **POST /sessions/:sessionId/units/:unitId/evaluate** que será el que crea el registro `Result` y ejecuta de nuevo el algoritomo que nos da la siguiente unidad. 
+
+Si lo pensamos detenidamente, este enfoque puede paracer no tener mucho sentido. Lo natural sería que el anterior endpoint, el que calcula la evaluación, ya se encargue también de guardar el resultado y calcular la siguiente unidad, evitando tener que realizar 2 llamadas diferentes. Sin embargo, el hacerlo en 2 llamdas tiene su explicación. En esta primera versión de la app, la evaluación de la respuesta del usuario la haremos en el back, como acabamos de ver. Pero la idea a futuro es poder llevar esta evaluación directamente al lado del cliente, ejecutando modelos de IA directamente en el dispositivo para, principalmente, evitar el coste que esto supone. Cuando eso sea así, necesitaremos recibir en el back el resultado de la evaluación realizada para poder registrarla y continuar. Por esa razón mantenemos ya esta implementación en 2 pasos, pensando en esta migración a futuro.
 
 ## Fin
 

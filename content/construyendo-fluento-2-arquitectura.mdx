@@ -6,12 +6,12 @@ summary: 'En este artículo vamos a ver la arquitectura y funcionalidad del MVP 
 
 > Este artículo forma parte de la serie "Desarrollando Fluento". Aquí tienes el índice completo:
 > 
-> 1. [Idea y presentación del proyecto](/blog/construyendo-fluento-idea)
+> 1. [Idea y presentación del proyecto](/blog/construyendo-fluento-1-idea)
 > 2. **Arquitectura y Funcionalidad del MVP** (Este artículo)
-> 3. [Implementación del backend](/blog/construyendo-fluento-backend)
+> 3. [Implementación del backend](/blog/construyendo-fluento-3-backend)
 > 4. *Próximamente: Algorítmos e implementación de IA*
 
-¡Bienvenidos a la segunda parte de la serie sobre el desarrollo de Fluento! En el [artículo anterior](/blog/construyendo-fluento-idea) presentamos la idea general del proyecto. Hoy vamos a sumergirnos un poco más los detalles técnicos y funcionales que darán vida a esta aplicación.
+¡Bienvenidos a la segunda parte de la serie sobre el desarrollo de Fluento! En el [artículo anterior](/blog/construyendo-fluento-1-idea) presentamos la idea general del proyecto. Hoy vamos a sumergirnos un poco más los detalles técnicos y funcionales que darán vida a esta aplicación.
 
 ## MVP. Funcionalidades
 
@@ -27,20 +27,20 @@ El usuario, una vez identificado, debe poder acceder a un conjunto de listas ya 
 
 ### Guardar sus listas
 
-El usuario debe poder guardar aquellas listas que le interese para poder acceder de nuevo a ellas en el futuro y tenerlas siempre a mano. Esta sección la llamamos "Guardado".
+El usuario debe poder guardar aquellas listas que le interese para poder acceder de nuevo a ellas en el futuro y tenerlas siempre a mano. Esta sección la llamamos "Guardado". Del mismo modo, cuando un usuario decide practicar una lista, automáticamente se marcará como guardada para que aparezca en esta sección.
 
 ### Crear listas
 
-El usuario debe poder crear sus propias listas para poder practicar con contenido personalizado. Esta sección la llamamos "Mis listas". Las listas que se creen de esta forma, serán privadas y solo accesibles para el usuario que las ha creado. Para crear una lista, el usuario lo hará a través de un formulario en el que podrá especificar cosas como la temática del vocabulario que le gustaría practicar, el nivel de dificultad, etc. Con esta información, un modelo de IA generará las frases que se incluirán en la lista.
+Un usuario Premium debe poder crear sus propias listas para poder practicar con contenido personalizado. Esta sección la llamamos "Mis listas". Las listas que se creen de esta forma, serán privadas y solo accesibles para el usuario que las ha creado. Para crear una lista, el usuario lo hará a través de un formulario en el que tendrá que especificar los parámetros de la misma: temática, nivel de dificultad, estructuras gramaticales, etc. Con esta información, un modelo de IA generará las frases que se incluirán.
 
 ### Práctica
 
-Esta es la funcionalidad principal de la aplicación. Sea en una lista pública o en una lista privada, el usuario debe poder practicar. Practicar en una lista consistirá en ir iterando por las distintas frases de la misma, de forma que el usuario pueda practicar de forma cíclica y repetitiva. El sistema se encargará de escoger la siguiente frase a practicar, analizando el progreso del usuario y haciendo que las frases que el usuario domina menos se repitan más veces y viceversa. Para ello, se implementará un algoritmo similar al de Anki, que ya veremos en más detalle cuando profundicemos en esa parte.
+Esta es la funcionalidad principal de la aplicación. Sea en una lista pública o en una lista privada, el usuario debe poder practicar. Practicar en una lista consistirá en ir iterando por las distintas frases de la misma, de forma que el usuario pueda practicar de forma cíclica y repetitiva. El sistema se encargará de escoger la siguiente frase a practicar, analizando el progreso del usuario y haciendo que las frases que domina menos se repitan más veces y viceversa. Para ello, se implementará un algoritmo similar al de Anki, que ya veremos en más detalle cuando profundicemos en esa parte.
 
-En cada frase que el usuario debe practicar, se seguirá el siguiente flujo:
+En cada unidad o frase a practicar, se seguirá el siguiente flujo:
 
 1. El usuario empezará viendo en pantalla y escuchando la frase en español.
-2. El usuario tendrá un tiempo para dar la traducción al inglés, en el que se activará el micrófono y se empezará a grabar su respuesta.
+2. El usuario tendrá un tiempo para decir la traducción al inglés. Durante este tiempo, se activará el micrófono y se grabará su respuesta.
 3. Pasado este tiempo, el sistema procesará el audio recogido, pasándolo por un modelo de IA que lo convertirá a texto y luego lo comparará con la traducción correcta de la frase, emitiendo una evaluación entre 1 y 4 puntos.
 4. La aplicación mostrará en pantalla la respuesta correcta (la frase en inglés) y la reproducirá.
 5. En función de la evaluación, se le proporcionará feedback visual y auditivo.
@@ -55,7 +55,7 @@ Como explicamos en el anterior artículo, la idea de Fluento es aplicar un model
 
 ## Partes que componen la plataforma
 
-Ya hemos visto las funcionalidades mínimas que consideramos necesarias para el MVP. Ahora vamos a ver las partes que necesitamos a implementar para dar soporte a estas funcionalidades.
+Ya hemos visto las funcionalidades mínimas que consideramos necesarias para el MVP. Ahora vamos a ver las partes que necesitamos implementar para dar soporte a estas funcionalidades.
 
 ### Aplicación móvil
 
@@ -75,14 +75,14 @@ Si queremos llevar a cabo campañas de marketing y que los usuarios puedan enten
 
 ### Back office
 
-Aunque esto no es algo estrictamente necesario en esta fase MVP, donde lo que prima es que el usuario utilice la aplicación y recojamos feedback sobre ella lo antes posible, si que consideramos importante contar con un mínimo back office que nos permita gestionar fundamentalmente 2 cosas:
+Aunque esto no es algo estrictamente necesario en esta fase MVP, donde lo que prima es que el usuario utilice la aplicación y recojamos feedback sobre ella lo antes posible, sí que consideramos importante contar con un mínimo back office que nos permita gestionar fundamentalmente 2 cosas:
 
 * **Contenido del Explora**: Como decíamos el contenido del Explora debe ser dinámico y variado, por lo que necesitaremos un sistema que nos permita llevar a cabo una gestión eficiente de dicho contenido.
 * **Revisión de listas privadas**: Las listas privadas se crearán de forma automática por el usuario y la idea es que no requiera de intervención humana. Sin embargo, es esperable que se puedan producir errores que necesiten de una intervención manual, como el forzar un reintento de creación de la lista. El back office debe permitir esta funcionalidad.
 
 ## Arquitectura: Construyendo sobre bases sólidas
 
-La arquitectura de Fluento está diseñada pensando en tres pilares fundamentales: escalabilidad, mantenibilidad y agilidad en el desarrollo. Veamos en detalle cada componente del stack tecnológico y por qué lo hemos elegido:
+La arquitectura de Fluento está diseñada pensando en un equilibrio entre tres pilares fundamentales: escalabilidad, mantenibilidad y agilidad en el desarrollo. Veamos en detalle cada componente del stack tecnológico y por qué lo hemos elegido:
 
 ### Aplicación móvil: React Native y Expo
 
@@ -104,7 +104,7 @@ Sin embargo, veíamos demasiada atadura la dependencia que esto implica. Pensand
 
 Por ello, hemos optado por usar Prisma como ORM para PostgreSQL. Prisma nos proporciona un sistema de tipos TypeScript que nos permite interactuar con la base de datos de forma segura y sencilla, y nos ofrece una capa de abstracción que nos permite migrar a otra base de datos en el futuro si fuera necesario. Además, la integración entre Prisma y Supabase es totalmente válida y está documentada tanto por [Prisma](https://www.prisma.io/docs/orm/overview/databases/supabase) como por [Supabase](https://supabase.com/docs/guides/database/prisma).
 
-### Back Office con NextJS y despedida de Vercel
+### Back Office con NextJS y despliegue en Vercel
 
 Para el back office, hemos optado por usar NextJS. Este framework nos permite crear una interfaz de administración altamente eficiente, donde la mayoría del renderizado ocurre en el servidor, resultando en una experiencia más rápida. La integración nativa con React Server Components significa que podemos construir interfaces complejas manteniendo tiempos de carga mínimos.
 
@@ -127,7 +127,7 @@ Por la misma razón que la API, la web corporativa la desarrollaremos también c
 
 ### Conclusión
 
-En resumen, a pesar de que la plataforma cuenta con varias partes que funcionan de forma independiente, la estrategia adoptada nos permite tener solo con 2 proyectos a implementar y mantener:
+En resumen, a pesar de que la plataforma cuenta con varias partes que funcionan de forma independiente, la estrategia adoptada nos permite tener únicamente 2 proyectos a implementar y mantener:
 
 * **Proyecto app**: La aplicación móvil con React Native y Expo.
 * **Proyecto next**: El proyecto NextJS que albergará la API, el back office y la web corporativa.
@@ -142,4 +142,4 @@ En este artículo hemos visto la arquitectura general de la plataforma y los com
 
 ***
 
-*Este es el segundo artículo de la serie "Desarrollando Fluento". Puedes continuar con el siguiente artículo de la serie:* [Implementación del backend](/blog/construyendo-fluento-backend)
+*Este es el segundo artículo de la serie "Desarrollando Fluento". Puedes continuar con el siguiente artículo de la serie:* [Implementación del backend](/blog/construyendo-fluento-3-backend)
