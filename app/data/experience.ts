@@ -8,15 +8,26 @@ export interface Experience {
 
 export const experiences: Experience[] = [
   {
-    title: "Web Developer & Tech Lead",
-    company: "Logixs",
+    title: "Freelance Full Stack Developer",
+    company: "Freelance",
     period: "2022 - Actualidad",
     description: [
-      "Participación en proyectos como Desarrollador Web FullStack",
+      "Desarrollo de proyectos de software como Full Stack Developer",
+      "Análisis, diseño e implementación de soluciones tecnológicas",
       "Puesta en marcha, gestión y liderazgo de proyectos"
     ],
     technologies: ["NextJS", "NestJS", "PostgreSQL", "Microservices", "Kubernetes", "AWS"]
   },
+  // {
+  //   title: "Web Developer & Tech Lead",
+  //   company: "Logixs",
+  //   period: "2022 - Actualidad",
+  //   description: [
+  //     "Participación en proyectos como Desarrollador Web FullStack",
+  //     "Puesta en marcha, gestión y liderazgo de proyectos"
+  //   ],
+  //   technologies: ["NextJS", "NestJS", "PostgreSQL", "Microservices", "Kubernetes", "AWS"]
+  // },
   {
     title: "CTO y Fundador",
     company: "Mooviment",
