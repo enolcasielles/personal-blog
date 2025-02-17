@@ -7,6 +7,12 @@ interface ExperienceTimelineProps {
 export default function ExperienceTimeline({ experiences }: ExperienceTimelineProps) {
   return (
     <>
+      <h2 className="font-bold text-3xl mb-4 tracking-tighter">
+        Experiencia Profesional
+      </h2>
+      <p className="text-lg mb-8 text-gray-600 dark:text-gray-400">
+          A continuación, puedes ver mi experiencia profesional en el sector tecnológico.
+        </p>
 
       <div className="space-y-12">
         {experiences.map((experience, index) => (
