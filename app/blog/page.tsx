@@ -12,11 +12,7 @@ export default function BlogPage() {
 
   return (
     <section className="max-w-4xl mx-auto">
-      <PageTitle title="Blog" />
-      
-      <p className='mb-12 text-lg prose prose-neutral dark:prose-invert'>
-        Un blog sobre Desarrollo Web, Inteligencia Artifical y Tecnología en general
-      </p>
+      <PageTitle title="Blog" description='Artículos sobre desarrollo web, tecnologías emergentes y creación de productos digitales' />
 
       <div className="space-y-8">
         {allBlogs

@@ -6,11 +6,6 @@ import SectionCard from "./components/section-card";
 export default function Page() {
   return (
     <section className="max-w-4xl mx-auto">
-      <h1 className="font-bold text-5xl mb-8 tracking-tighter bg-gradient-to-r from-black to-gray-500 dark:from-white dark:to-gray-400 bg-clip-text text-transparent">
-        Sobre mí
-      </h1>
-      
-      <div className="h-[2px] w-full bg-gradient-to-r from-black to-transparent dark:from-white mb-12"></div>
       
       <div className="grid grid-cols-1 md:grid-cols-[300px_1fr] gap-12 mb-20">
         <div className="flex flex-col items-center space-y-6">
@@ -34,7 +29,7 @@ export default function Page() {
 
         <div className="space-y-6">
           <p className="text-lg leading-relaxed prose prose-neutral dark:prose-invert">
-            Soy un desarrollador de software con más de 10 años de experiencia, especializado en la creación y desarrollo de productos digitales. Mi trayectoria está estrechamente ligada al mundo de las startups, donde he fundado proyectos exitosos como
+            Desarrollador de software con más de 10 años de experiencia, especializado en la creación y desarrollo de productos digitales. Mi trayectoria está estrechamente ligada al mundo de las startups, donde he fundado proyectos exitosos como
             <a 
               href="https://www.mooviment.com" 
               target="_blank" 
@@ -55,7 +50,7 @@ export default function Page() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <SectionCard 
             title="Blog"
-            description="Artículos sobre desarrollo web, inteligencia artificial y cualquier aprendizaje que me resulte interesante."
+            description="Artículos sobre desarrollo web, tecnologías emergentes y cualquier aprendizaje que me resulte interesante."
             href="/blog"
             buttonText="Ver artículos"
           />

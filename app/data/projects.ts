@@ -5,6 +5,7 @@ export interface Project {
   summary: string;
   description: string;
   images: string[];
+  isPersonal: boolean;
   customer?: string;
   jobTitle?: string;
   technologies: string[];
@@ -23,6 +24,7 @@ export const projects: Project[] = [
     description: "Fluento es una aplicación móvil que ofrece una solución para mejorar tu inglés. La idea es explotar la metodología de los ejercicios de traducción inversa. El alumno recibe una frase en español y debe traducirla al inglés, que será evaluada por un modelo de IA. Esta metodología es ampliamente utilizada por reconocidas academias y ha demostrado unos resultados muy satisfactorios. Cuando el usuario realiza esta actividad una y otra vez, mejora su vocabulario, adquiere mayor fluidez a la hora de construir las frases y, en general, adquiere confianza en su capacidad para hablar inglés.",
     images: ["/projects/fluento/cover-image.png"],
     customer: "Proyecto Personal",
+    isPersonal: true,
     technologies: ["NextJS", "React Native", "Expo", "Open AI"],
     challenges: [
       "Desarrollo de un sistema de evaluación de respuestas mediante IA que analice gramática y vocabulario",
@@ -41,6 +43,7 @@ export const projects: Project[] = [
     description: "MemoMate es un chatbot en Telegram que te ayuda a mejorar tus relaciones personales. A través de conversación natural, puedes ir contándole cualquier cosa que quieras recordar de tus contactos. El sistema se encargará de identificar el contacto (o de crearlo si no existira) y de guardar la información correspondiente. Así mismo, MemoMate te permite preguntarle cualquier cosa acerca de cualquiera de tus contactos, analizando la información almacenada y devolviendo una respuesta basada en los datos.",
     images: ["/projects/memomate/imagen1.png"],
     customer: "Proyecto Personal",
+    isPersonal: true,
     technologies: ["NextJS", "Open AI", "PostgreSQL", "Pinecone", "Telegram API"],
     challenges: [
       "Implementación de un bot en Telegram para manejar la conversación con el usuario",
@@ -60,6 +63,7 @@ export const projects: Project[] = [
     description: "Plataforma Web y Aplicación Móvil que permite al usuario crear una experiencia de Realidad Aumentada, mediante una imagen y un vídeo, e imprimirla sobre un producto físico.",
     images: ["/projects/mooviment/mooviment_1.png"],
     customer: "Mooviment Lab SL",
+    isPersonal: true,
     jobTitle: "Fundador y CTO",
     technologies: ["Angular", "Flutter", "AR", "Express", "AWS", "React"],
     challenges: [
@@ -79,6 +83,8 @@ export const projects: Project[] = [
     summary: 'Framework para la construcción, testeo y puesta en marcha de agencias de inteligencia artificial.',
     description: 'Framework para la construcción, testeo y puesta en marcha de agencias de inteligencia artificial.',
     images: ["/projects/ai-agency/cover-image.png"],
+    customer: "Proyecto Personal",
+    isPersonal: true,
     technologies: ["OpenAI", "Next.js", "pnpm"],
     challenges: [
       "Implementación de un sistema modular sobre el cual se pueden crear nuevas agencias de IA",
