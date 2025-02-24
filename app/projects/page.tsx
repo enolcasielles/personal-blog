@@ -1,7 +1,6 @@
 import { projects } from "../data/projects";
 import Image from "next/image";
 import { Link } from 'next-view-transitions'
-import { useState } from "react";
 import PageTitle from "app/components/page-title";
 
 export const metadata = {
@@ -37,6 +36,7 @@ export default function ProjectsPage() {
       </div>
 
       {/* Projects Grid */}
+      <h2 className="text-2xl font-bold mb-8" id="personal">Proyectos Personales</h2>
       <div id="personal" className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
         {personalProjects.map((project) => (
           <Link 

@@ -22,14 +22,14 @@ export default function Page() {
           <div className="text-center">
             <h2 className="font-bold text-2xl mb-2">Enol Casielles</h2>
             <span className="inline-block px-4 py-2 bg-gray-100 dark:bg-gray-800 rounded-full text-sm font-medium">
-              Full Stack Developer
+              Ingeniero de software
             </span>
           </div>
         </div>
 
         <div className="space-y-6">
           <p className="text-lg leading-relaxed prose prose-neutral dark:prose-invert">
-            Desarrollador de software con más de 10 años de experiencia, especializado en la creación y desarrollo de productos digitales. Mi trayectoria está estrechamente ligada al mundo de las startups, donde he fundado proyectos exitosos como
+            Ingeniero de software con más de 10 años de experiencia, especializado en la creación y desarrollo de productos digitales. Mi trayectoria está estrechamente ligada al mundo de las startups, donde he fundado proyectos exitosos como
             <a 
               href="https://www.mooviment.com" 
               target="_blank" 
