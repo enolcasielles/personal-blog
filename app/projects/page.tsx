@@ -2,6 +2,7 @@ import { projects } from "../data/projects";
 import Image from "next/image";
 import { Link } from 'next-view-transitions'
 import PageTitle from "app/components/page-title";
+import ProjectCard from "app/components/project-card";
 
 export const metadata = {
   title: 'Proyectos',
@@ -9,8 +10,9 @@ export const metadata = {
 };
 
 export default function ProjectsPage() {
-  const personalProjects = projects.filter(project => project.isPersonal);
-  const clientProjects = projects.filter(project => !project.isPersonal);
+  const personalProjects = projects.filter(project => project.type === 'personal').sort((a, b) => a.order - b.order);
+  const clientProjects = projects.filter(project => project.type === 'client').sort((a, b) => a.order - b.order);
+  const experimentProjects = projects.filter(project => project.type === 'experiment').sort((a, b) => a.order - b.order);
 
   return (
     <section className="max-w-4xl mx-auto">
@@ -25,7 +27,13 @@ export default function ProjectsPage() {
           href="#personal"
           className="group inline-flex items-center px-4 py-2 rounded-lg bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
         >
-          Proyectos Personales ({personalProjects.length})
+          Startups Lanzadas ({personalProjects.length})
+        </a>
+        <a 
+          href="#experiment"
+          className="group inline-flex items-center px-4 py-2 rounded-lg bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+        >
+          Experimentos ({experimentProjects.length})
         </a>
         <a 
           href="#client"
@@ -36,46 +44,29 @@ export default function ProjectsPage() {
       </div>
 
       {/* Projects Grid */}
-      <h2 className="text-2xl font-bold mb-8" id="personal">Proyectos Personales</h2>
-      <div id="personal" className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+
+      <h2 className="text-2xl font-bold mb-8" id="personal">Startups Lanzadas</h2>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
         {personalProjects.map((project) => (
           <Link 
             href={`/projects/${project.id}`} 
             key={project.id}
             className="group"
           >
-            <article className="border border-gray-200 dark:border-gray-800 rounded-lg overflow-hidden hover:shadow-lg transition-all duration-300">
-              <div className="relative h-48 w-full">
-                <Image
-                  src={project.images[0]}
-                  alt={project.title}
-                  fill
-                  className="object-cover group-hover:scale-105 transition-transform duration-300"
-                  style={{viewTransitionName: `image-${project.id}`}}
-                />
-              </div>
-              <div className="p-6">
-                <h2 
-                  className="text-xl font-bold mb-2" 
-                  style={{viewTransitionName: `title-${project.id}`}}
-                >
-                  {project.title}
-                </h2>
-                <p className="text-gray-600 dark:text-gray-400 mb-4 line-clamp-2">
-                  {project.summary}
-                </p>
-                <div className="flex flex-wrap gap-2">
-                  {project.technologies.slice(0, 3).map((tech) => (
-                    <span 
-                      key={tech}
-                      className="px-3 py-1 bg-gray-100 dark:bg-gray-800 rounded-full text-sm"
-                    >
-                      {tech}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            </article>
+            <ProjectCard project={project} />
+          </Link>
+        ))}
+      </div>
+
+      <h2 className="text-2xl font-bold mb-8" id="experiment">Experimentos</h2>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+        {experimentProjects.map((project) => (
+          <Link 
+            href={`/projects/${project.id}`} 
+            key={project.id}
+            className="group"
+          >
+            <ProjectCard project={project} />
           </Link>
         ))}
       </div>
@@ -88,43 +79,7 @@ export default function ProjectsPage() {
             key={project.id}
             className="group"
           >
-            <article className="border border-gray-200 dark:border-gray-800 rounded-lg overflow-hidden hover:shadow-lg transition-all duration-300">
-              <div className="relative h-48 w-full">
-                <Image
-                  src={project.images[0]}
-                  alt={project.title}
-                  fill
-                  className="object-cover group-hover:scale-105 transition-transform duration-300"
-                  style={{viewTransitionName: `image-${project.id}`}}
-                />
-              </div>
-              <div className="p-6">
-                <h2 
-                  className="text-xl font-bold mb-2" 
-                  style={{viewTransitionName: `title-${project.id}`}}
-                >
-                  {project.title}
-                </h2>
-                {project.customer && (
-                  <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">
-                    {project.customer}
-                  </p>
-                )}
-                <p className="text-gray-600 dark:text-gray-400 mb-4 line-clamp-2">
-                  {project.summary}
-                </p>
-                <div className="flex flex-wrap gap-2">
-                  {project.technologies.slice(0, 3).map((tech) => (
-                    <span 
-                      key={tech}
-                      className="px-3 py-1 bg-gray-100 dark:bg-gray-800 rounded-full text-sm"
-                    >
-                      {tech}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            </article>
+            <ProjectCard project={project} />
           </Link>
         ))}
       </div>
