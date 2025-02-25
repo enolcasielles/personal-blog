@@ -66,19 +66,20 @@ export default function Page() {
       <ExperienceTimeline experiences={experiences} />
 
       <div className="mt-20">
-        <h2 className="font-bold text-3xl mb-8 tracking-tighter">¿Necesitas ayuda con tu proyecto?</h2>
+        <h2 className="font-bold text-3xl mb-8 tracking-tighter">¿Necesitas asesoramiento tecnológico?</h2>
         <div className="p-8 rounded-2xl border-2 border-gray-100 dark:border-gray-800 hover:border-gray-200 dark:hover:border-gray-700 transition-colors">
           <div className="grid grid-cols-1 md:grid-cols-[2fr_1fr] gap-8 items-center">
             <div className="space-y-6">
-              <h3 className="font-bold text-2xl">Servicios de Consultoría y Desarrollo</h3>
+              <h3 className="font-bold text-2xl">Servicios de Consultoría Tecnológica</h3>
               <p className="text-lg leading-relaxed text-gray-600 dark:text-gray-300">
-                Con más de 10 años de experiencia en desarrollo de productos digitales, puedo ayudarte a construir 
-                soluciones tecnológicas innovadoras y escalables. Desde el MVP hasta el producto final.
+                Ayudo a empresas a tomar las mejores decisiones técnicas. Desde la puesta en marcha de nuevos proyectos
+                hasta la optimización de sistemas existentes, ofrezco asesoramiento especializado para impulsar tu 
+                transformación digital.
               </p>
-              <div>
+              <div className="flex flex-col sm:flex-row gap-4">
                 <a 
                   href="/consulting" 
-                  className="inline-flex items-center px-6 py-3 bg-black dark:bg-white text-white dark:text-black rounded-lg font-medium hover:opacity-90 transition-opacity"
+                  className="w-full sm:w-auto text-center inline-flex items-center justify-center px-6 py-3 bg-black dark:bg-white text-white dark:text-black rounded-lg font-medium hover:opacity-90 transition-opacity"
                 >
                   Explorar servicios
                   <svg 
@@ -95,13 +96,19 @@ export default function Page() {
                     />
                   </svg>
                 </a>
+                <a 
+                  href="mailto:enolcasielles@gmail.com"
+                  className="w-full sm:w-auto text-center inline-flex items-center justify-center px-6 py-3 border-2 border-black dark:border-white rounded-lg font-medium hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                >
+                  Contactar
+                </a>
               </div>
             </div>
             <div className="relative aspect-square w-full max-w-[300px] mx-auto">
               <Image
                 fill
-                src="/consulting-image.png"
-                alt="Consultoría de desarrollo"
+                src="/images/consulting/hero.jpg"
+                alt="Consultoría tecnológica"
                 className="object-cover rounded-2xl"
                 sizes="(max-width: 768px) 100vw, 300px"
               />

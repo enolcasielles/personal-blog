@@ -9,20 +9,20 @@ export default function Page() {
       <section className="mb-24">
         <div className="grid grid-cols-1 md:grid-cols-[1fr_300px] gap-12 items-center">
           <div className="space-y-6">
-            <h1 className="font-bold text-5xl tracking-tighter bg-gradient-to-r from-black to-gray-500 dark:from-white dark:to-gray-400 bg-clip-text text-transparent">
-              Transformo Ideas en Productos Digitales Exitosos
+            <h1 className="font-bold text-5xl text-black dark:text-white">
+              Consultoría Tecnológica para tu Negocio
             </h1>
             <p className="text-lg leading-relaxed text-gray-600 dark:text-gray-300">
-              Soy un desarrollador full-stack especializado en ayudar a startups a construir productos 
-              digitales innovadores. Con más de 10 años de experiencia, convierto ideas ambiciosas en 
-              soluciones tecnológicas escalables y listas para el mercado.
+              Ofrezco servicios de consultoría tecnológica para ayudar a tu empresa a tomar las mejores decisiones 
+              técnicas. Con más de 10 años de experiencia, asesoro en la optimización de sistemas, 
+              elección de tecnologías y transformación digital.
             </p>
             <div className="flex gap-4">
               <Link 
                 href="/projects" 
                 className="inline-flex items-center px-6 py-3 bg-black dark:bg-white text-white dark:text-black rounded-lg font-medium hover:opacity-90 transition-opacity"
               >
-                Ver Proyectos
+                Ver casos de éxito
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
               <a 
@@ -33,13 +33,15 @@ export default function Page() {
               </a>
             </div>
           </div>
-          <div className="relative w-64 h-64 mx-auto">
+          <div className="relative w-[400px] h-[350px] mx-auto hidden md:block">
             <Image 
               fill
-              alt="enol-photo" 
-              src="/ec-photo.png" 
-              className="object-cover rounded-2xl"
-              sizes="(max-width: 768px) 100vw, 300px"
+              priority
+              alt="consulting-strategy" 
+              src="/images/consulting/hero.jpg" 
+              className="object-cover rounded-xl"
+              sizes="(max-width: 768px) 100vw, 400px"
+              quality={100}
             />
           </div>
         </div>
@@ -47,32 +49,58 @@ export default function Page() {
 
       {/* Services Section */}
       <section className="mb-24">
-        <h2 className="font-bold text-3xl mb-8 tracking-tighter">Servicios Especializados para Startups</h2>
+        <h2 className="font-bold text-3xl mb-8 tracking-tighter">Servicios de Consultoría Tecnológica</h2>
         <div className="grid grid-cols-1 gap-6">
           <div className="p-8 rounded-2xl border-2 border-gray-100 dark:border-gray-800 hover:border-gray-200 dark:hover:border-gray-700 transition-colors">
-            <h3 className="font-bold text-xl mb-4">Desarrollo de MVP</h3>
+            <h3 className="font-bold text-xl mb-4">Puesta en Marcha de Proyectos</h3>
             <p className="text-gray-600 dark:text-gray-300 mb-4">
-              Construyo la primera versión de tu producto digital con las funcionalidades esenciales 
-              para validar tu idea en el mercado rápidamente.
+              Te ayudo a arrancar nuevos proyectos tecnológicos con bases sólidas, definiendo la estrategia 
+              técnica y el roadmap adecuado para tu negocio.
             </p>
             <ul className="space-y-2 text-sm text-gray-600 dark:text-gray-300">
-              <li>• Aplicaciones web full-stack</li>
-              <li>• APIs RESTful</li>
-              <li>• Arquitectura escalable</li>
-              <li>• Integración con servicios cloud</li>
+              <li>• Definición de arquitectura</li>
+              <li>• Planificación técnica</li>
+              <li>• Selección de equipo</li>
+              <li>• Gestión de riesgos técnicos</li>
             </ul>
           </div>
           <div className="p-8 rounded-2xl border-2 border-gray-100 dark:border-gray-800 hover:border-gray-200 dark:hover:border-gray-700 transition-colors">
-            <h3 className="font-bold text-xl mb-4">Desarrollo de Producto</h3>
+            <h3 className="font-bold text-xl mb-4">Selección de Tecnologías</h3>
             <p className="text-gray-600 dark:text-gray-300 mb-4">
-              Desarrollo completo de tu producto digital, desde la arquitectura hasta el despliegue, 
-              con foco en la escalabilidad y mantenibilidad.
+              Asesoro en la elección de las tecnologías y herramientas más adecuadas para tu caso específico, 
+              considerando factores técnicos y de negocio.
             </p>
             <ul className="space-y-2 text-sm text-gray-600 dark:text-gray-300">
-              <li>• Arquitectura limpia</li>
-              <li>• Testing automatizado</li>
-              <li>• CI/CD</li>
-              <li>• Monitorización y análisis</li>
+              <li>• Análisis de requisitos</li>
+              <li>• Evaluación de alternativas</li>
+              <li>• Proof of concepts</li>
+              <li>• Estrategia de implementación</li>
+            </ul>
+          </div>
+          <div className="p-8 rounded-2xl border-2 border-gray-100 dark:border-gray-800 hover:border-gray-200 dark:hover:border-gray-700 transition-colors">
+            <h3 className="font-bold text-xl mb-4">Auditorías Tecnológicas</h3>
+            <p className="text-gray-600 dark:text-gray-300 mb-4">
+              Evalúo el estado actual de tu infraestructura y sistemas para identificar áreas de mejora 
+              y proponer soluciones efectivas.
+            </p>
+            <ul className="space-y-2 text-sm text-gray-600 dark:text-gray-300">
+              <li>• Análisis de arquitectura</li>
+              <li>• Revisión de código</li>
+              <li>• Evaluación de seguridad</li>
+              <li>• Recomendaciones detalladas</li>
+            </ul>
+          </div>
+          <div className="p-8 rounded-2xl border-2 border-gray-100 dark:border-gray-800 hover:border-gray-200 dark:hover:border-gray-700 transition-colors">
+            <h3 className="font-bold text-xl mb-4">Optimización de Sistemas</h3>
+            <p className="text-gray-600 dark:text-gray-300 mb-4">
+              Mejoro el rendimiento y la eficiencia de tus sistemas existentes, identificando cuellos de botella 
+              y aplicando soluciones optimizadas.
+            </p>
+            <ul className="space-y-2 text-sm text-gray-600 dark:text-gray-300">
+              <li>• Análisis de rendimiento</li>
+              <li>• Rediseño de sistemas</li>
+              <li>• Optimización de costes</li>
+              <li>• Escalabilidad</li>
             </ul>
           </div>
         </div>
@@ -80,7 +108,7 @@ export default function Page() {
 
       {/* Why Me Section */}
       <section className="mb-24">
-        <h2 className="font-bold text-3xl mb-12 tracking-tighter text-center">¿Por qué trabajar conmigo?</h2>
+        <h2 className="font-bold text-3xl mb-12 tracking-tighter text-center">¿Por qué elegirme como consultor?</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           <div className="group p-8 rounded-2xl border-2 border-gray-100 dark:border-gray-800 hover:border-gray-200 dark:hover:border-gray-700 transition-all duration-300 hover:shadow-lg">
             <div className="mb-6 p-4 rounded-xl bg-gray-50 dark:bg-gray-800 w-fit group-hover:scale-110 transition-transform duration-300">
@@ -98,10 +126,10 @@ export default function Page() {
                 />
               </svg>
             </div>
-            <h3 className="font-bold text-xl mb-3">Experiencia Probada</h3>
+            <h3 className="font-bold text-xl mb-3">Experiencia Práctica</h3>
             <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
-              He trabajado con startups en diferentes etapas, desde la idea inicial hasta el 
-              escalado del producto. Mi experiencia te ayudará a evitar errores comunes y acelerar el desarrollo.
+              Mi experiencia como desarrollador y arquitecto me permite ofrecer consejos prácticos y realistas, 
+              basados en casos reales y no solo en teoría.
             </p>
           </div>
 
@@ -121,10 +149,10 @@ export default function Page() {
                 />
               </svg>
             </div>
-            <h3 className="font-bold text-xl mb-3">Enfoque Técnico</h3>
+            <h3 className="font-bold text-xl mb-3">Visión Estratégica</h3>
             <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
-              Desarrollo con las últimas tecnologías y mejores prácticas para garantizar productos 
-              robustos y mantenibles. Tu producto estará preparado para escalar.
+              Combino conocimiento técnico con visión de negocio para recomendar soluciones que no solo son 
+              técnicamente sólidas, sino que también aportan valor al negocio.
             </p>
           </div>
 
@@ -144,10 +172,10 @@ export default function Page() {
                 />
               </svg>
             </div>
-            <h3 className="font-bold text-xl mb-3">Visión de Producto</h3>
+            <h3 className="font-bold text-xl mb-3">Soluciones Adaptadas</h3>
             <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
-              No solo escribo código, ayudo a definir y mejorar el producto desde una perspectiva 
-              técnica y de negocio. Tu éxito es mi prioridad.
+              Cada empresa es única. Proporciono recomendaciones personalizadas que se ajustan a tu contexto, 
+              recursos y objetivos específicos.
             </p>
           </div>
 
@@ -167,10 +195,10 @@ export default function Page() {
                 />
               </svg>
             </div>
-            <h3 className="font-bold text-xl mb-3">Comunicación Efectiva</h3>
+            <h3 className="font-bold text-xl mb-3">Acompañamiento Continuo</h3>
             <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
-              Mantengo una comunicación clara y constante durante todo el proceso. Reuniones semanales, 
-              actualizaciones frecuentes y total transparencia en el desarrollo.
+              No solo entrego recomendaciones, sino que te acompaño en la implementación y seguimiento 
+              de las soluciones propuestas.
             </p>
           </div>
         </div>
@@ -179,7 +207,7 @@ export default function Page() {
       {/* Projects Preview */}
       <section className="mb-24">
         <div className="flex justify-between items-center mb-8">
-          <h2 className="font-bold text-3xl tracking-tighter">Proyectos Destacados</h2>
+          <h2 className="font-bold text-3xl tracking-tighter">Casos de Éxito</h2>
           <Link 
             href="/projects"
             className="text-gray-600 dark:text-gray-300 hover:text-black dark:hover:text-white transition-colors inline-flex items-center"
@@ -198,7 +226,7 @@ export default function Page() {
             />
             <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
               <Link 
-                href="/projects#mooviment"
+                href="/projects/mooviment"
                 className="px-6 py-3 bg-white text-black rounded-lg font-medium hover:bg-opacity-90 transition-opacity"
               >
                 Ver Detalles
@@ -208,13 +236,13 @@ export default function Page() {
           <div className="aspect-video relative rounded-2xl overflow-hidden group">
             <Image
               fill
-              src="/blog/construyendo-fluento-2-arquitectura/og-image.png"
-              alt="Proyecto Fluento"
+              src="/projects/beeping/cover-image.png"
+              alt="Proyecto Beeping"
               className="object-cover group-hover:scale-105 transition-transform duration-300"
             />
             <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
               <Link 
-                href="/projects#fluento"
+                href="/projects/beeping"
                 className="px-6 py-3 bg-white text-black rounded-lg font-medium hover:bg-opacity-90 transition-opacity"
               >
                 Ver Detalles
@@ -227,15 +255,15 @@ export default function Page() {
       {/* Contact Section */}
       <section id="contact" className="mb-24">
         <div className="p-8 rounded-2xl border-2 border-gray-100 dark:border-gray-800 text-center">
-          <h2 className="font-bold text-3xl mb-4 tracking-tighter">¿Tienes un proyecto en mente?</h2>
+          <h2 className="font-bold text-3xl mb-4 tracking-tighter">¿Necesitas asesoramiento tecnológico?</h2>
           <p className="text-gray-600 dark:text-gray-300 mb-6 max-w-xl mx-auto">
-            Cuéntame sobre tu idea y exploremos cómo puedo ayudarte a convertirla en un producto digital exitoso.
+            Cuéntame sobre los retos tecnológicos de tu empresa y exploremos cómo puedo ayudarte a superarlos.
           </p>
           <a 
-            href="mailto:tu@email.com" 
+            href="mailto:enolcasielles@gmail.com" 
             className="inline-flex items-center px-6 py-3 bg-black dark:bg-white text-white dark:text-black rounded-lg font-medium hover:opacity-90 transition-opacity"
           >
-            Contactar ahora
+            Solicitar consulta
             <ArrowRight className="ml-2 h-4 w-4" />
           </a>
         </div>

@@ -22,7 +22,7 @@ export default function ProjectsPage() {
       />
 
       {/* Tabs */}
-      <div className="flex space-x-4 mb-8">
+      <div className="hidden md:flex space-x-4 mb-8">
         <a 
           href="#personal"
           className="group inline-flex items-center px-4 py-2 rounded-lg bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
