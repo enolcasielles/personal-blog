@@ -36,11 +36,11 @@ export default function Page() {
               className="text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300 font-medium transition-colors"
             >
               {" "}mooviment.com
-            </a>. He creado este espacio como punto central de mi marca personal, donde comparto conocimientos, experiencias y los proyectos innovadores en los que trabajo.
+            </a>. Combino el desarrollo de productos innovadores con servicios de consultoría tecnológica, ayudando a empresas a materializar sus ideas en soluciones digitales efectivas.
           </p>
           
           <p className="text-lg leading-relaxed prose prose-neutral dark:prose-invert">
-            Actualmente estoy creando proyectos web que utilicen tecnologías emergentes como la inteligencia artificial. Creo firmemente en el aprendizaje constante y en compartir ese conocimiento para inspirar a otros desarrolladores a crear productos innovadores que resuelvan problemas reales.
+            Actualmente me centro en crear productos web que aprovechen tecnologías emergentes como la inteligencia artificial, mientras asesoro a empresas en su transformación digital. Mi objetivo es unir visión estratégica con implementación práctica para crear soluciones que generen valor real.
           </p>
         </div>
       </div>
@@ -66,22 +66,22 @@ export default function Page() {
       <ExperienceTimeline experiences={experiences} />
 
       <div className="mt-20">
-        <h2 className="font-bold text-3xl mb-8 tracking-tighter">¿Necesitas asesoramiento tecnológico?</h2>
+        <h2 className="font-bold text-3xl mb-8 tracking-tighter">¿Tienes algún proyecto en mente?</h2>
         <div className="p-8 rounded-2xl border-2 border-gray-100 dark:border-gray-800 hover:border-gray-200 dark:hover:border-gray-700 transition-colors">
           <div className="grid grid-cols-1 md:grid-cols-[2fr_1fr] gap-8 items-center">
             <div className="space-y-6">
-              <h3 className="font-bold text-2xl">Servicios de Consultoría Tecnológica</h3>
+              <h3 className="font-bold text-2xl">Desarrollo de Producto y Consultoría Tecnológica</h3>
               <p className="text-lg leading-relaxed text-gray-600 dark:text-gray-300">
-                Ayudo a empresas a tomar las mejores decisiones técnicas. Desde la puesta en marcha de nuevos proyectos
-                hasta la optimización de sistemas existentes, ofrezco asesoramiento especializado para impulsar tu 
-                transformación digital.
+                Combino mi experiencia en desarrollo de productos digitales con servicios de consultoría tecnológica.
+                Ya sea creando un nuevo producto desde cero o mejorando sistemas existentes, aporto una visión integral
+                que une estrategia técnica con implementación práctica.
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
                 <a 
                   href="/consulting" 
                   className="w-full sm:w-auto text-center inline-flex items-center justify-center px-6 py-3 bg-black dark:bg-white text-white dark:text-black rounded-lg font-medium hover:opacity-90 transition-opacity"
                 >
-                  Explorar servicios
+                  Ver servicios
                   <svg 
                     className="ml-2 h-4 w-4" 
                     fill="none" 

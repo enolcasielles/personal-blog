@@ -10,12 +10,12 @@ export default function Page() {
         <div className="grid grid-cols-1 md:grid-cols-[1fr_300px] gap-12 items-center">
           <div className="space-y-6">
             <h1 className="font-bold text-5xl text-black dark:text-white">
-              Consultoría Tecnológica para tu Negocio
+              Desarrollo de Producto y Consultoría Tecnológica
             </h1>
             <p className="text-lg leading-relaxed text-gray-600 dark:text-gray-300">
-              Ofrezco servicios de consultoría tecnológica para ayudar a tu empresa a tomar las mejores decisiones 
-              técnicas. Con más de 10 años de experiencia, asesoro en la optimización de sistemas, 
-              elección de tecnologías y transformación digital.
+              Ofrezco un servicio integral que combina desarrollo de productos digitales y consultoría tecnológica. 
+              Con más de 10 años de experiencia, ayudo a empresas tanto en la implementación práctica como en la 
+              dirección estratégica de sus proyectos tecnológicos.
             </p>
             <div className="flex gap-4">
               <Link 
@@ -52,55 +52,55 @@ export default function Page() {
         <h2 className="font-bold text-3xl mb-8 tracking-tighter">Servicios de Consultoría Tecnológica</h2>
         <div className="grid grid-cols-1 gap-6">
           <div className="p-8 rounded-2xl border-2 border-gray-100 dark:border-gray-800 hover:border-gray-200 dark:hover:border-gray-700 transition-colors">
-            <h3 className="font-bold text-xl mb-4">Puesta en Marcha de Proyectos</h3>
+            <h3 className="font-bold text-xl mb-4">Desarrollo de Productos Digitales</h3>
             <p className="text-gray-600 dark:text-gray-300 mb-4">
-              Te ayudo a arrancar nuevos proyectos tecnológicos con bases sólidas, definiendo la estrategia 
-              técnica y el roadmap adecuado para tu negocio.
+              Transformo ideas en productos digitales funcionales y escalables, aplicando las mejores prácticas
+              de desarrollo y una metodología centrada en resultados.
             </p>
             <ul className="space-y-2 text-sm text-gray-600 dark:text-gray-300">
-              <li>• Definición de arquitectura</li>
+              <li>• Desarrollo web full-stack</li>
+              <li>• Arquitectura de software</li>
+              <li>• Integración de IA y tecnologías emergentes</li>
+              <li>• Desarrollo ágil y escalable</li>
+            </ul>
+          </div>
+          <div className="p-8 rounded-2xl border-2 border-gray-100 dark:border-gray-800 hover:border-gray-200 dark:hover:border-gray-700 transition-colors">
+            <h3 className="font-bold text-xl mb-4">Consultoría Estratégica</h3>
+            <p className="text-gray-600 dark:text-gray-300 mb-4">
+              Asesoro en la toma de decisiones técnicas y estratégicas, ayudando a elegir las tecnologías
+              y enfoques más adecuados para cada proyecto.
+            </p>
+            <ul className="space-y-2 text-sm text-gray-600 dark:text-gray-300">
               <li>• Planificación técnica</li>
-              <li>• Selección de equipo</li>
-              <li>• Gestión de riesgos técnicos</li>
+              <li>• Selección de tecnologías</li>
+              <li>• Optimización de procesos</li>
+              <li>• Estrategia de producto</li>
             </ul>
           </div>
           <div className="p-8 rounded-2xl border-2 border-gray-100 dark:border-gray-800 hover:border-gray-200 dark:hover:border-gray-700 transition-colors">
-            <h3 className="font-bold text-xl mb-4">Selección de Tecnologías</h3>
+            <h3 className="font-bold text-xl mb-4">Auditorías y Mejoras</h3>
             <p className="text-gray-600 dark:text-gray-300 mb-4">
-              Asesoro en la elección de las tecnologías y herramientas más adecuadas para tu caso específico, 
-              considerando factores técnicos y de negocio.
+              Evalúo y optimizo productos existentes, identificando áreas de mejora tanto en el código
+              como en la arquitectura y procesos.
             </p>
             <ul className="space-y-2 text-sm text-gray-600 dark:text-gray-300">
-              <li>• Análisis de requisitos</li>
-              <li>• Evaluación de alternativas</li>
-              <li>• Proof of concepts</li>
-              <li>• Estrategia de implementación</li>
+              <li>• Auditorías de código y arquitectura</li>
+              <li>• Optimización de rendimiento</li>
+              <li>• Mejora de procesos de desarrollo</li>
+              <li>• Modernización tecnológica</li>
             </ul>
           </div>
           <div className="p-8 rounded-2xl border-2 border-gray-100 dark:border-gray-800 hover:border-gray-200 dark:hover:border-gray-700 transition-colors">
-            <h3 className="font-bold text-xl mb-4">Auditorías Tecnológicas</h3>
+            <h3 className="font-bold text-xl mb-4">Acompañamiento Continuo</h3>
             <p className="text-gray-600 dark:text-gray-300 mb-4">
-              Evalúo el estado actual de tu infraestructura y sistemas para identificar áreas de mejora 
-              y proponer soluciones efectivas.
+              Ofrezco soporte y seguimiento durante todo el ciclo de vida del proyecto, desde la 
+              conceptualización hasta la implementación y mantenimiento.
             </p>
             <ul className="space-y-2 text-sm text-gray-600 dark:text-gray-300">
-              <li>• Análisis de arquitectura</li>
-              <li>• Revisión de código</li>
-              <li>• Evaluación de seguridad</li>
-              <li>• Recomendaciones detalladas</li>
-            </ul>
-          </div>
-          <div className="p-8 rounded-2xl border-2 border-gray-100 dark:border-gray-800 hover:border-gray-200 dark:hover:border-gray-700 transition-colors">
-            <h3 className="font-bold text-xl mb-4">Optimización de Sistemas</h3>
-            <p className="text-gray-600 dark:text-gray-300 mb-4">
-              Mejoro el rendimiento y la eficiencia de tus sistemas existentes, identificando cuellos de botella 
-              y aplicando soluciones optimizadas.
-            </p>
-            <ul className="space-y-2 text-sm text-gray-600 dark:text-gray-300">
-              <li>• Análisis de rendimiento</li>
-              <li>• Rediseño de sistemas</li>
-              <li>• Optimización de costes</li>
-              <li>• Escalabilidad</li>
+              <li>• Mentoring técnico</li>
+              <li>• Supervisión de implementación</li>
+              <li>• Soporte en la toma de decisiones</li>
+              <li>• Evolución del producto</li>
             </ul>
           </div>
         </div>
@@ -108,7 +108,7 @@ export default function Page() {
 
       {/* Why Me Section */}
       <section className="mb-24">
-        <h2 className="font-bold text-3xl mb-12 tracking-tighter text-center">¿Por qué elegirme como consultor?</h2>
+        <h2 className="font-bold text-3xl mb-12 tracking-tighter text-center">¿Por qué trabajar conmigo?</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           <div className="group p-8 rounded-2xl border-2 border-gray-100 dark:border-gray-800 hover:border-gray-200 dark:hover:border-gray-700 transition-all duration-300 hover:shadow-lg">
             <div className="mb-6 p-4 rounded-xl bg-gray-50 dark:bg-gray-800 w-fit group-hover:scale-110 transition-transform duration-300">
@@ -126,10 +126,10 @@ export default function Page() {
                 />
               </svg>
             </div>
-            <h3 className="font-bold text-xl mb-3">Experiencia Práctica</h3>
+            <h3 className="font-bold text-xl mb-3">Experiencia Dual</h3>
             <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
-              Mi experiencia como desarrollador y arquitecto me permite ofrecer consejos prácticos y realistas, 
-              basados en casos reales y no solo en teoría.
+              Mi experiencia como desarrollador y consultor me permite ofrecer una perspectiva única, 
+              combinando visión estratégica con conocimiento técnico profundo.
             </p>
           </div>
 
