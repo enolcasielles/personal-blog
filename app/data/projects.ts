@@ -206,15 +206,15 @@ export const projects: Project[] = [
     images: ["/projects/fluento/cover-image.png"],
     customer: "Proyecto Personal",
     type: 'experiment',
-    technologies: ["NextJS", "React Native", "Expo", "OpenAI", "TypeScript", "TailwindCSS"],
+    technologies: ["NextJS", "React Native", "Expo", "OpenAI", "TypeScript", "Kafka", "PostgreSQL"],
     challenges: [
       "Desarrollo de un sistema de evaluación basado en IA que analiza múltiples aspectos lingüísticos: gramática, vocabulario, naturalidad y contexto",
       "Implementación de un algoritmo de repetición espaciada inspirado en Anki, optimizado para el aprendizaje de idiomas",
       "Integración de tecnologías avanzadas de reconocimiento de voz y text-to-speech para mejorar la experiencia de aprendizaje",
       "Diseño de una interfaz móvil intuitiva que prioriza la experiencia de usuario y mantiene altos niveles de engagement"
     ],
-    repoUrl: "https://github.com/enolcasielles/es.fluento.next",
-    blogUrl: "/blog/construyendo-fluento-1-idea"
+    repoUrl: "https://github.com/enolcasielles/fluento-app",
+    blogUrl: "/blog/construyendo-fluento"
   },
   {
     id: "memomate",

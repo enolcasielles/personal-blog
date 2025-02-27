@@ -1,0 +1,291 @@
+---
+title: 'Construyendo Fluento: Una Aplicación para Mejorar tu Inglés'
+publishedAt: '2024-12-31'
+summary: 'En este artículo comparto mi experiencia desarrollando Fluento, una aplicación móvil que ayuda a mejorar el inglés a través de ejercicios de traducción inversa. Veremos desde la idea inicial hasta los detalles técnicos de su implementación.'
+---
+
+## Introducción
+
+En este artículo quiero compartir mi experiencia desarrollando **Fluento**, una aplicación móvil que busca ofrecer una forma eficiente y divertida de mejorar tu inglés. Es un proyecto educativo, que busca explorar como utilizar diferentes tecnologías para crear una aplicación útil y escalable.
+
+## ¿Qué es Fluento?
+
+Fluento es una aplicación móvil que ofrece una solución para mejorar tu inglés utilizando la metodología de traducción inversa. El usuario recibe una frase en español y debe traducirla al inglés. Esta metodología, ampliamente utilizada por reconocidas academias, ha demostrado resultados muy satisfactorios. La práctica repetitiva mejora el vocabulario, la fluidez en la construcción de frases y la confianza para expresarse en inglés.
+
+### Características Principales
+
+1. **Traducción inversa en tiempo real**: El usuario escucha una frase en español y debe decirla en inglés.
+2. **Adaptación inteligente**: Utilizando un algoritmo inspirado en Anki, Fluento aprende de los errores y hace practicar más aquellas estructuras que cuestan más trabajo.
+3. **Generación de listas mediante IA**: El contenido de la aplicación se genera automáticamente mediante IA.
+4. **Evaluación mediante IA**: Las respuestas son evaluadas por modelos de IA que se centran en la gramática y el vocabulario.
+
+### Funcionamiento
+
+El sistema se basa en listas de frases, donde cada lista contiene unidades compuestas por una frase en español y su traducción al inglés. Las listas tienen parámetros como nivel de dificultad, temática y estructuras gramaticales.
+
+Existen dos tipos de listas:
+- **Públicas**: Gestionadas por la plataforma y accesibles para cualquier usuario registrado.
+- **Privadas**: Creadas por usuarios Premium y accesibles solo para ellos.
+
+### Modelo Freemium
+
+La aplicación implementa un modelo freemium con las siguientes características:
+- **Plan Gratuito**: Acceso limitado a la plataforma con un número restringido de frases diarias.
+- **Plan Premium**: Acceso ilimitado y capacidad para crear listas personalizadas.
+
+## Funcionalidades Principales
+
+### Sistema de Práctica
+
+El corazón de Fluento es su sistema de práctica de traducción inversa, que funciona de la siguiente manera:
+
+1. **Selección Inteligente**: El sistema elige frases basándose en tu nivel y rendimiento anterior, asegurando un aprendizaje progresivo y personalizado.
+
+2. **Flujo de Ejercicios**:
+   - Escuchas y lees la frase en español
+   - Dispones de unos segundos para traducirla al inglés
+   - La dices en voz alta
+   - El sistema evalúa tu respuesta y te muestra la respuesta correcta junto con una puntuación
+
+3. **Evaluación mediante IA**: 
+   - Tu respuesta hablada se convierte a texto mediante tecnología de reconocimiento de voz
+   - Un modelo de IA evalúa la precisión gramatical y el uso correcto del vocabulario
+   - Recibes una puntuación según tu respuesta
+   - El sistema calcula la mejor siguiente frase y empiezas el ciclo de nuevo
+
+### Sistema de Listas
+
+Las listas son la forma en que organizamos el contenido de aprendizaje:
+
+1. **Listas Públicas**:
+   - Creadas y curadas por el equipo de Fluento
+   - Organizadas por niveles de dificultad y temáticas
+   - Actualizadas regularmente con nuevo contenido
+   - Accesibles para todos los usuarios
+
+2. **Listas Personalizadas** (Premium):
+   - Creación de listas propias
+   - Personalización de parámetros como:
+     - Nivel de dificultad
+     - Temática específica
+     - Estructuras gramaticales a practicar
+
+### Sistema de Adaptación
+
+Fluento aprende de tu interacción para optimizar tu experiencia de aprendizaje:
+
+   - Inspirado en la metodología Anki
+   - Las frases que te resultan más difíciles aparecen con mayor frecuencia
+   - Las frases que dominas es menos probable que aparezcan
+
+## Arquitectura y Tecnologías
+
+La plataforma se compone de varios elementos clave:
+
+### 1. Aplicación Móvil (React Native + Expo)
+
+Desarrollada con React Native para cubrir tanto iOS como Android con un único código base. Utilizamos Expo por su ecosistema maduro, impecable experiencia de desarrollo, y amplia variedad de librerías.
+
+### 2. Backend (NestJS)
+
+Para el backend elegimos NestJS por sus múltiples ventajas:
+- Framework robusto y maduro para Node.js
+- Arquitectura modular y escalable inspirada en Angular
+- Excelente soporte para TypeScript y decoradores
+- Sistema integrado de inyección de dependencias
+- Amplia variedad de módulos oficiales para funcionalidades comunes
+
+### 3. Base de Datos (PostgreSQL + Prisma)
+
+Utilizamos PostgreSQL a través de Supabase, con Prisma como ORM. Esta combinación nos ofrece:
+- Base de datos robusta y escalable
+- Sistema de tipos TypeScript seguro
+- Flexibilidad para futuras migraciones. El uso de Prisma en lugar de la api de Supabase nos permite cambiar a otro sistema de base de datos si lo necesitamos.
+
+### 4. Autenticación (Supabase)
+
+Supabase nos proporciona un sistema de autenticación robusto con soporte para múltiples proveedores OAuth. Por el momento, solo usaremos un sistema de autenticación por mail/contraseña. Pero el sistema está preparado para soportar más proveedores de autenticación en el futuro.
+
+### 5. Web Corporativa (NextJS)
+
+Una web sencilla desarrollada con NextJS que sirve como punto de entrada para nuevos usuarios:
+- Landing page explicativa del producto
+- Sección de ayuda y documentación (pendiente)
+- Páginas legales necesarias (pendiente)
+- Posibilidad para crear fácilmente páginas para campañas de marketing
+
+### 6. Procesamiento Asíncrono (Kafka + Process Worker)
+
+Para manejar tareas pesadas y procesamiento en segundo plano, implementamos:
+
+- **Apache Kafka**: Como sistema de mensajería para gestionar eventos y tareas asíncronas
+- **Process Worker**: Una aplicación Typescript independiente que:
+  - Consume eventos de Kafka
+  - Procesa tareas en segundo plano, como la generación de listas
+
+Esta arquitectura nos permite:
+- Escalar horizontalmente el procesamiento de tareas
+- Manejar picos de carga de forma eficiente
+- Separar la lógica de procesamiento del API principal
+- Desplegar la API en un entorno serverless y el procesamiento en un entorno de ejecución continuo.
+
+## Proyectos involucrados
+
+Para el desarrollo de la plataforma, opté por separar los eferentes componentes en 2 proyectos independientes.
+
+- **fluento-app**: Proyecto React Native que utilizando Expo desarrolla la aplicación móvil que utiliza el usuario final. Puedes ver el código [aquí](https://github.com/enolcasielles/fluento-app).
+- **fluento-monorepo**: Para el resto de elementos, se definió un monorepo con `pnpm` en el que conviven diferentes aplicaciones y paquetes que dan soporte a la API, al Process Worker y a la Web Corporativa. Puedes ver el código [aquí](https://github.com/enolcasielles/fluento-back).
+
+En las siguientes secciones, vamos a ver las principales características de cada uno de estos proyectos. No voy a entrar en detalle en explicar en profundidad la implementación realizada por no hacer un artículo demasiado largo. Voy a explicar únicamente las características más relevantes.
+
+## Monorepo
+
+El proyecto `fluento-monorepo` está estructurado en dos directorios principales: `apps` y `packages`. Esta organización nos permite mantener un código modular y reutilizable, donde los paquetes proporcionan funcionalidad común que puede ser utilizada por las diferentes aplicaciones. Si quieres saber mejor como funciona este tipo de estructura, te recomiendo [este artículo](https://enolcasielles.com/blog/monorepo) donde explico como funciona y como crear un monorepo con pnpm.
+
+
+### Paquetes (`packages`)
+
+En el directorio `packages` encontramos el código compartido que da soporte a todas las aplicaciones:
+
+El paquete `core` encapsula toda la lógica de negocio común entre las diferentes aplicaciones. Aquí definimos los tipos e interfaces compartidas, implementamos utilidades y helpers que se utilizan en múltiples lugares, y mantenemos las constantes y configuraciones globales que necesita toda la plataforma.
+
+El paquete `database` centraliza todo lo relacionado con la persistencia de datos. Contiene el schema de Prisma que define nuestra estructura de datos, las migraciones que mantienen la base de datos actualizada, los modelos y tipos que representan nuestras entidades, y es donde definiríamos cualquier otra funcionalidad que nos ayude a facilitar el acceso a datos desde cualquier aplicación.
+
+El paquete `kafka` es simple pero efectivo. Contiene un único fichero que implemente componentes clave para que las aplicaciones gestionen de forma eficiente cualquier aspecto relacionado. Por un lado, expone el método `produceMessage` para que las aplicaciones puedan enviar mensajes a un topic de Kafka. Por otro lado, expone una clase abstracta `KafkaConsumer` que facilita la implementación de consumidores de forma fácil y eficiente. Además, se hace uso de genéricos de Typescipt que permitan a las aplicaciones definir el tipo de datos que se envían y reciben. Por útlimo, expone el método `initKafka` que permite crear los topic de Kafka que se utilizarán en la plataforma.
+
+### Aplicaciones (`apps`)
+
+Por otro lado, el directorio `apps` contiene las diferentes aplicaciones que conforman el backend y la web de Fluento:
+
+La aplicación `api`, desarrollada con NestJS, constituye el núcleo del backend. Se encarga de gestionar todas las peticiones de la aplicación móvil e implementa la lógica de negocio principal. Además, maneja toda la autenticación y autorización de usuarios. La arquitectura se ha diseñado pensando en su despliegue en un entorno serverless, lo que nos permitirá optimizar costes y escalar según la demanda.
+
+La aplicación `process-worker`, desarrollada con TypeScript, es una aplicación independiente diseñada para manejar el procesamiento asíncrono. Su principal responsabilidad es consumir mensajes de Kafka y ejecutar tareas computacionalmente intensivas o de larga duración, que no deban ser ejecutadas en el mismo hilo que el API. Por el momento, solo se incluye la generación de listas de frases. Pero queda perfectamente preparada para añadir nuevas tareas en el futuro. La manera de proceder es sencilla. Simplemente se crea un nuevo `consumer` como una clase que herede de `KafkaConsumer` y que implemente el método `onMessage` con la lógica de la nueva tarea.
+
+La aplicación `web` contiene la web corporativa, construida con Next.js, sirve como punto de entrada principal para nuevos usuarios, acciones de marketing, etc. Incluye una landing page atractiva que presenta el producto y, a futuro, un portal de documentación completo, un blog técnico donde compartimos nuestras experiencias y aprendizajes, y todas las páginas legales necesarias para la operación del servicio.
+
+Finalmente, la aplicación `infra` contiene toda la configuración necesaria para levantar el entorno de desarrollo local. Esto incluye una base de datos PostgreSQL, un servidor Kafka y una interfaz web para gestionar el cluster de Kafka.
+
+Esta estructura modular aporta numerosos beneficios a nuestro desarrollo. Al centralizar el código común en paquetes compartidos, eliminamos la duplicación y aseguramos la consistencia en toda la plataforma. La clara separación de responsabilidades facilita el mantenimiento y permitiría que diferentes equipos trabajen en paralelo en distintas aplicaciones. Además, cada aplicación puede desplegarse de manera independiente, lo que nos da gran flexibilidad en la gestión de releases y actualizaciones.
+
+### ¿Por qué el Process Worker no se implementa en la aplicación NestJS?
+
+Quiero hacer incapié en este aspecto que puede ser un poco confuso. La aplicación NestJS se ha diseñado para ser desplegada en un entorno serverless, lo que nos permite optimizar costes y escalar según demanda. Como definición, en un entorno serverless no existe una máquina en continua ejecución, si no que se activa a demanda cuando entra una solicitud.
+
+Sin embargo, para el procesado de los eventos de Kafka, se necesita un código en continua ejecución. Cada vez que entra un nuevo evento en la cola, el consumidor debe recibirlo y procesarlo. Por tanto, un entorno serverless **no es el adecuado**. 
+
+Por eso se separa la API del Process Worker en aplicaciones independientes. La API se despliega en un entorno serverless y el Process Worker se despliega en un entorno de ejecución continuo. La API, cuando sea necesario (como cuando se genera una nueva lista), utiliza el método `produceMessage` del paquete `kafka` para enviar un mensaje al topic. En el otro lado, la aplicación Process Worker, que tiene el Consumer en continua escucha, se encarga de recibir ese mensaje y de procesarlo.
+
+## Algoritmos del sistema. IA Generativa.
+
+Un aspecto clave de Fluento es el uso de modelos de IA para diferentes tareas. Toda esta implementación se ha hecho utilizando la API de OpenAI y usando diferentes modelos que nos ofrece. Dicha implementación se ha llevado a cabo en el paquete `core`, en el directorio `engine`. Veamos las diferentes funcionalidades implementadas:
+
+### Generación de Listas
+
+El módulo `list-generator.ts` implementa la generación automática de listas de frases. Utilizando `gpt-4o-mini`, se generan un listado de frases en español junto con su traducción al inglés. Para ello tiene en cuenta los siguientes parámetros:
+- El nivel de dificultad deseado
+- La temática específica de la lista
+- Las estructuras gramaticales que se quieren practicar
+- El número de frases a generar
+
+Además, se le pide que genere una descripción de la lista que sea breve, de entre 10 y 20 palabras, que resuma el contenido de la lista. Finalmente, se le especifica que de una respuesta en JSON con el esquema deseado.
+
+### Evaluación de Respuestas
+
+En `evaluate-answer.ts` encontramos la lógica para evaluar las respuestas de los usuarios. Mediante `gpt-4o-mini`, se analiza la respuesta del usuario comparándola con la traducción correcta. La evaluación es comprehensiva y considera:
+
+1 = Incorrecta (significado muy diferente o respuesta incomprensible)
+2 = Parcialmente correcta (tiene errores pero mantiene parte del significado)
+3 = Correcta (igual significado, pueden existir pequeñas variaciones)
+
+Se le pide que nos devuelva únicamente el número de la evaluación (1, 2, 3).
+
+### Conversión de Audio a Texto
+
+El módulo `audio-to-text.ts` utiliza el modelo Whisper de OpenAI para transcribir el audio del usuario a texto. Se utilizará este módulo para convertir la respuesta hablada del usaurio al texto que nos permitirá evaluarla con el módulo anterior.
+
+### Conversión de Texto a Audio
+
+En `text-to-audio.ts` implementamos la generación de audio a partir de texto utilizando el modelo TTS (Text-to-Speech) de OpenAI. Este componente nos permite convertir a audio las preguntas y respuestas que el usuario debe escuchar en la aplicación. 
+
+**Nota**: Los 2 anteriores módulos finalmente no han sido utilizados en la aplicacion. Tras pruebas y evaluaciones, se ha optado por usar librerías nativas que nos permiten realizar esta conversión desde la propia aplicación móvil, envitando costes de OpenAI y mejorando la latencia. Por contra, el resultado no es tan bueno como el que se obtiene utilizando el modelo TTS de OpenAI. En cualquier caso, mantenemos estos módulos por si en el futuro se quisiera utilizar de nuevo.
+
+### Generación de Imágenes
+
+El módulo `generate-list-image.ts` implementa un proceso interesante para generar imágenes representativas para cada lista de frases, combinando la IA generativa de OpenAI con el servicio de imágenes Unsplash:
+
+Primero, utiliza `gpt-4o-mini` para generar términos de búsqueda creativos basados en la temática de la lista. Por ejemplo, si la lista es sobre "Viajes", el modelo podría generar términos como "adventure journey", "scenic landscapes", "cultural exploration", etc.
+
+Finalmente, estos términos de búsqueda se utilizan para obtener una imagen aleatoria de Unsplash, añadiendo "General English" como término de respaldo para garantizar resultados (por si los demás términos no producen resultados).
+
+Este enfoque híbrido nos proporciona varias ventajas:
+- Imágenes de alta calidad y libres de derechos de Unsplash
+- Términos de búsqueda creativos y contextuales gracias a la IA
+- Mayor variedad de resultados al combinar múltiples términos de búsqueda
+
+### Cálculo de Tiempos de Respuesta
+
+Aunque esta parte no es ningún algoritmo de IA, el módulo `calculate-response-time.ts` implementa un algoritmo que, según la dificultado de la frase y la longitud de la respuesta que el usuario debe dar, calcula el tiempo que le daremos al usuario para responder. La aplicación utilizará este tiempo calculado para permitir al usuario dar su respuesta. 
+
+### Algoritmo de repetición espaciada
+
+Finalmente, el módulo `generate-next-unit.ts` implementa el algoritmo que decide qué frase debe practicar el usuario en cada momento. Este algoritmo, basado en el sistema Anki, es fundamental para optimizar el aprendizaje, ya que asegura que el usuario practique más aquellas frases que necesita reforzar y menos las que ya domina.
+
+El algoritmo calcula una puntuación para cada frase basándose en cuatro factores principales:
+
+1. **Rendimiento histórico (40% del peso final)**
+   - Se calcula la media de las puntuaciones obtenidas en prácticas anteriores
+   - Cuanto peor sea el rendimiento en una frase, más probabilidades hay de que aparezca
+   - Las frases nunca practicadas tienen prioridad inicial
+
+2. **Tiempo desde la última práctica (30%)**
+   - Se considera cuánto tiempo ha pasado desde la última vez que se practicó
+   - Las frases que llevan más tiempo sin practicarse tienen más probabilidades de aparecer
+   - Se normaliza respecto al tiempo máximo sin práctica en el conjunto de frases
+
+3. **Frecuencia de práctica (20%)**
+   - Se tiene en cuenta cuántas veces se ha practicado cada frase
+   - Las frases menos practicadas tienen más probabilidades de aparecer
+   - Ayuda a mantener un equilibrio en la práctica de todas las frases
+
+4. **Factor aleatorio (10%)**
+   - Añade un elemento de aleatoriedad al algoritmo
+   - Evita patrones predecibles en la selección
+   - Asegura variedad en la práctica
+
+La puntuación final de cada frase se calcula mediante la fórmula:
+
+```typescript
+finalScore = 0.4 * (1/rendimiento) + 
+             0.3 * (tiempoSinPracticar/tiempoMaximo) + 
+             0.2 * (1/(vecesPracticada + 1)) + 
+             0.1 * random()
+```
+
+Este algoritmo asegura que:
+- Las frases con peor rendimiento se practiquen más frecuentemente
+- Ninguna frase quede olvidada durante demasiado tiempo
+- El usuario mantenga un progreso equilibrado en todas las frases
+- La práctica sea variada y no predecible
+
+## Aplicación Móvil con Expo
+
+La aplicación móvil está desarrollada con React Native utilizando Expo como framework de desarrollo. Si bien es una parte fundamental del proyecto, su implementación sigue patrones y prácticas estándar de desarrollo móvil, sin aspectos especialmente destacables desde el punto de vista técnico.
+
+La aplicación implementa toda la interfaz de usuario necesaria para que el usuario pueda interactuar con las funcionalidades que hemos visto anteriormente. Si te interesa ver cómo está implementada, te animo a explorar el código en el [repositorio de GitHub](https://github.com/enolcasielles/fluento-app). Encontrarás una estructura de proyecto limpia que te permitirá entender fácilmente cómo funciona cada componente.
+
+## Siguientes pasos
+Aunque el proyecto está en una fase avanzada, y he sido más o menos capaz de darle forma a todas las funcionalidades que planteé incialmente, sí que es cierto que hay algunas partes que claramenten se pueden mejorar o que habría que añadir para tener una aplicación completa y lista para producción.
+
+- Refinar, mejorar y optimizar los algoritmos de IA, para que sean más estables, precisos y optimizando costes.
+- Integrar el sistema de pagos para gestionar las suscripciones Premium. Ahora mismo tenemos un sistema fake que simula el pago y la suscripción.
+- Crear un panel de administración para poder gestionar el contenido de la aplicación.
+- Crear las páginas que faltan de la web corporativas y de marketing.
+
+
+## Conclusión
+
+Fluento es un proyecto educativo que demuestra cómo combinar diferentes tecnologías modernas para crear una aplicación útil y escalable. Para cualquier duda que te pueda generar, o cualquier información extra que necesites, puedes contactar conmigo en:
+
+* [Email](mailto:enolcasielles@gmail.com)
+* [LinkedIn](https://www.linkedin.com/in/enol-casielles-martinez-2a848864/)
+* [X](https://x.com/enolcasielles)
