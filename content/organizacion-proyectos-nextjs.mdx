@@ -1,0 +1,285 @@
+---
+title: 'Cómo organizo mis proyectos NextJS y mejores prácticas'
+publishedAt: '2025-02-28'
+summary: 'En este artículo comparto mi enfoque personal sobre cómo estructuro mis proyectos NextJS, basándome en las mejores prácticas y en la experiencia adquirida a lo largo del tiempo.'
+---
+
+Organizar un proyecto NextJS de manera eficiente es fundamental para mantener la escalabilidad y la mantenibilidad del código. En este artículo, compartiré mi enfoque personal sobre cómo estructuro mis proyectos NextJS, basándome en las mejores prácticas y en la experiencia adquirida a lo largo del tiempo.
+
+## Objetivo
+He probado muchas formas diferentes de organizar el código, aplicando diferentes enfoques, arquitecturas y patrones. Y esta forma que voy a presentar es la que más me gusta por el equilibro que tiene entre la modularidad y la facilidad de mantenimiento. Sí que es importante mencionar que esta estructura no es una regla fija que aplique en el 100% de los proyectos. De hecho, lo normal es que cada proyecto acabe teniendo su propia estructura ya que, en función del tipo de proyecto, del alcance y demás factores, la estructura debe adaptarse. En cualquier caso, creo que es interesante mantenerla como referencia e ir iterando sobre ella según los requerimientos específicos del proyecto.
+
+
+## Estructura de carpetas
+
+La estructura de carpetas que utilizo es la siguiente:
+
+```
+/app
+  /[únicamente los archivos especiales de Next, como pages, layouts, routes, etc.]
+/modules
+  /[nombre-del-modulo]
+    /pages
+    /components
+    /contexts
+    /actions
+    /services
+    /requests
+    /responses
+/core
+  /components
+  /contexts
+  /lib
+  /api-responses
+  /errors
+  /[cualquier cosa que no sea específica de un módulo pero que sea relevante para el proyecto]
+```
+
+La idea es dividir el código en 3 carpetas principales. La carpeta `app` contendrá solo los archivos especiales de NextJS, como los pages o los layouts. Esto es una restricción de NextJS y por tanto no se puede evitar. La idea es que en estos archivos se realice la mínima implementación posible y que, en cambio, deleguemos la implementación a los respectivos módulos.
+
+La carpeta `core` contendrá aquellos ficheros que definan funcionalidades más genéricas y que sean reutilizables en diferentes partes del proyecto. Normalmente ya arranco esta capreta `core` con varios ficheros que sé que con muy alta probabilidad los voy a necesitar en cualquier proyecto. Por ejemplo, la clase `CustomError` que utilizo para manejar errores de manera consistente en toda la aplicación o el contexto `ErrorsContext`, que me otorga una forma simple pero robusta de manejar errores en el cliente.
+
+Por último la carpeta `modules` que será donde realmente implementamos la aplicación. Llamo módulo a una parte de la aplicación. Esto se corresponde con una o varias pantallas o Api Routes que están relacionadas entre sí, por ejemplo Autenticación, Productos, Pedidos, etc. Cada módulo tiene su propia carpeta en la que se definen todos aquellos elementos que dicho módulo necesita implementar.
+
+En las siguientes secciones vamos a ir viendo cada una de estas partes de forma más detallada así como la forma en la que trabajo con ellas.
+
+### Carpeta `app`
+
+Como decíamos, reservo esta carpeta para los archivos especiales de Next. Y siempre delego la implementación al correspondiente módulo. Si por ejemplo tengo que crear una nueva página en la ruta `/orders/create`, lo que haré es crear el fichero `app/orders/create/page.tsx` y hacer lo siguiente:
+
+```tsx
+import OrderCreatePage from "@/modules/orders/pages/OrderCreatePage";
+
+export default OrderCreatePage;
+```
+
+La implementación del código de esta página lo delegaré al correspondiente módulo. Esto me permite tener el código totalmente centralizado en la carpeta `modules` y de la forma que a mi me gusta organizarlo, pero haciendo que sea totalmente compatible con el enfoque que NextJS exige.
+
+### Carpeta `core`
+
+Esta carpeta contendrá aquellos ficheros que sean genéricos y que sean reutilizables en cualquier parte de la aplicación. Normalmente, los ficheros que defino en esta carpeta son los que considero más genéricos y que, por tanto, son independientes de cualquier módulo. Mencionábamos anteriormente la clase `CustomError` que utilizo para manejar errores de manera consistente en toda la aplicación o el contexto `ErrorsContext`, que me otorga una forma simple pero robusta de manejar errores en el cliente.
+
+También incluyo en esta carpeta la librería de componentes que se utilizan como base para definir la UI de la aplicación. La carpeta `core/components` contendrá estos componentes y, a su vez, se dividirá en carpetas según el tipo de componente. Por ejemplo, podría tener las carpetas `core/components/base` para los componentes de UI como botones, inputs, etc. y `core/components/modals` para los componentes de modales, etc. Así mantengo los componentes de UI bien organizados y permitiendo su reutilización en cualquier parte de la aplicación.
+
+Como suelo utilizar shadcn, modifico el fichero `components.ts` de shadcn para que la cli genere los componentes en la carpeta `core/components/base`.
+
+La carpeta `core` también es el lugar en el que defino cualquier integración que realice con una librería o servicio externo. Para ello, en la carpeta `core/lib` incluyo los ficheros que realizan la integración con la librería o servicio externo. También, la carpeta `core/utils` contendrá aquellos métodos *helpers* que pueda necesitar en cualquier parte de la aplicación.
+
+### Carpeta `modules`
+
+Cada módulo representa una parte de la aplicación y se define en su propia carpeta. La organización de carpetas internas del módulo no sigue una regla exacta, ya que cada módulo puede necesitar unas cosas u otras. Pero, como norma general y analizando un módulo que sea bastante típico, podría tener la siguiente estructura:
+
+- `pages` Define los componentes página del módulo. En el ejemplo de antes, el `OrderCreatePage` estaría en esta carpeta. Los componentes páginas, en la mayoría de los casos, intento que sean Server Components. Su objetivo principal será cargar los datos necesarios que esa página necesite, manejar los posibles errores y cargar los componentes necesarios para renderizar dicha página. 
+
+- `routes` Si el módulo tiene Api Routes, al igual que las páginas, las defino en esta carpeta. Es raro que utilice esta carpeta porque la comunicación entre cliente y servidor la suelo realizar mediante Server Actions. Pero sí que hay casos en los que es necesario utilizar Api Routes.
+
+- `contexts` En aquellas páginas (o componentes) que requieran de una interactividad, lo habitual es que defina un Contexto y un Provider para absstraer lógica de negocio y los posibles estados y que pueda ser utilizada por los componentes de dicha página/componente. Definiré los contextos necesarios en esta carpeta.
+
+- `components` En esta carpeta estarán los componentes React que el módulo necesite. Pero cuidado, solo aquellos componentes que sean específicos del módulo, como secciones de una página o componentes que no sean reutilizables fuera del módulo. Como ya comentamos, los componentes que son reutilizables en cualquier parte de la aplicación, se definirán en la carpeta `core/components`.
+
+- `actions` Reservo esta carpeta para las Server Actions. Estos ficheros usarán siempre la directriz "use server" y serán el punto de entrada para la lógica que se ejecute en el servidor.
+
+- `services` Dependiendo de la complejidad del módulo, la lógica de negocio que se necesite realizar en el lado del servidor, la delego a servicios específicos que irían en esta carpeta. Si es simple, lo suelo hacer directamente en el fichero de la acción del servidor.
+
+- `requests` y `responses`. Utilizo estas carpetas para definir los tipos de las peticiones y respuestas que las acciones del servidor o las Api Routes deben cumplir. También es un buen sitio para realizar validaciones o mapeos de datos.
+
+- `schemas` Si el módulo tiene formularios, para la validación del mismo suelo utilizar `react-hook-form` y `zod`. Los esquemas de zod de validación los defino en esta carpeta.
+
+
+
+## Uso del Server Side Rendering (SSR)
+
+En la mayoría de las aplicaciones, utilizo el Server Side Rendering (SSR) para cargar los datos necesarios para que la página se renderice. El enfoque que suelo aplicar es el siguiente:
+
+- En el `PageComponent`, se llama al servicio o acción en el servidor para que me devuelva los datos que necesito. 
+- Gestiono el posible error que se pueda producir, cargando un componente de error en caso necesario.
+- Si todo va bien, renderizo la UI de la página a partir de la respuesta obtenida.
+
+A continuación, un ejemplo de como podría ser un `PageComponent`:
+
+```tsx
+export default async function ContactsPage() {
+  const userId = await getUserId();
+  const [error, contacts] = await getContactsAction(userId);
+
+  if (error) return <Error message={error.message} />;
+
+  return (
+    <ContactsProvider initialContacts={contacts}>
+      <div className="container mx-auto px-4 py-8 max-w-6xl">
+        {/* Implementación de la UI de la página */}
+        <SomeComponent />
+        <SomeOtherComponent />
+      </div>
+    </ContactsProvider>
+  );
+}
+```
+
+## Uso de las Server Actions
+
+Utilizo las Server Actions como el punto de entrada para la lógica del servidor. Si la lógica es simple, como por ejemplo recuperar datos de la base de datos, la implemento directamente en el fichero de la acción del servidor. Si la lógica es más compleja, la delego a servicios que irá en la carpeta `services` del módulo. Lo que sí es seguro, es que las Server Actions deben encargarse de realizar validaciones en los datos de entrada y/o mapear las respuestas que se devuelven al cliente.
+
+Nunca lanzo excepciones en las Actions si algo sale mal. Hay una clara razón para esto. Por motivos de seguridad, Next elimina el mensaje de los errores en entorno de producción, para evitar que lleguen al cliente mensajes que pueda contener información sensible del back. Esto es un problema cuando quieres que el back sea el que lance el error y que el cliente simplemente lo muestre. Por eso, siempre devuelvo un Array con dos elementos: el primero será un error personalizado `CustomError` y el segundo la repuesta que la acción da si todo ha ido bien.
+
+A continuación, un ejemplo de como podría ser una Server Action:
+
+```tsx
+export async function createContactAction(
+  userId: string,
+  data: CreateContactRequest,
+): Promise<ActionResponse<ContactResponse>> {
+  try {
+    await validateCreateContactRequest(data);
+    const contact = await prisma.contact.create({
+      data: {
+        relation: data.relationship,
+        location: data.location,
+        name: data.name,
+        userId,
+      },
+    });
+    return [null, mapContactEntityToContactResponse(contact)];
+  } catch (error) {
+    if (error instanceof CustomError) return [buildCustomError(error), null];
+    return [{ message: "Error al crear el contacto" }, null];
+  }
+}
+```
+
+`ActionResponse` es un tipo de respusta genérico que tengo en el core y que fuerza a devolver siempre esta estructura de array con el posible error en el primer elemento y la posible respuesta en el segundo.
+
+
+## Gestión de Errores
+
+Los errores siempre los gestiono con mi clase `CustomError` que tengo en el core. Cualquier método auxiliar, servicio o, en general, cualquier pieza de código debe lanzar este tipo de error si algo sale mal. Las funciones principales de la applicación, como las Server Actions, deben tratar de capturar los errores y devolver el error personalizado, asegurando que nunca se lance un error diferente a `CustomError`.
+
+En las Api Routes, aplico un enfoque muy similar pero apoyándome en las funciones de `apiSuccess` y `apiError` que convierten el `CustomError` en la respuesta de la Api Rest. A continuación, un ejemplo de como una Api Route estándar quedaría:
+
+```ts
+export default async function SubscriptionSuccessRoute(request: Request) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const sessionId = searchParams.get("session_id");
+
+    if (!sessionId) throw new CustomError({
+      message: "No se ha proporcionado el id de la sesión",
+      statusCode: 400,
+    });
+
+    await verifySubscription(sessionId);
+
+    return apiSuccess({
+      message: "Suscripción verificada correctamente",
+    });
+  } catch (error) {
+    if (error instanceof CustomError) return apiError(error);
+    return apiError(
+      new CustomError({
+        message: "Error interno del servidor",
+        statusCode: 500,
+      }),
+    );
+  }
+}
+```
+
+## Solicitudes y Respuestas
+
+Intento tipar todo objeto que se utiliza en la aplicación. Considero que es una muy buena práctica que hace que el código sea más robusto y fácil de mantener. Por ejemplo, una action o un servicio, tendrán parámetros de entrada y respuestas tipadas. Para ello, creo interfaces en las carpetas `requests` y `responses` de cada módulo, representando cada posible petición y respuesta. Por ejemplo:
+
+```ts
+export interface CreateContactRequest {
+  name: string;
+  relationship: string;
+  location: string;
+}
+```
+
+```ts
+export interface ContactResponse {
+  id: string;
+  name: string;
+  relationship: string;
+  location: string;
+}
+```
+
+Estos ficheros también son un buen lugar para realizar mapeos o validaciones de datos. Las Request, deben ser validadas para que cumplan con el tipo esperado. Para ello, utilizo la librería `zod` y suelo crear un esquema en el mismo fichero de la Request. En cuanto a las Responses, es habitual que haya que realizar mapeos de datos, por ejemplo, convertir la respuesta de la base de datos al tipo de la Response. Para ello, suelo crear un método en el fichero de la Response que se encargue de realizar el mapeo.
+
+## Interactividad en el cliente
+
+Por lo general, intento utilizar SSR siempre que sea posible y minimizar el uso de Client Components. Pero, obviamente, esto no es posible en muchísimos casos. Cuando una página requiere interacción, suelo aplicar el patrón que defino a continuación:
+
+- En el `PageComponent`, se llama al servicio o acción en el servidor para que me devuelva los datos que necesito, que servirán para la carga inicial de la interfaz.
+- En el `PageComponent`, cargo un Provider cuyo contexto contendrá toda la lógica que el cliente necesite: estados, métodos, etc. 
+- Este Provider recibirá los datos iniciales que necesita para su estado. Este mecanismo permite llevar los datos del lado del servidor al cliente de manera sencilla y eficiente.
+- Cualquier componente de la página, puede utilizar el contexto del Provider para obtener los datos y métodos que necesita.
+
+A continuación, un ejemplo de como podría ser un Provider:
+
+```tsx
+interface IContext {
+  subscription: Subscription | null;
+  manageSubscription: () => Promise<void>;
+  activateSubscription: () => Promise<void>;
+}
+
+const Context = createContext<IContext>(null);
+
+export const useSubscriptionContext = () => useContext(Context);
+
+interface Props {
+  subscription: Subscription | null;
+}
+
+export default function SubscriptionProvider({
+  subscription: initialSubscription,
+  children,
+}: PropsWithChildren<Props>) {
+  const { showError } = useError();
+
+  const manageSubscription = async () => {
+    const [error, result] = await createPortalSessionAction();
+    if (error) showError(error);
+    else window.location.href = result.url;
+  };
+
+  const activateSubscription = async () => {
+    const [error, result] = await createCheckoutSessionAction();
+    if (error) showError(error);
+    else window.location.href = result.url;
+  };
+
+  const value: IContext = {
+    subscription: initialSubscription,
+    manageSubscription,
+    activateSubscription,
+  };
+
+  return <Context.Provider value={value}>{children}</Context.Provider>;
+}
+```
+
+El `PageComponent`, cargará `SubscriptionProvider` pasando el objeto `subscription` que obtendrá en su inicialización. Cualquier componente de la página, puede utilizar `useSubscriptionContext` para obtener el contexto y sus métodos. En el ejemplo anterior solo hay métodos pero, habitualmente, también podría haber variables de estado.
+
+
+## Estilos
+
+Para la gestión de estilos, utilizo **Tailwind CSS** junto con **Shadcn**. Tailwind CSS me permite aplicar estilos de manera rápida y eficiente utilizando clases utilitarias, mientras que Shadcn proporciona componentes predefinidos que facilitan la creación de interfaces atractivas y funcionales. Esta combinación me ayuda a mantener un diseño coherente y a acelerar el proceso de desarrollo.
+
+
+## Gestión de formularios
+
+Para la gestión de formularios, `react-hook-form` y `zod` es una excelente combinación. Suelo implementar [la propuesta](https://ui.shadcn.com/docs/components/form) de shadcn para la definición de formularios. En el `onSubmit`, se lanza la acción del servidor y se gestionan los errores y posibles respuestas.
+
+
+## Conclusión
+
+Organizar un proyecto NextJS puede parecer un desafío, pero con una estructura clara y buenas prácticas, se puede lograr un código limpio y mantenible. En este artículo he intentado dar un enfoque general de cómo organizo mis proyectos. Como decía al principio, esta estructura no es una regla fija y cada proyecto tendrá sus particularidades. Si quieres ver en más profundidad algún ejemplo práctico, te animo a que eches un vistazo al [repositorio](https://github.com/enolcasielles/memo-mate) del proyecto MemoMate que desarrollé hace unos meses y que expliqué en [este artículo](https://enolcasielles.com/blog/memomate). El proyecto es un monorepo, pero la aplicación `web` es un proyecto NextJS que cuenta con una estructura similar a la que he explicado en este artículo.
+
+Como siempre, espero que este artículo te sea de ayuda. Si tienes alguna duda o sugerencia, no dudes en contactar conmigo.
+
+* [Email](mailto:enolcasielles@gmail.com)
+* [LinkedIn](https://www.linkedin.com/in/enol-casielles-martinez-2a848864/)
+* [X](https://x.com/enolcasielles)
