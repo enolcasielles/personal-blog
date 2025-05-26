@@ -77,38 +77,6 @@ export const projects: Project[] = [
     ],
   },
   {
-    id: "so-lo",
-    order: 10,
-    publishedAt: "2023-12-01",
-    title: "SO-LO",
-    summary: "Plataforma innovadora que revoluciona el sector del transporte de mercancías conectando empresas con transportistas autónomos",
-    description: "SO-LO representa una transformación digital en el sector del transporte de mercancías, funcionando como un marketplace que conecta de manera eficiente a empresas que necesitan realizar envíos con transportistas independientes. La plataforma implementa un sistema sofisticado de matching, gestión de rutas y seguimiento en tiempo real, todo ello respaldado por una arquitectura cloud robusta y escalable. El sistema incluye gestión avanzada de usuarios con diferentes roles, sistema de creación y asignación de envíos, generación de kpis claves de negocio, entre otras funcionalidades. La infraestructura, desplegada en AWS mediante Kubernetes, garantiza alta disponibilidad y escalabilidad, complementada con un sistema personalizado de CI/CD para automatizar el despliegue y garantizar la calidad del código.",
-    images: ["/projects/so-lo/cover-image.png"],
-    customer: "Soluciones Logísticas",
-    type: 'client',
-    jobTitle: "Tech Lead & Full Stack Developer",
-    technologies: [
-      "Next.js",
-      "NestJS",
-      "TypeScript",
-      "Kubernetes",
-      "AWS",
-      "Docker",
-      "PostgreSQL",
-      "Redis",
-      "Kafka",
-      "Keycloak",
-    ],
-    challenges: [
-      "Liderazgo del equipo de desarrollo y supervisión para asegurar el cumplimiento de los objetivos",
-      "Definición de la arquitectura técnica y selección de tecnologías para garantizar escalabilidad y mantenibilidad",
-      "Diseño e implementación de una infraestructura cloud en AWS utilizando Kubernetes para alta disponibilidad",
-      "Desarrollo de un sistema personalizado de CI/CD para automatizar el proceso de despliegue y testing",
-      "Implementación del frontend con Next.js, creando una interfaz intuitiva y responsive para múltiples tipos de usuarios",
-      "Desarrollo del backend con NestJS, incluyendo sistemas de autenticación, gestión de pagos y tracking en tiempo real"
-    ]
-  },
-  {
     id: "beeping",
     order: 40,
     publishedAt: "2024-02-01",
