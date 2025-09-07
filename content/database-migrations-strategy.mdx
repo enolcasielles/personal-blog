@@ -1,0 +1,269 @@
+---
+title: 'Migraciones en la base de datos. El patrón expand-contract'
+publishedAt: '2025-08-30'
+summary: 'En este artículo comparto mi experiencia sobre cómo gestiono migraciones de base de datos en entornos de alta disponibilidad.'
+---
+
+La gestión de migraciones en bases de datos ha evolucionado significativamente con la complejidad de los sistemas modernos. Durante años, el enfoque tradicional se basaba en un proceso simple pero efectivo: ejecutar las migraciones durante el despliegue de una nueva versión. Esta metodología resulta adecuada en proyectos de escala reducida, caracterizados por una única instancia, volumen de datos limitado y tráfico moderado.
+
+Sin embargo, al escalar a entornos de alta concurrencia —caracterizados por múltiples instancias en ejecución simultánea y tablas que albergan millones de registros— la estrategia de migración en tiempo de inicialización presenta limitaciones críticas en términos de seguridad, eficiencia y disponibilidad del sistema.
+
+Este artículo presenta una metodología robusta para gestionar migraciones en sistemas que requieren alta disponibilidad, basada en experiencia práctica en entornos productivos. Si bien no pretende ser una solución universal, ofrece un marco de trabajo probado y adaptable a las necesidades específicas de cada proyecto.
+
+***
+
+## Objetivo del artículo
+
+El objetivo es mostrar un enfoque que te permita aplicar migraciones de manera **segura, escalable y sin downtime** en sistemas distribuidos.
+
+Como siempre, no se trata de una regla fija: cada proyecto tiene sus particularidades. Pero creo que este patrón es una buena base sobre la que iterar y adaptarlo a cada caso.
+
+***
+
+## Desafíos de la migración en tiempo de inicialización
+
+### Escenario básico
+
+En un entorno de desarrollo o producción simple, el proceso de migración sigue una secuencia lineal y predecible:
+
+1. Despliegue de nueva versión
+2. Ejecución de migraciones
+3. Inicialización de la aplicación
+4. Verificación de sincronización con la base de datos
+
+Esta aproximación resulta viable debido a que el periodo de inconsistencia entre el esquema de base de datos y el código en ejecución es prácticamente imperceptible.
+
+### Complejidades en entornos de producción
+
+No obstante, en un sistema distribuido con múltiples instancias y volúmenes de datos significativos, emergen desafíos técnicos críticos:
+
+* **Condiciones de carrera**: Múltiples instancias intentando ejecutar migraciones simultáneamente
+* **Bloqueos de recursos**: Operaciones de larga duración (ej. creación de índices) pueden impactar en la disponibilidad
+* **Desincronización temporal**: Ventanas de tiempo donde el código en ejecución no está alineado con el esquema de datos
+
+Consecuencia directa: **Compromiso significativo de la disponibilidad del sistema e integridad de datos**.
+
+***
+
+## Ejemplo práctico: añadir `last_login_at`
+
+Para ilustrar la complejidad inherente a las migraciones en sistemas distribuidos, analicemos un caso práctico representativo.
+
+### Contexto del sistema
+
+Consideremos un entorno con las siguientes características:
+
+* **Volumen de datos**: Tabla `users` con un millón de registros
+* **Patrón de uso**: Alta frecuencia de operaciones de lectura/escritura
+* **Infraestructura**: Cluster Kubernetes con múltiples instancias para gestionar el tráfico elevado
+* **Requisito**: Incorporar campo `last_login_at` con restricción `NOT NULL`
+
+### Análisis del desafío técnico
+
+La adición del campo `last_login_at` presenta una complejidad fundamental: la imposibilidad de agregar una columna no nullable a registros existentes sin un valor por defecto. Una aproximación inicial sugeriría una secuencia de tres pasos:
+
+1. Crear la columna `last_login_at` como nullable
+2. Actualizar registros existentes con un valor predeterminado (fecha actual o fecha de creación)
+3. Modificar la columna para aplicar restricción `NOT NULL`
+
+### Implicaciones en producción
+
+Esta estrategia, aparentemente directa, presenta riesgos significativos en un entorno de producción:
+
+* **Impacto en rendimiento**: La actualización masiva de un millón de registros implica una operación de larga duración
+* **Problemas de concurrencia**: Múltiples instancias intentando ejecutar la migración simultáneamente
+* **Riesgos operacionales**:
+  * Potenciales deadlocks por bloqueos prolongados
+  * Timeouts en pods de Kubernetes por demoras excesivas
+  * Degradación significativa del rendimiento durante la migración
+
+***
+
+## Buenas prácticas: el patrón *expand → backfill → contract*
+
+Vamos a ver como se podría afrontar este problema de forma segura y sin downtime.
+
+La solución pasa por utilizar un conocido patrón llamado **expand → backfill → contract** para separar las migraciones en **fases seguras**:
+
+* **Expand**: hacer cambios no destructivos y compatibles hacia atrás (añadir columnas nuevas, índices, constraints en modo “NOT VALID”).
+* **Backfill**: rellenar los datos históricos en segundo plano, en lotes pequeños, sin bloquear.
+* **Contract**: una vez que todo está listo, aplicar los cambios destructivos (ej. poner la columna en NOT NULL, borrar lo viejo).
+
+Esto se combina con la regla **N/N-1**: la nueva versión de la app debe ser compatible con el esquema anterior, y viceversa.
+
+A diferencia del enfoque anterior en el que ejecutábamos la migración en único proceso, ahora vamos a invocar procesos independientes para cada una de las fases.
+
+Vamos a ver como se aplicacaría en el ejemplo mencionado en el apartado anterior.
+
+* En un primer paso, lanzaríamos la migración `expand`, que simplemente añade la columna `last_login_at` como nullable. Además en este paso se lanza la nueva versión de la aplicación. Esta versión debe asegurar compatibilidad con ambos esquemas. Cuando un usuario haga login, se informará el campo `last_login_at` con la fecha actual. Cuando un servicio recupere un usuario, se contemplará que este campo puede ser null, a pesar de que a futuro sabemos que no lo será.
+* Nada más lanzar esta nueva versión, en un nuevo proceso se ejecutará lo que se conoce como `backfill`. Este proceso se encargará de actualizar todos los valores existentes agregando un valor al campo `last_login_at`. Este proceso se realizará en lotes pequeños, sin bloquear la tabla, por ejemplo en lotes de 500 registros. Además, no se ejecuta desde las instancias que corren la aplicación, si no que tendrá su propia instancia encargada de realizar esta tarea.
+* Cuando el backfill finalice, se lanza el último proceso en el que se ejecuta la migración `contract`, que en nuestro ejemplo significa convertir la columna `last_login_at` a `NOT NULL`. Opcionalmente en este paso, se podría lanzar una nueva versión de la aplicación que deje de contemplar el caso de que el campo `last_login_at` sea null.
+
+En este ejemplo estamos simplemente agregando una nueva columna a una tabla, lo cual es un caso bastante simple. En proyectos reales, los cambios pueden ser mucho más complejos, como cambiar relaciones, renombrar columnas, etc. Cada caso tendrá sus particularidades y requerirá analizar detenidamente la mejor forma de aplicar el patrón, garantizando que el sistema es compatible con ambas versiones.
+
+***
+
+## Orquestación en Kubernetes y CI/CD
+
+La implementación práctica del patrón expand-contract requiere una infraestructura robusta que automatice y coordine las diferentes fases del proceso. A continuación, presentamos una arquitectura de referencia basada en Kubernetes y ArgoCD.
+
+### Contexto tecnológico
+
+La solución propuesta está diseñada para el siguiente stack tecnológico:
+
+* **Framework**: NestJS con TypeORM
+* **Orquestación**: Kubernetes
+* **CD**: ArgoCD
+* **Arquitectura**: Microservicios
+
+Si bien el enfoque está optimizado para estas tecnologías, los principios son adaptables a otros stacks tecnológicos.
+
+### Arquitectura de la solución
+
+#### Proyecto de migraciones
+
+El primer componente fundamental es un proyecto independiente dedicado exclusivamente a la gestión de migraciones. Esta separación de responsabilidades permite:
+
+* Gestión independiente del ciclo de vida de las migraciones
+* Organización clara del código por fases (expand, backfill, contract)
+* Aislamiento de la lógica de migración del código de la aplicación
+
+#### Adaptación del sistema de migraciones
+
+TypeORM, por defecto, genera migraciones monolíticas que no se alinean con el patrón expand-contract. Para adaptar este comportamiento:
+
+1. Se mantiene la generación automática de migraciones como punto de partida
+2. Se refactoriza la migración generada, separándola en las fases correspondientes
+3. Se distribuyen los componentes en las carpetas expand, backfill y contract del nuevo proyecto dedicado a migraciones.
+
+#### Configuración del sistema de ejecución
+
+La ejecución de migraciones requiere una configuración específica para cada fase. Implementamos esto mediante:
+
+* En el proyecto de las migraciones, creamos 3 ficheros `data-source` diferentes, que mantengan una configuración común pero cada uno de ellos cargando las migraciones de su correspondiente carpeta.
+
+```tsx
+import * as expandMigrations from './migrations/expand';
+
+export const datasource: DataSourceOptions = {
+    type: 'postgres',
+    host: configService.get<string>('DB_HOST'),
+    port: configService.get<string | undefined>('DB_PORT')
+      ? parseInt(configService.get<string>('DB_PORT'), 10)
+      : 5432,
+    username: configService.get<string>('DB_USERNAME'),
+    password: configService.get<string>('DB_PASSWORD'),
+    database: configService.get<string>('DB_DATABASE'),
+    schema: 'migrations',
+    migrations: Object.values(expandMigrations) as any,
+    entities: Object.values(entities) as any,
+};
+```
+
+* En el `package.json`de este mismo proyecto, creamos diferentes scripts para lanzar las migraciones de cada fase, usando su correspondiente `data-source`
+
+```
+{
+  "scripts": {
+    "migration:expand": "typeorm migration:run -d ./db/expand-ds.ts",
+    "migration:backfill": "typeorm migration:run -d ./db/backfill-ds.ts",
+    "migration:contract": "typeorm migration:run -d ./db/contract-ds.ts",
+  }
+}
+
+```
+
+#### Integración con ArgoCD y Kubernetes
+
+La orquestación de las diferentes fases de migración se implementa aprovechando las capacidades de ArgoCD y Kubernetes. Específicamente, utilizamos el concepto de `Resource Hooks` de ArgoCD para ejecutar las migraciones en momentos precisos del ciclo de despliegue.
+
+#### Definición de Jobs
+
+Implementamos dos tipos de hooks principales:
+
+* **PreSync**: Ejecuta las migraciones expand antes del despliegue
+* **PostSync**: Gestiona el proceso de backfill después del despliegue
+
+Esta separación garantiza una secuencia ordenada y controlada de las operaciones de migración.
+
+```
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: expand-migrations
+  annotations:
+    argocd.argoproj.io/hook: PreSync
+    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
+spec:
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: migration
+          image: your-registry/migrations-app:1.2.3
+          command: ["npm","run","migration:expand"]
+```
+
+```
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: backfill-migrations
+  annotations:
+    argocd.argoproj.io/hook: PostSync
+    argocd.argoproj.io/hook-delete-policy: HookSucceeded
+spec:
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: migration
+          image: your-registry/migrations-app:1.2.3
+          command: ["npm","run","migration:backfill"]
+```
+
+Configuramos ArgoCD para que aplique estos Jobs en la aplicación destinada a ejecutar las migraciones. Y configuramos nuestro CI para que, cualquier cambio en el repo del proyecto de migraciones, lance nueva versión. Para el Job del backfill, es buena idea configurar una notificación que se dispare cuando finalice, enviando un email, notificación por Slack o lo que se quiera.
+
+Ahora bien, ¿qué pasa con el contract? Como decíamos en apartados anteriores, la fase contract es una muy buena práctica realizarla de forma manual, para que se pueda llevar a cabo verificaciones y asegurar que todo está correcto antes de proceder. ¿Como encajamos esto en el flujo? Podemos hacer lo siguiente: creamos una nueva aplicación en el ArgoCD, que contendrá únicamente el Job para ejecutar el contract. Además, configuramos esta aplicación para no sincronizar automáticamente.
+
+```
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: contract-migrations
+spec:
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: migration
+          image: your-registry/migrations-app:1.2.3
+          command: ["npm","run","migration:contract"]
+```
+
+Cuando se quiera ejecutar este Job, podemos forzar un Sync desde la UI de ArgoCD.
+
+Con esto tenemos todas las piezas necesarias. Veamos ahora como funcionaría volviendo al ejemplo anterior de agregar el campo `last_login_at` a nuestra tabla usuarios.
+
+1. Creamos las migraciones necesarias, partiendo de la generada por TypeORM o desde 0. Nos aseguramos que no empleamos ninguna migración que pueda bloquear la base de datos, sobre todo en el proceso de backfill. Guardamos dichas migraciones en el proyecto dedicado a las migraciones.
+2. Desplegamos nueva versión al repo del proyecto de las migraciones. Esto forzará a ejecutar las fases expand y, al finalizar, backfill.
+3. Desplegamos la nueva versión de la aplicación, garantizando compatibilidad en su código con los 2 esquemas, el antiguo y el nuevo.
+4. Cuando sepamos que el backfill ha finalizado, realizamos pruebas para asegurar integridad en la base de datos. Desde la UI de ArgoCD forzamos un Sync en la app dedicada a la fase contract.
+5. Opcionalmente, podemos lanzar una nueva versión de la app eliminando condiciones que hayamos puesto para asegurar la compatibilidad con los 2 esquemas. En este punto podemos asegurar que solo el nuevo esquema debe ser compatible.
+
+Para finalizar, comentar que no es obligatorio realizar el flujo completo en cada cambio al esquema de la base de datos. En muchas ocasiones nos encontraremos con cambios que no necesitan asegurar compatibilidad entre los esquemas, como por ejemplo, crear una nueva tabla totalmente independiente. Para estos casos, podemos fácilmente crear la migración en la carpeta expand, desplegar migraciones para que se lance esta fase. El backfill, al no tener nuevas migraciones, directamente no realizará nada. Y el contracto nunca lo lanzamos. Por tanto, solo el expand se ejecuta y, tras finalizar, podemos subir la nueva versión de la aplicación.
+
+***
+
+## Conclusiones y consideraciones finales
+
+La gestión de migraciones en bases de datos es un aspecto crítico en el desarrollo de sistemas robustos y altamente disponibles. El patrón expand-contract, combinado con una infraestructura automatizada de CI/CD, nos proporciona un marco de trabajo robusto para abordar este desafío.
+
+Puntos clave a recordar:
+
+* La seguridad y la disponibilidad del sistema deben ser prioritarias al diseñar estrategias de migración
+* La automatización del proceso es fundamental, pero debe mantener puntos de control manual cuando sea necesario
+* La compatibilidad entre versiones (N/N-1) es un requisito no negociable
+* No todos los cambios requieren el flujo completo - adapta el patrón según la complejidad del cambio
+
+Este enfoque ha demostrado ser efectivo en entornos de producción reales, permitiendo evolucionar el esquema de datos de manera segura y controlada, sin comprometer la disponibilidad del sistema. Como con cualquier patrón arquitectónico, la clave está en entender los principios subyacentes y adaptarlos a las necesidades específicas de cada proyecto.
