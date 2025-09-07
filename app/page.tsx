@@ -1,6 +1,8 @@
 import Image from "next/image";
 import ExperienceTimeline from "./components/experience-timeline";
+import CertificationsSection from "./components/certifications-section";
 import { experiences } from "./data/experience";
+import { certifications } from "./data/certifications";
 import SectionCard from "./components/section-card";
 
 export default function Page() {
@@ -29,18 +31,18 @@ export default function Page() {
 
         <div className="space-y-6">
           <p className="text-lg leading-relaxed prose prose-neutral dark:prose-invert">
-            Ingeniero de software con más de 10 años de experiencia, especializado en la creación y desarrollo de productos digitales. Mi trayectoria está estrechamente ligada al mundo de las startups, donde he fundado proyectos exitosos como
+            Ingeniero de software con más de 10 años de experiencia en desarrollo full-stack y liderazgo técnico de proyectos. Mi trayectoria combina la implementación de soluciones de software complejas con una formación continua en tecnologías emergentes. Estrechamente vinculado al ecosistema de startups, donde he fundado y desarrollado proyectos exitosos como
             <a 
               href="https://www.mooviment.com" 
               target="_blank" 
               className="text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300 font-medium transition-colors"
             >
               {" "}mooviment.com
-            </a>. Combino el desarrollo de productos innovadores con servicios de consultoría tecnológica, ayudando a empresas a materializar sus ideas en soluciones digitales efectivas.
+            </a>, aplicando tecnologías de vanguardia para crear productos innovadores que generan valor real para los usuarios.
           </p>
           
           <p className="text-lg leading-relaxed prose prose-neutral dark:prose-invert">
-            Actualmente me centro en crear productos web que aprovechen tecnologías emergentes como la inteligencia artificial, mientras asesoro a empresas en su transformación digital. Mi objetivo es unir visión estratégica con implementación práctica para crear soluciones que generen valor real.
+            Me especializo en el diseño de arquitecturas robustas que integran tecnologías modernas de desarrollo, siguiendo las mejores prácticas para la construcción de productos de alta calidad. Mi experiencia abarca todas las fases del ciclo de vida del desarrollo, desde la planificación estratégica inicial hasta el despliegue y mantenimiento en producción.
           </p>
         </div>
       </div>
@@ -66,55 +68,7 @@ export default function Page() {
       <ExperienceTimeline experiences={experiences} />
 
       <div className="mt-20">
-        <h2 className="font-bold text-3xl mb-8 tracking-tighter">¿Tienes algún proyecto en mente?</h2>
-        <div className="p-8 rounded-2xl border-2 border-gray-100 dark:border-gray-800 hover:border-gray-200 dark:hover:border-gray-700 transition-colors">
-          <div className="grid grid-cols-1 md:grid-cols-[2fr_1fr] gap-8 items-center">
-            <div className="space-y-6">
-              <h3 className="font-bold text-2xl">Desarrollo de Producto y Consultoría Tecnológica</h3>
-              <p className="text-lg leading-relaxed text-gray-600 dark:text-gray-300">
-                Combino mi experiencia en desarrollo de productos digitales con servicios de consultoría tecnológica.
-                Ya sea creando un nuevo producto desde cero o mejorando sistemas existentes, aporto una visión integral
-                que une estrategia técnica con implementación práctica.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4">
-                <a 
-                  href="/consulting" 
-                  className="w-full sm:w-auto text-center inline-flex items-center justify-center px-6 py-3 bg-black dark:bg-white text-white dark:text-black rounded-lg font-medium hover:opacity-90 transition-opacity"
-                >
-                  Ver servicios
-                  <svg 
-                    className="ml-2 h-4 w-4" 
-                    fill="none" 
-                    stroke="currentColor" 
-                    viewBox="0 0 24 24"
-                  >
-                    <path 
-                      strokeLinecap="round" 
-                      strokeLinejoin="round" 
-                      strokeWidth="2" 
-                      d="M14 5l7 7m0 0l-7 7m7-7H3"
-                    />
-                  </svg>
-                </a>
-                <a 
-                  href="mailto:enolcasielles@gmail.com"
-                  className="w-full sm:w-auto text-center inline-flex items-center justify-center px-6 py-3 border-2 border-black dark:border-white rounded-lg font-medium hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
-                >
-                  Contactar
-                </a>
-              </div>
-            </div>
-            <div className="relative aspect-square w-full max-w-[300px] mx-auto">
-              <Image
-                fill
-                src="/images/consulting/hero.jpg"
-                alt="Consultoría tecnológica"
-                className="object-cover rounded-2xl"
-                sizes="(max-width: 768px) 100vw, 300px"
-              />
-            </div>
-          </div>
-        </div>
+        <CertificationsSection certifications={certifications} />
       </div>
     </section>
   );
