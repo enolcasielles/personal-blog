@@ -1,3 +1,7 @@
+import createNextIntlPlugin from 'next-intl/plugin';
+
+const withNextIntl = createNextIntlPlugin();
+
 const nextConfig = {
   experimental: {
     useLightningcss: true,
@@ -54,4 +58,4 @@ const securityHeaders = [
   },
 ];
 
-export default nextConfig;
+export default withNextIntl(nextConfig);

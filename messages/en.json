@@ -1,0 +1,26 @@
+{
+  "HomePage": {
+    "title": "Software Engineer",
+    "description1": "Software engineer with over 10 years of experience in full-stack development and technical project leadership. My career combines the implementation of complex software solutions with continuous training in emerging technologies. Closely linked to the startup ecosystem, where I have founded and developed successful projects such as",
+    "moovimentLink": "mooviment.com",
+    "description1End": ", applying cutting-edge technologies to create innovative products that generate real value for users.",
+    "description2": "I specialize in designing robust architectures that integrate modern development technologies, following best practices for building high-quality products. My experience spans all phases of the development lifecycle, from initial strategic planning to deployment and production maintenance.",
+    "exploreContent": "Explore my content",
+    "blogTitle": "Blog",
+    "blogDescription": "Articles about web development, emerging technologies, and any interesting learning I find.",
+    "blogButton": "View articles",
+    "projectsTitle": "Projects",
+    "projectsDescription": "Discover the projects I'm working on, from web applications to AI experiments.",
+    "projectsButton": "View projects"
+  },
+  "ExperienceTimeline": {
+    "title": "Professional Experience",
+    "description": "Below, you can see my professional experience in the technology sector."
+  },
+  "CertificationsSection": {
+    "title": "Certifications and Courses",
+    "description": "Continuous training and certifications that have contributed to my professional growth.",
+    "viewCertificate": "View certification",
+    "viewCourse": "View course"
+  }
+}

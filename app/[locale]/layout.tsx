@@ -1,15 +1,23 @@
-import './global.css';
+import '../global.css';
 import type { Metadata } from 'next';
 import { GeistSans } from 'geist/font/sans';
 import { GeistMono } from 'geist/font/mono';
-import { Navbar } from './components/nav';
+import { Navbar } from '../components/nav';
 import { Analytics } from '@vercel/analytics/react';
 import { SpeedInsights } from '@vercel/speed-insights/next';
-import { PreloadResources } from './preload';
-import { SandpackCSS } from './blog/[slug]/sandpack';
+import { PreloadResources } from '../preload';
+import { SandpackCSS } from '../blog/[slug]/sandpack';
 import { GoogleAnalytics } from '@next/third-parties/google'
-import Footer from './components/footer';
+import Footer from '../components/footer';
 import { ViewTransitions } from 'next-view-transitions';
+import { hasLocale } from 'next-intl';
+import { notFound } from 'next/navigation';
+import { routing } from 'i18n/routing';
+import { setRequestLocale } from 'next-intl/server';
+
+export function generateStaticParams() {
+  return routing.locales.map((locale) => ({locale}));
+}
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://www.enolcasielles.com'),
@@ -49,15 +57,28 @@ export const metadata: Metadata = {
 
 const cx = (...classes) => classes.filter(Boolean).join(' ');
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
+  params
 }: {
   children: React.ReactNode;
+  params: {
+    locale: string;
+  };
 }) {
+  const {locale} = await params;
+
+  if (!hasLocale(routing.locales, locale)) {
+    notFound();
+  }
+
+  // Enable static rendering
+  setRequestLocale(locale);
+
   return (
     <ViewTransitions>
       <html
-        lang="en"
+        lang={locale}
         className={cx(
           GeistSans.variable,
           GeistMono.variable

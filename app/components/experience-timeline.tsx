@@ -1,3 +1,4 @@
+import { useTranslations } from "next-intl";
 import { Experience } from "../data/experience";
 
 interface ExperienceTimelineProps {
@@ -5,13 +6,14 @@ interface ExperienceTimelineProps {
 }
 
 export default function ExperienceTimeline({ experiences }: ExperienceTimelineProps) {
+  const t = useTranslations("ExperienceTimeline");
   return (
     <>
       <h2 className="font-bold text-3xl mb-4 tracking-tighter">
-        Experiencia Profesional
+        {t("title")}
       </h2>
       <p className="text-lg mb-8 text-gray-600 dark:text-gray-400">
-          A continuación, puedes ver mi experiencia profesional en el sector tecnológico.
+          {t("description")}
         </p>
 
       <div className="space-y-12">

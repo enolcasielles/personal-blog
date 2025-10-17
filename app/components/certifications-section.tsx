@@ -1,17 +1,20 @@
 import { Certification } from "../data/certifications";
+import { useTranslations } from "next-intl";
 
 interface CertificationsSectionProps {
   certifications: Certification[];
 }
 
 export default function CertificationsSection({ certifications }: CertificationsSectionProps) {
+  const t = useTranslations("CertificationsSection");
+  
   return (
     <>
       <h2 className="font-bold text-3xl mb-4 tracking-tighter">
-        Certificaciones y Cursos
+        {t("title")}
       </h2>
       <p className="text-lg mb-8 text-gray-600 dark:text-gray-400">
-        Formación continua y certificaciones que han contribuido a mi crecimiento profesional.
+        {t("description")}
       </p>
 
       <div className="space-y-8">
@@ -43,7 +46,7 @@ export default function CertificationsSection({ certifications }: Certifications
                   rel="noopener noreferrer"
                   className="inline-flex items-center text-sm text-green-600 dark:text-green-400 hover:text-green-700 dark:hover:text-green-300 transition-colors"
                 >
-                  Ver {certification.type === "certificate" ? "certificación" : "curso"}
+                  {t(certification.type === "certificate" ? "viewCertificate" : "viewCourse")}
                   <svg 
                     className="ml-1 h-3 w-3" 
                     fill="none" 
