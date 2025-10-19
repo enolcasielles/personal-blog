@@ -22,5 +22,9 @@
     "description": "Formación continua y certificaciones que han contribuido a mi crecimiento profesional.",
     "viewCertificate": "Ver certificación",
     "viewCourse": "Ver curso"
+  },
+  "Navbar": {
+    "blog": "Blog",
+    "projects": "Proyectos"
   }
 }

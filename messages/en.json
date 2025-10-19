@@ -10,7 +10,7 @@
     "blogDescription": "Articles about web development, emerging technologies, and any interesting learning I find.",
     "blogButton": "View articles",
     "projectsTitle": "Projects",
-    "projectsDescription": "Discover the projects I'm working on, from web applications to AI experiments.",
+    "projectsDescription": "Discover the projects I've been working on, from web applications to some AI experiments.",
     "projectsButton": "View projects"
   },
   "ExperienceTimeline": {
@@ -22,5 +22,9 @@
     "description": "Continuous training and certifications that have contributed to my professional growth.",
     "viewCertificate": "View certification",
     "viewCourse": "View course"
+  },
+  "Navbar": {
+    "blog": "Blog",
+    "projects": "Projects"
   }
 }

@@ -1,20 +1,19 @@
-import Link from 'next/link';
-import ThemeModeSelector from './theme-mode-selector';
-import Image from 'next/image';
+"use client";
 
-const navItems = {
-  '/blog': {
-    name: 'Blog',
-  },
-  '/projects': {
-    name: 'Proyectos',
-  },
-  // '/consulting': {
-  //   name: 'Consulting',
-  // }
-};
+import { Link } from '../../i18n/navigation';
+import ThemeModeSelector from './theme-mode-selector';
+import LanguageSelector from './language-selector';
+import Image from 'next/image';
+import { useTranslations } from 'next-intl';
 
 export function Navbar() {
+  const t = useTranslations('Navbar');
+
+  const navItems = [
+    { path: '/blog', key: 'blog' },
+    { path: '/projects', key: 'projects' },
+  ];
+
   return (
     <aside className="-ml-[8px] mb-16 tracking-tight">
       <div className="lg:sticky lg:top-20">
@@ -28,20 +27,21 @@ export function Navbar() {
               <span className='hidden md:block font-bold text-2xl'>Enol Casielles</span>
             </div>
           </Link>
-          <div className='flex flex-row items-center'>
-            <div className="flex flex-row space-x-0 pr-10">
-              {Object.entries(navItems).map(([path, { name }]) => {
+          <div className='flex flex-row items-center gap-4'>
+            <div className="flex flex-row space-x-0">
+              {navItems.map(({ path, key }) => {
                 return (
                   <Link
                     key={path}
                     href={path}
                     className="transition-all hover:text-blue-400 flex align-middle relative py-1 px-2"
                   >
-                    {name}
+                    {t(key)}
                   </Link>
                 );
               })}
             </div>
+            <LanguageSelector />
             <ThemeModeSelector />
           </div>
         </nav>

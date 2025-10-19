@@ -10,10 +10,10 @@ import { SandpackCSS } from '../blog/[slug]/sandpack';
 import { GoogleAnalytics } from '@next/third-parties/google'
 import Footer from '../components/footer';
 import { ViewTransitions } from 'next-view-transitions';
-import { hasLocale } from 'next-intl';
+import { hasLocale, NextIntlClientProvider } from 'next-intl';
 import { notFound } from 'next/navigation';
 import { routing } from 'i18n/routing';
-import { setRequestLocale } from 'next-intl/server';
+import { setRequestLocale, getMessages } from 'next-intl/server';
 
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({locale}));
@@ -75,6 +75,9 @@ export default async function RootLayout({
   // Enable static rendering
   setRequestLocale(locale);
 
+  // Get messages for the locale
+  const messages = await getMessages();
+
   return (
     <ViewTransitions>
       <html
@@ -89,13 +92,15 @@ export default async function RootLayout({
           <SandpackCSS />
         </head>
         <body className="text-black bg-white dark:text-white dark:bg-[#111010] antialiased min-h-screen max-w-4xl flex flex-col md:flex-row mx-4 pt-8 lg:mx-auto">
-          <main className="flex-auto min-w-0 mt-6 flex flex-col px-2 md:px-0">
-            <Navbar />
-            {children}
-            <div className='flex-1 flex flex-col justify-end items-center mt-12'>
-              <Footer />
-            </div>
-          </main>
+          <NextIntlClientProvider messages={messages} locale={locale}>
+            <main className="flex-auto min-w-0 mt-6 flex flex-col px-2 md:px-0">
+              <Navbar />
+              {children}
+              <div className='flex-1 flex flex-col justify-end items-center mt-12'>
+                <Footer />
+              </div>
+            </main>
+          </NextIntlClientProvider>
           <GoogleAnalytics gaId='G-9HGPDV0ZJ7' />
           <Analytics />
           <SpeedInsights />
