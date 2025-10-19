@@ -26,5 +26,23 @@
   "Navbar": {
     "blog": "Blog",
     "projects": "Projects"
+  },
+  "ProjectsPage": {
+    "title": "Projects",
+    "description": "Some of the projects I've worked on in recent years",
+    "startups": "Launched Startups",
+    "experiments": "Experiments",
+    "clients": "Client Work"
+  },
+  "ProjectDetail": {
+    "backToProjects": "Back to projects",
+    "description": "Description",
+    "customer": "Client",
+    "responsibility": "Responsibility",
+    "technologies": "Technologies",
+    "challenges": "Challenges",
+    "viewWebsite": "View website",
+    "viewCode": "View code",
+    "readMore": "Read more"
   }
 }

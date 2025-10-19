@@ -1,15 +1,19 @@
-import { projects } from "../../data/projects";
+import { projects } from "../../../data/projects";
 import Image from "next/image";
 import { Link } from 'next-view-transitions'
 import { notFound } from "next/navigation";
 import { ExternalLink, Code2, BookOpen, ArrowLeft } from 'lucide-react';
 import { Metadata } from "next";
-
+import { useTranslations } from "next-intl";
+import { use } from "react";
+import { setRequestLocale, getLocale } from "next-intl/server";
 
 export async function generateMetadata({
   params,
 }): Promise<Metadata | undefined> {
-  let project = projects.find((p) => p.id === params.id);
+  const {id, locale} = await params;
+  const localizedProjects = projects[locale] || projects['es'];
+  let project = localizedProjects.find((p) => p.id === id);
   if (!project) {
     return;
   }
@@ -41,19 +45,27 @@ export async function generateMetadata({
 }
 
 export async function generateStaticParams() {
-  return projects.map((p) => ({
+  const allProjects = Object.values(projects).flat();
+  return allProjects.map((p) => ({
     id: p.id,
   }))
 }
 
 interface Props {
-  params: {
+  params: Promise<{
     id: string;
-  };
+    locale: string;
+  }>;
 }
 
 export default function ProjectPage({ params }: Props) {
-  const project = projects.find((p) => p.id === params.id);
+  const {id, locale} = use(params);
+  setRequestLocale(locale);
+  
+  const t = useTranslations("ProjectDetail");
+  
+  const localizedProjects = projects[locale];
+  const project = localizedProjects.find((p) => p.id === id);
   
   if (!project) {
     notFound();
@@ -66,7 +78,7 @@ export default function ProjectPage({ params }: Props) {
         className="inline-flex items-center gap-2 mb-8 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition-colors group"
       >
         <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-1" />
-        <span>Volver a proyectos</span>
+        <span>{t("backToProjects")}</span>
       </Link>
 
       {/* 
@@ -94,24 +106,24 @@ export default function ProjectPage({ params }: Props) {
         <div className="h-[2px] w-full bg-gradient-to-r from-black to-transparent dark:from-white"></div>
 
         <div className="prose prose-neutral dark:prose-invert max-w-none">
-          <h2>Descripción</h2>
+          <h2>{t("description")}</h2>
           <p>{project.description}</p>
 
           {project.customer && (
             <>
-              <h2>Cliente</h2>
+              <h2>{t("customer")}</h2>
               <p>{project.customer}</p>
             </>
           )}
 
           {project.jobTitle && (
             <>
-              <h2>Responsabilidad</h2>
+              <h2>{t("responsibility")}</h2>
               <p>{project.jobTitle}</p>
             </>
           )}
 
-          <h2>Tecnologías</h2>
+          <h2>{t("technologies")}</h2>
           <div className="flex flex-wrap gap-2 not-prose">
             {project.technologies.map((tech) => (
               <span
@@ -123,7 +135,7 @@ export default function ProjectPage({ params }: Props) {
             ))}
           </div>
 
-          <h2>Desafíos</h2>
+          <h2>{t("challenges")}</h2>
           <ul>
             {project.challenges.map((challenge) => (
               <li key={challenge}>{challenge}</li>
@@ -139,7 +151,7 @@ export default function ProjectPage({ params }: Props) {
                 className="group flex items-center gap-2 px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-all hover:scale-105"
               >
                 <ExternalLink className="w-5 h-5" />
-                <span>Ver sitio web</span>
+                <span>{t("viewWebsite")}</span>
               </a>
             )}
             {project.repoUrl && (
@@ -150,7 +162,7 @@ export default function ProjectPage({ params }: Props) {
                 className="group flex items-center gap-2 px-6 py-3 bg-gray-800 text-white rounded-lg hover:bg-gray-900 transition-all hover:scale-105"
               >
                 <Code2/>
-                <span>Ver código</span>
+                <span>{t("viewCode")}</span>
               </a>
             )}
             {project.blogUrl && (
@@ -159,7 +171,7 @@ export default function ProjectPage({ params }: Props) {
                 className="group flex items-center gap-2 px-6 py-3 bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-white rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-all hover:scale-105"
               >
                 <BookOpen className="w-5 h-5" />
-                <span>Leer más</span>
+                <span>{t("readMore")}</span>
               </Link>
             )}
           </div>

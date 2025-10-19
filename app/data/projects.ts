@@ -16,7 +16,8 @@ export interface Project {
   blogUrl?: string;
 }
 
-export const projects: Project[] = [
+export const projects: Record<string, Project[]> = {
+  es: [
   {
     id: "hexagonal-monorepo",
     order: 100,
@@ -247,4 +248,237 @@ export const projects: Project[] = [
     repoUrl: "https://github.com/enolcasielles/ai-agency-typescript",
     blogUrl: "/blog/agencia-ia-proyecto-base"
   },
-]; 
+  ],
+  en: [
+    {
+      id: "hexagonal-monorepo",
+      order: 100,
+      publishedAt: "2024-01-15",
+      title: "Hexagonal Architecture in Monorepo",
+      summary: "Experimental implementation of hexagonal architecture in a TypeScript monorepo, integrating Next.js and NestJS with clear separation of layers and responsibilities",
+      description: "Experimental project exploring the practical implementation of hexagonal architecture (ports and adapters) in a modern monorepo environment. The project demonstrates how to structure complex enterprise applications through layer separation into independent packages, facilitating maintainability and testing. The architecture includes a web application in Next.js and a REST API in NestJS, both sharing common domain logic through internal packages. The monorepo, managed with pnpm, implements advanced development practices such as workspaces and optimized build, providing a practical example of how to apply SOLID principles and Clean Architecture in modern TypeScript applications.",
+      images: ["/projects/hexagonal-monorepo/cover-image.png"],
+      customer: "Personal Project",
+      type: 'experiment',
+      technologies: [
+        "TypeScript",
+        "Next.js",
+        "NestJS",
+        "pnpm",
+        "Clean Architecture",
+        "Monorepo",
+        "REST API"
+      ],
+      challenges: [
+        "Design and implementation of a monorepo structure that facilitates layer separation according to hexagonal architecture principles",
+        "Development of shared packages for domain logic, use cases, and port and adapter interfaces",
+        "Implementation of dependency injection and inversion of control while maintaining decoupled and testable code",
+        "Configuration of an optimized build system that efficiently manages dependencies between packages",
+      ],
+      repoUrl: "https://github.com/enolcasielles/next-nest-clean-arquitecture",
+      blogUrl: "/blog/next-nest-clean-arquitecture"
+    },
+    {
+      id: "moneyup",
+      order: 100,
+      publishedAt: "2023-11-01",
+      title: "MoneyUp",
+      summary: "Innovative fintech application that acts as a personal financial coach, helping users achieve their savings goals through banking integration and smart analysis",
+      description: "MoneyUp represents an innovation in the fintech sector, functioning as a digital financial coach that helps users achieve their savings goals in an intelligent and automated way. The application securely integrates with the user's bank accounts to monitor movements and balances in real-time, implementing a 'virtual savings' system that sets aside and manages funds intelligently according to established goals. The platform uses advanced data analysis to optimize savings strategies, adapting to each user's spending patterns and financial capacity, all while maintaining the highest security standards in handling sensitive financial data.",
+      images: ["/projects/moneyup/cover-image.png"],
+      customer: "MoneyUp",
+      type: 'personal',
+      jobTitle: "Co-founder & CTO",
+      technologies: [
+        "Ionic",
+        "Node.js",
+        "MongoDB",
+        "TypeScript",
+        "Azure",
+        "Banking APIs",
+        "REST API",
+        "Wordpress"
+      ],
+      challenges: [
+        "Development of secure integrations with banking APIs for real-time financial data synchronization",
+        "Implementation of a savings virtualization system that enables intelligent management of financial goals",
+        "Design of a robust architecture that ensures security and privacy of sensitive financial data",
+        "Creation of analysis algorithms to optimize savings strategies based on spending patterns",
+        "Development of an intuitive mobile interface that simplifies personal financial management",
+        "Implementation of a smart notification system to keep users engaged with their goals",
+        "Integration of secure payment processing and bank transfer systems"
+      ],
+    },
+    {
+      id: "beeping",
+      order: 40,
+      publishedAt: "2024-02-01",
+      title: "Beeping",
+      summary: "Comprehensive logistics management platform that optimizes picking and fulfillment operations for e-commerce through Shopify integration",
+      description: "Advanced enterprise solution designed to optimize the operations of a logistics center specialized in picking services for e-commerce. The system implements a multi-user architecture that manages different roles and access levels, facilitating coordination between administrators, online stores, and warehouse operators. The platform integrates natively with the Shopify API, enabling real-time order synchronization and automating warehouse workflows. The system architecture is built on modern technologies and deployed on a robust and scalable cloud infrastructure, ensuring high availability and optimal performance even during high-demand periods.",
+      images: ["/projects/beeping/cover-image.png"],
+      customer: "Logistics Warehouse",
+      type: 'client',
+      jobTitle: "Full Stack Developer",
+      technologies: [
+        "Next.js",
+        "NestJS",
+        "MySQL",
+        "TypeScript",
+        "Kubernetes",
+        "AWS",
+        "Aurora Serverless",
+        "Shopify API",
+        "Docker",
+        "REST API"
+      ],
+      challenges: [
+        "Design and implementation of a multi-user architecture with advanced role and permission management",
+        "Development of a robust integration with Shopify API for order synchronization and inventory management",
+        "Implementation of a warehouse management system optimized for picking and fulfillment operations",
+        "Creation of specific interfaces and adapted workflows for each user type (administrator, store, operator)",
+        "Deployment and management of infrastructure on a Kubernetes cluster in AWS, ensuring high availability",
+        "Implementation of a scalable database architecture using Aurora Serverless to optimize costs and performance",
+        "Development of a reporting and analytics system for tracking logistics KPIs and operational performance"
+      ],
+    },
+    {
+      id: "tappy",
+      order: 60,
+      publishedAt: "2024-03-01",
+      title: "Tappy",
+      summary: "Innovative IoT system that revolutionizes the beer serving experience through an automated platform and intuitive mobile app",
+      description: "Tappy represents a pioneering solution in the hospitality sector that transforms the traditional beer serving experience through an advanced IoT system. The platform integrates specialized hardware with a robust backend infrastructure and an intuitive mobile application, allowing users to pour their own beer in an automated way. The system includes user management, consumption control, payment system integration, and real-time tap status monitoring, all backed by a highly available and scalable cloud architecture on AWS. The infrastructure uses managed services such as Elastic Beanstalk for application deployment, Aurora for database, S3 for storage, and SES for email communications.",
+      images: ["/projects/tappy/cover-image.png"],
+      customer: "Tappy",
+      type: 'client',
+      jobTitle: "Lead Backend Developer",
+      technologies: ["NestJS", "MySQL", "Flutter", "TypeScript", "Docker", "AWS", "Elastic Beanstalk", "Aurora", "S3", "SES", "REST API"],
+      challenges: [
+        "Design and implementation of a robust and scalable backend architecture using NestJS and MySQL",
+        "Development of a secure authentication and authorization system for tap access control",
+        "Implementation of a REST API for real-time communication between the mobile application and IoT devices",
+        "Integration of payment systems and transaction management for consumption control",
+        "Supervision and contribution to Flutter mobile application development, ensuring proper backend integration",
+        "Implementation of a monitoring and diagnostic system for preventive device maintenance",
+        "Architecture and implementation of cloud infrastructure on AWS using managed services like Elastic Beanstalk, Aurora, S3, SES",
+        "Configuration of CI/CD pipelines to automate deployments and ensure code quality"
+      ],
+    },
+    {
+      id: "airhopping",
+      order: 80,
+      publishedAt: "2024-01-01",
+      title: "Airhopping",
+      summary: "Innovative multi-destination travel platform that revolutionizes itinerary planning through advanced web and mobile technology",
+      description: "Airhopping represents an innovation in the tourism sector, offering a comprehensive platform for planning and booking multi-destination trips. The project encompasses multiple technological solutions: a web platform for end users, a sophisticated operations panel for internal management, and native mobile applications that facilitate the traveler's experience. The system architecture constantly evolves to incorporate the latest technologies and improve user experience, highlighting the successful migration of the mobile application from Ionic to Flutter to optimize performance and user experience.",
+      images: ["/projects/airhopping/cover-image.png"],
+      customer: "Airhopping",
+      type: 'client',
+      jobTitle: "Frontend & Mobile Developer",
+      technologies: [
+        "Angular",
+        "Flutter",
+        "Ionic",
+        "Django",
+        "Express",
+        "TypeScript",
+        "Python",
+        "JavaScript",
+        "SCSS",
+        "REST API",
+        "Azure"
+      ],
+      challenges: [
+        "Development and implementation of the first version of the web platform with Angular, establishing the foundation for user experience",
+        "Design and development of an operations panel for internal management of trips and bookings",
+        "Creation of the first version of the mobile application using Ionic, enabling rapid mobile market entry",
+        "Leadership and execution of mobile application migration to Flutter, significantly improving performance and user experience",
+        "Implementation of specific backend functionalities using Django, contributing to the overall system architecture"
+      ],
+    },
+    {
+      id: "fluento",
+      order: 10,
+      publishedAt: "2024-12-20",
+      title: "Fluento",
+      summary: "Innovative mobile application that revolutionizes English learning through AI and reverse translation",
+      description: "Fluento represents an innovation in the language learning field, combining proven methodologies with cutting-edge technology. The application implements the reverse translation method, backed by advanced AI, where users translate sentences from Spanish to English receiving instant and personalized feedback. This approach not only improves grammatical accuracy and vocabulary, but also develops the user's natural linguistic intuition. The application incorporates an adaptive learning system, based on Anki, that adjusts the frequency of exercises according to individual progress, thus maximizing learning efficiency.",
+      images: ["/projects/fluento/cover-image.png"],
+      customer: "Personal Project",
+      type: 'experiment',
+      technologies: ["NextJS", "React Native", "Expo", "OpenAI", "TypeScript", "Kafka", "PostgreSQL"],
+      challenges: [
+        "Development of an AI-based evaluation system that analyzes multiple linguistic aspects: grammar, vocabulary, naturalness, and context",
+        "Implementation of a spaced repetition algorithm inspired by Anki, optimized for language learning",
+        "Integration of advanced voice recognition and text-to-speech technologies to improve the learning experience",
+        "Design of an intuitive mobile interface that prioritizes user experience and maintains high engagement levels"
+      ],
+      repoUrl: "https://github.com/enolcasielles/fluento-app",
+      blogUrl: "/blog/construyendo-fluento"
+    },
+    {
+      id: "memomate",
+      order: 50,
+      publishedAt: "2024-12-04",
+      title: "MemoMate",
+      summary: "Intelligent personal assistant on Telegram that revolutionizes personal relationship management through advanced AI",
+      description: "MemoMate is an innovative personal relationship management solution that uses advanced natural language processing to transform the way we remember and maintain information about our contacts. Through a natural conversational interface on Telegram, the system allows users to record and retrieve detailed information about their contacts intuitively. The application employs cutting-edge AI technologies to analyze, categorize, and retrieve contextually relevant information, facilitating the building and maintenance of more meaningful relationships.",
+      images: ["/projects/memomate/cover-image.png"],
+      customer: "Personal Project",
+      type: 'experiment',
+      technologies: ["NextJS", "OpenAI", "PostgreSQL", "Pinecone", "Telegram API", "TypeScript"],
+      challenges: [
+        "Design and implementation of a robust architecture for processing natural conversations through the Telegram API",
+        "Development of a sophisticated natural language processing system using OpenAI for contextual information extraction and analysis",
+        "Implementation of an optimized database structure in PostgreSQL for efficient storage of relational information",
+        "Integration of advanced semantic search using Pinecone for precise contextual information retrieval",
+        "Development of a subscription management and usage monitoring system through Stripe"
+      ],
+      repoUrl: "https://github.com/enolcasielles/memo-mate",
+      blogUrl: "/blog/memomate"
+    },
+    {
+      id: "mooviment",
+      order: 10,
+      publishedAt: "2024-05-01",
+      title: "Mooviment",
+      summary: "Innovative Augmented Reality platform that transforms physical products into multimedia experiences",
+      description: "Mooviment is a comprehensive platform that revolutionizes the interaction between physical products and digital content through Augmented Reality. The system allows linking a video to an image, making it appear as if the video is in the image. The solution includes a web platform for generating experiences, an e-commerce for selling products, and a mobile application for viewing AR experiences, all backed by a scalable cloud infrastructure.",
+      images: ["/projects/mooviment/mooviment_1.png"],
+      customer: "Mooviment Lab SL",
+      type: 'personal',
+      jobTitle: "Founder and CTO",
+      technologies: ["Angular", "Flutter", "AR", "Express", "AWS", "React"],
+      challenges: [
+        "Development and integration of advanced AR technologies through Wikitude in a cross-platform Flutter application",
+        "Design and implementation of a scalable REST API with Express for robust user and product management",
+        "Creation of an intuitive and powerful Product Editor using Angular, facilitating AR experience configuration and customization",
+        "Seamless integration of the Product Editor with WooCommerce for efficient e-commerce management",
+        "Architecture and implementation of highly available and scalable cloud infrastructure on AWS",
+        "Development of a serverless system using AWS Lambda for efficient multimedia asset processing"
+      ],
+      websiteUrl: "https://www.mooviment.com",
+    },
+    {
+      id: 'ai-agency',
+      order: 80,
+      publishedAt: "2024-04-15",
+      title: 'AI Agency Framework',
+      summary: 'Modular and scalable framework for the development and deployment of custom artificial intelligence agents',
+      description: 'Innovative framework designed to facilitate the creation, testing, and deployment of specialized artificial intelligence agents. The solution provides a modular architecture that enables rapid development of custom AI agents, including a testing and debugging environment. The framework is optimized to integrate with the latest AI technologies, enabling the creation of robust and scalable solutions.',
+      images: ["/projects/ai-agency/cover-image.png"],
+      customer: "Personal Project",
+      type: 'experiment',
+      technologies: ["OpenAI", "Next.js", "pnpm", "TypeScript", "Server Events"],
+      challenges: [
+        "Design and implementation of a modular and extensible architecture for flexible AI agent creation",
+        "Development of an advanced integration with OpenAI's Assistant API, optimizing performance and efficiency",
+        "Implementation of mechanisms that allow communication between AI agents and the end user",
+        "Implementation of a web platform to interact and test created agencies",
+      ],
+      repoUrl: "https://github.com/enolcasielles/ai-agency-typescript",
+      blogUrl: "/blog/agencia-ia-proyecto-base"
+    },
+  ]
+};
