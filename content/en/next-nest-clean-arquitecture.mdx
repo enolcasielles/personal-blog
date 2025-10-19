@@ -1,0 +1,143 @@
+---
+title: Hexagonal Architecture with TypeScript and pnpm
+publishedAt: '2024-08-30'
+summary: This article explains how to create a Web project using Clean Architecture and a monorepo approach for layer separation
+---
+
+In a previous article <a href="/blog/monorepo" target="_blank">How to create a Monorepo with TypeScript and pnpm</a>, I explored the configuration process of a monorepo using pnpm and TypeScript. This approach allows managing multiple packages within the same project, ensuring a more organized and easy-to-maintain structure as the code grows.
+
+Now, let's go a step further by applying the Hexagonal Architecture concept within this monorepo. This pattern, also known as "Ports and Adapters Architecture", allows us to create modular and decoupled applications, where business logic remains independent of implementation details, such as the database or application framework.
+
+## Why hexagonal architecture?
+
+The main advantage of hexagonal architecture is the independence of layers. In this approach, business logic is at the center of the architecture, without being coupled to external infrastructure such as databases, external APIs, or frameworks. External components, such as databases or HTTP controllers, act as adapters connected to ports defined in the business layer.
+
+### Key advantages of hexagonal architecture:
+
+* **Decoupling**: Clearly separates business logic from infrastructure and external dependencies.
+* **Testability**: Facilitates the creation of unit tests by isolating business logic from implementation details.
+* **Scalability**: Adding new functionalities or changing components is much simpler, as different parts of the system don't directly depend on each other.
+
+## Monorepo and Hexagonal Architecture: An efficient approach
+
+Using a monorepo to implement hexagonal architecture has several advantages. By managing different layers as independent packages, we ensure that each maintains its own responsibility and that dependencies between them are clearly defined. This allows us to scale the project without fear of creating circular dependencies or unwanted couplings.
+
+## Example Project
+
+Before going into detail about the architecture, I want to briefly explain the example project I built to illustrate this concept. This project is an **online store manager**, which includes product and user management. On one hand, we have an API to perform CRUD operations on products and users. On the other hand, we create a web that allows users to access their account to view or manage their product catalog.
+
+The API is built using NestJS while the web is implemented in NextJS. We will see how using this architecture allows us to easily reuse code pieces between both projects.
+
+You can directly access the <a href="https://github.com/enolcasielles/next-nest-clean-arquitecture" target="_blank">project repository</a> to see the implementation carried out
+
+## Implementation
+
+I have organized the hexagonal architecture layers into three independent packages within the monorepo:
+
+### Domain
+
+This package defines the system entities, which represent the key domain objects, such as `User` or `Product`. Additionally, here are the models that structure communication between different parts of the system, as well as repository contracts that establish how implementations should behave. This layer is totally independent, without dependencies on other packages, and acts as the application core.
+
+### Application
+
+This layer defines business logic, also known as application use cases. Here are all operations the application can perform, such as creating, updating, deleting, and searching for products and users. Each use case acts as an orchestrator that coordinates entities and business rules to fulfill a specific operation. This layer depends on `Domain` to access entities and repository contracts, but doesn't know the concrete implementations of these repositories. This allows changing implementations without affecting business logic.
+
+### Database
+
+This package implements the database connection and provides concrete classes that comply with contracts defined in `Domain`. Here all details of how to interact with the database are encapsulated, including queries, storage, and information retrieval. I opted to use Prisma as the ORM library for said management with all the operations it entails, such as migrations, schema definition, etc. It is this package that is responsible for encapsulating all this implementation.
+
+## api and web applications
+
+Now let's see the 2 applications I created to test the architecture, as I mentioned earlier.
+
+### API (NestJS)
+
+This NestJS application depends on the three previous packages (domain, application and database). This is where the magic happens: through `providers` and the use of `factories`, dependencies are injected into use cases defined in application, passing as context the concrete implementations of database repositories. An example of how this is implemented in the products module (`products.module.ts`):
+
+```tsx
+@Module({
+  controllers: [ProductsController],
+  providers: [
+    ProductsService,
+    {
+      provide: CreateProductUseCase,
+      useFactory: () =>
+        new CreateProductUseCase({
+          productsRepository: DI.productsRepository,
+        }),
+    },
+    // Other use cases
+  ],
+})
+export class ProductsModule {}
+```
+
+Here we use `useFactory` to control dependency injection, ensuring the correct repository is passed to use cases. The `DI` constant is responsible for dependency inversion, relating the implementation of each repository made in `database` with the contract that each use case requires to fulfill for its dependencies.
+
+```tsx
+import { ProductsRepository, UsersRepository } from '@marketplace/database';
+
+export const DI = {
+  usersRepository: new UsersRepository(),
+  productsRepository: new ProductsRepository(),
+};
+```
+
+### Web (NextJS)
+
+The NextJS application is responsible for implementing the web that the user will use to interact with the system. Pages, using the SSR concept that NextJS provides, are rendered on the server before sending them to the client, ensuring a better user experience. Similar to the API, it also relies on use cases defined in `application` to handle business logic from the server side, which allows reusing the application's core logic in both web and API, ensuring consistency and simpler maintenance.
+
+What's interesting about this approach is the logic reuse between both applications. On the web, we have a screen that shows the user's product list, while in the API there is an endpoint that returns that same list. Both applications trigger the same use case defined in the application package and use the same repository implementation defined in database, thanks to the DI constant.
+
+Here is an example of the web code, where the use case is used to get user products:
+
+```tsx
+import { GetProductsUseCase } from "@marketplace/application";
+import { DI } from "@/di";
+import getUserId from "@/app/utils/get-user-id";
+import handleActionsError from "@/app/utils/handle-actions-error";
+
+export const getProductsAction = async () => {
+  return handleActionsError(async () => {
+    const userId = await getUserId();
+    return await new GetProductsUseCase({
+      productsRepository: DI.productsRepository,
+      usersRepository: DI.usersRepository,
+    }).execute({ userId: userId, query: {} });
+  });
+};
+```
+
+While in the API, the NestJS controller invokes the same use case from the service:
+
+```tsx
+async getProducts(userId: string, query: GetProductsRequest) {
+  const response = await this.getProductsUseCase.execute({
+    userId,
+    query,
+  });
+  return response;
+}
+```
+
+## Dependency injection with DI
+
+To handle dependency inversion, I centralized repository instances in a DI constant, where user and product repository instances are created. This way, we maintain control over dependencies and can ensure everything is correctly linked:
+
+```tsx
+import { ProductsRepository, UsersRepository } from '@marketplace/database';
+
+export const DI = {
+  usersRepository: new UsersRepository(),
+  productsRepository: new ProductsRepository(),
+};
+```
+
+This centralization strategy facilitates system scalability, since, in case of changes or new dependencies, it's only necessary to adjust the DI constant without touching the rest of the application.
+
+## Conclusion
+
+The combination of a monorepo and hexagonal architecture not only guarantees layer independence, but also facilitates project development, scalability, and maintenance. Additionally, the ability to reuse logic between different applications (as in this case, between API and web) ensures consistency and reduces maintenance effort. The use of NestJS and NextJS allows building robust and scalable applications, while the hexagonal pattern ensures that business logic remains intact and decoupled from concrete implementations.
+
+You can find the detailed implementation in the following GitHub repository: <a href="https://github.com/enolcasielles/next-nest-clean-arquitecture" target="_blank">next-nest-clean-arquitecture</a>
+

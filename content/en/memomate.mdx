@@ -1,0 +1,897 @@
+---
+title: 'How I Developed MemoMate: An AI Personal Assistant on Telegram'
+publishedAt: '2024-12-04'
+summary: 'MemoMate is a Telegram bot that acts as a PRM (Personal Relationship Manager). Through a natural conversation, you can tell it information about your contacts, and the bot is responsible for storing and organizing this information so you can easily use it in the future.'
+---
+
+## Introduction
+
+In this article I want to share my experience developing **MemoMate**, a personal assistant on Telegram that helps manage and improve our personal relationships. The idea arose from a personal need: to have a simple way to remember important details about the people who matter to me - from birthdays to significant conversations.
+
+## What is MemoMate?
+
+MemoMate is a Telegram bot that acts as a PRM (Personal Relationship Manager). Through a natural conversation, you can tell it information about your contacts, and the bot is responsible for storing and organizing this information so you can access it in the future. Let's see here its main features.
+
+### Contact Management
+
+During your conversation with the bot, it will be detecting the contacts you are talking about and will be registering them in your account. It will have the ability to know if the contact already exists in the database and, if not, will create it. You can also ask it to edit any information about a contact or even delete it.
+
+### Contact Information
+
+The bot is prepared for you to tell it anything you need to remember about any of your contacts. The bot will store all this information so you can consult it later. Let's see it with an example:
+
+Imagine you have a friend named José and the bot already has him registered as one of your contacts. You could tell it something like:
+
+> "Yesterday I was with my friend José and he told me he is considering leaving his job"
+
+Now imagine that 3 months pass and you are going to meet your friend José. You could go to MemoMate and ask:
+
+> "What did my friend José tell me last time?"
+
+The bot will respond saying:
+
+> "José told you he is considering leaving his job"
+
+### Reminders
+
+Another interesting functionality of the bot is reminders. MemoMate allows you to register reminders about any contact, so it sends you a message on the assigned date. For example, you could tell it:
+
+> "Next December 15th is my friend José's birthday. Remind me to congratulate him"
+
+The bot will interpret from this message that it has to create a reminder for next December 15th about contact José and to congratulate him. When that date arrives, the bot will send you a message like:
+
+> "Remember to congratulate José on his birthday"
+
+### Free vs Premium
+
+MemoMate can be used for free, which will allow limited account use. Each user will have a number of messages they can send to the bot each month. When these messages run out, the user cannot send more messages until their credits are renewed or they upgrade to Premium. When going Premium, the user unlocks the message limitation and can make unlimited use.
+
+### Web Platform
+
+In addition to the Telegram bot, MemoMate also has a web platform that grants the user certain functionalities:
+
+* **Subscription Management**: Through this web the user can control the subscription that converts the user into Premium.
+* **Contact Management**: In addition to the contact management performed by the bot itself, the user will have a section on the web where they can also perform this management and with an important extra feature: csv import.
+* **Event Management:** The same for contact information. The user can view and manage this information also from the web application.
+* **Analytics:** The web application will give the user some interesting data about their account usage.
+* **Promotional Landing Page**: This Web also has the product explanatory page that would serve to promote and explain it to the user.
+
+## Architecture and Technologies
+
+MemoMate consists of 2 main components (or applications):
+
+1. **Telegram Bot**: to handle all user interaction.
+2. **Web Application**: so the user can manage their account and contacts.
+
+### Technologies Used
+
+Let's see here the technologies I decided to use to implement this product and the reason for each.
+
+* **Monorepo with pnpm**: Both applications (bot and web) have functionality that is interesting to share. For this reason, I decided to use a monorepo architecture in which these 2 applications live and that has packages that define the functionalities to be shared. PNPM was the natural choice for its efficiency in dependency management and excellent workspace support. If you want to know more about this topic I recommend [this article](https://www.enolcasielles.com/blog/monorepo) where I explain in more detail.
+* **PostgreSQL + Prisma**: I needed a robust database that could handle complex relationships between users, contacts and events. PostgreSQL was the perfect candidate. Prisma adds a layer that facilitates both migration management and implementation of different database communications as needed.
+* **OpenAI**: The OpenAI API, especially with its Assistants, offers advanced natural language processing capabilities. The ability to define custom "tools" that the assistant can use was key to implementing the bot's main functionalities.
+* **Next.js**: For the web application, Next.js was the ideal choice for several reasons:
+  * Server Components for better performance.
+  * App Router for implementing different sections.
+  * API Routes to implement serverless endpoints as needed.
+* **Tailwind CSS and Shadcn**: When defining the web application UI, this combination is perfect for the ease it provides when creating different components in a robust and efficient way.
+* **Pinecone**: To implement semantic searches on contact information, we needed a vector database. Pinecone stands out for its ease of use, performance, and ability to handle large volumes of vectorial data.
+* **Telegraf:** To implement the telegram bot, we opted to use the telegraf library which stands out for its good performance and ease of integration.
+
+## The Development Process
+
+We will now explain how the project development process was approached, going through all the steps taken to get from an initial idea to a final product. We won't go into detail about absolutely all the code pieces that were developed, as that would make the article excessively long. I will explain how the different parts were defined and stopping at those I consider most interesting. I recommend opening the [project repository](https://github.com/enolcasielles/memo-mate) and seeing the implementation in more detail.
+
+### Project Definition
+
+This process began by clearly defining the scope and architecture. Relying heavily on ChatGPT, I refined the idea and documented how we would implement each part. The goal here was to create different documents that I put in the `docs` folder. This planning phase was crucial to have a clear vision of the path to follow and to have the necessary information to carry out [efficient development with Cursor](https://www.enolcasielles.com/blog/using-cursor). In this folder we create different documents: project explanation, database definition, architecture, etc. This allows Cursor to have knowledge of what we are developing and help us iterate much faster.
+
+### Base Structure
+
+A monorepo architecture was used with the different components. On one hand the 2 applications we already mentioned (the bot and the web) and on the other hand the different packages on which these applications will rely. We also have an extra application that we call `infra`. This application will basically be a docker-compose that allows us to set up the local infrastructure we need, in this case only the PostgreSQL database.
+
+> Despite having a single service in the infrastructure, we decided to maintain a docker-compose to facilitate adding possible future services
+
+As for packages, we will have the following:
+
+* `core`: Where we will implement shared utilities
+* `database`: That will be responsible for managing everything related to the database using Prisma. Models, migrations, etc.
+* `openai`: Abstraction for OpenAI interaction. We will define in this package interesting classes and utilities that will facilitate the creation and management of the OpenAI Assistant.
+
+### Authentication System
+
+The platform's authentication system is somewhat unusual. The idea is not to have a usual Login and Registration mechanism, but for the bot to be responsible for managing this. The bot will have the ability to identify the user it is interacting with, creating new users in each new conversation. When the user needs to go to the web platform, either because the bot requires it or because the user wants to, the bot will be responsible for generating a unique and temporary access link.
+
+To achieve this, a simple but effective authentication system was developed. The flow works like this:
+
+1. When the user needs to access the web, the bot generates a temporary session with a unique token. That link will be valid only for 10 minutes (session expiration).
+
+```tsx
+  private async createSessionUrl(userId: string) {
+    const session = await prisma.session.create({
+      data: {
+        userId: userId,
+        expiresAt: new Date(Date.now() + 1000 * 60 * 10),
+      }
+    });
+    const link = `${process.env.FRONTEND_URL}/login?token=${session.id}`;
+    return link;
+  }
+```
+
+1. The bot sends this link to the user so they can click on it, which will trigger the Api Route `/login` on the web. This route will do the following:
+   * Verify that the token is valid and has not expired
+   * If valid, create a 30-day cookie and redirect to `/dashboard`
+   * If invalid, redirect to an error page
+
+```tsx
+export async function LoginRoute(request: Request) {
+  const { searchParams } = new URL(request.url);
+  const token = searchParams.get("token");
+  let errorType = null;
+  try {
+    if (!token) {
+      throw new CustomError({
+        message: "Token not provided",
+        type: "INVALID_TOKEN",
+        statusCode: 400,
+      });
+    }
+    const session = await prisma.session.findFirst({
+      where: {
+        id: token,
+        expiresAt: {
+          gt: new Date(),
+        },
+      },
+      include: {
+        user: true,
+      },
+    });
+
+    if (!session) {
+      throw new CustomError({
+        message: "Invalid or expired session",
+        statusCode: 401,
+        type: "INVALID_TOKEN",
+      });
+    }
+
+    // Create cookie with user ID
+    cookies().set("userId", session.userId, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      path: "/",
+      maxAge: 60 * 60 * 24 * 30, // 30 days
+    });
+
+    // Return a redirect
+    return NextResponse.redirect(new URL("/dashboard", request.url));
+  } catch (error) {
+    console.error(error);
+    if (error instanceof CustomError) errorType = error.type;
+    else errorType = "INTERNAL_SERVER_ERROR";
+  }
+  redirect(`/error?type=${errorType}`);
+}
+```
+
+This way, we achieve a simple but secure and effective mechanism for the user to access their web account from Telegram. Once identified, the user can return to their account whenever they want (for 30 days) simply by accessing the web. When the cookie expires, they must return to the bot to generate a new access link.
+
+### OpenAI Integration
+
+To handle OpenAI interaction in a clean and reusable way, a dedicated package `@memomate/openai` was created that abstracts all the API complexity. This package implements four main classes:
+
+#### Agent
+
+The `Agent` class represents an OpenAI assistant and manages its lifecycle. To use OpenAI Assistants, the first thing you need is to create one, which you can do using their API or directly through their [platform](https://platform.openai.com/assistants). In our case, we create the assistant directly on the platform and put its id as an environment variable to be able to retrieve it through the API, within this `Agent` class
+
+The assistant is the entity in OpenAI to which its purpose and how it should operate is specified. The model it should use is also specified, as well as the tools it has available to extend functionality.
+
+```tsx
+interface Props {
+  id: string;
+  name: string;
+  description: string;
+  instructions: string;
+  model?: string;
+  tools: Array<Tool>;
+}
+
+export class Agent {
+  // ...
+  async init() {
+    let openAiAssistant = await openaiClient.beta.assistants.retrieve(this.id);
+    const shouldUpdate = this.shouldUpdate(openAiAssistant);
+    if (shouldUpdate) {
+      openAiAssistant = await openaiClient.beta.assistants.update(
+        this.id,
+        this.generateBody()
+      );
+    }
+    this.assistant = openAiAssistant;
+  }
+}
+```
+
+This Agent class also has functionality to check whether the assistant should be updated in OpenAI or not. The idea is that we can specify from the project code itself how the assistant should behave. The `shouldUpdate` method compares the Assistant parameters in OpenAI with what we have specified locally (model, instructions, tools used, etc.) If it detects differences, it will update the assistant in OpenAI, ensuring we control its behavior from the code itself.
+
+```tsx
+  private shouldUpdate(openAiAssistant: Assistant): boolean {
+    if (this.name !== openAiAssistant.name) return true;
+    if (this.description !== openAiAssistant.description) return true;
+    if (this.instructions !== openAiAssistant.instructions) return true;
+    if (this.model !== openAiAssistant.model) return true;
+    if (this.tools.length !== openAiAssistant.tools.length) return true;
+    return false;
+  }
+```
+
+#### Tool
+
+Assistants are equipped to execute tools, which are pieces of code that allow us to carry out actions that the Assistant itself cannot perform on its own. For example, in our case, we will need a Tool that creates a new contact. To achieve this, what is done is, first specify to the assistant that it has a tool to create a contact and how it should use it. And, on the other hand, create the tool itself to implement said user creation.
+
+To support this, the abstract class `Tool` defines the structure for the tools the assistant can use:
+
+```tsx
+export abstract class Tool {
+  name: string;
+  description: string;
+  parameters: any;
+
+  constructor({ name, description, parameters }: ToolParams) {
+    this.name = name;
+    this.description = description;
+    this.parameters = parameters;
+  }
+
+  abstract run(parameters: RunProps): Promise<string>;
+}
+```
+
+Each Tool we need to create and add to the Agent, will have to be an extension of this class and must implement the `run` method to perform its function.
+
+#### Thread
+
+The next concept to communicate with OpenAI assistants is the `Thread` or communication thread, which is basically each conversation the Assistant has. The idea in MemoMate is that each user has their own Thread, which will be created at the same time as user creation and will allow maintaining their own conversation.
+
+The `Thread` class we implement in this `@memomate/openai` package is responsible for implementing all this functionality. Basically it allows us the following:
+
+* Create a new thread. We will use it when a new user is created.
+
+```tsx
+  static async create() {
+    const thread = await openaiClient.beta.threads.create();
+    return thread.id;
+  }
+```
+
+* Send a message to a thread. It will be triggered with each new user message, to its corresponding thread.
+
+```tsx
+  async send(message: string, retries: number = 1): Promise<string> {
+    if (!this.agent) throw new Error("Assistant not set");
+    if (!this.thread) await this.init();
+    await openaiClient.beta.threads.messages.create(this.id, {
+      role: "user",
+      content: message,
+    });
+    this.run = await openaiClient.beta.threads.runs.create(this.id, {
+      assistant_id: this.agent.id,
+    });
+    while (true) {
+      await this.waitUntilDone();
+      if (this.run.status === "completed") {
+        const _message = await this.extractMessage();
+        return _message;
+      } else if (this.run.status === "requires_action") {
+        await this.processAction();
+      } else {
+        const err = "Run failed: " + this.run.status;
+        console.log(err);
+        if (retries < MAX_RETRIES) {
+          console.log("Retrying in 30s...");
+          await new Promise((resolve) => setTimeout(resolve, 30000));
+          return this.send(message, retries + 1);
+        }
+        const _message = this.generateFailedMessage();
+        return _message;
+      }
+    }
+  }
+```
+
+Within this `send` method, the response OpenAI gives us is processed, which can be a message to return or a tool to execute. When it's a tool to execute, we will look for the corresponding tool within the Agent's tools and execute its `run` method, returning to the assistant the result of said execution so it can continue and deliver a final response to the user.
+
+```tsx
+  private async processAction() {
+    const toolsToExecute =
+      await this.run.required_action.submit_tool_outputs.tool_calls;
+    const toolsResults = [];
+    for (const toolToExecute of toolsToExecute) {
+      const toolName = toolToExecute.function.name;
+      const tool = this.agent.tools.find((t) => t.name === toolName);
+      const toolResult = tool
+        ? await tool.run({
+            ...JSON.parse(toolToExecute.function.arguments),
+            metadata: this.metadata,
+          })
+        : "ERROR: there is no tool with the name you indicated. Try again with the correct name. The list of available tools is as follows: " +
+          this.agent.tools.map((t) => t.name).join(", ");
+      toolsResults.push({
+        tool_call_id: toolToExecute.id,
+        output: toolResult.toString(),
+      });
+    }
+    this.run = await openaiClient.beta.threads.runs.submitToolOutputs(
+      this.id,
+      this.run.id,
+      {
+        tool_outputs: toolsResults,
+      },
+    );
+  }
+```
+
+#### Embeddings
+
+Another concept we need from OpenAI is embeddings, which is the transformation of certain text into a vector format that allows us to perform semantic searches. We will use this to be able to retrieve user contacts. Every time a contact is created or updated, we will generate its corresponding embedding and save it in Pinecone, to be able to search for it in the future.
+
+To handle this embedding generation we created this `Embeddings` class
+
+```tsx
+export class Embeddings {
+  private model = 'text-embedding-3-small';
+  private dimensions = 1024;
+
+  async generateEmbedding(text: string): Promise<number[]> {
+    const response = await openaiClient.embeddings.create({
+      model: this.model,
+      dimensions: this.dimensions,
+      input: text,
+      encoding_format: 'float'
+    });
+
+    return response.data[0].embedding;
+  }
+}
+```
+
+This way, the `@memomate/openai` package provides us with an abstraction layer over the OpenAI API, facilitating its use and allowing greater flexibility in future implementations.
+
+### Assistant Implementation
+
+Once we have this `@memomate/openai` package we are ready to proceed with the Assistant implementation. In the bot application, we create a new `assistant` folder to handle this.
+
+We start with the tools, or the tools we will give the assistant so it can perform the different necessary actions: Create a Contact, Search a Contact, Create an Event, etc. Each tool will be a class that extends from the abstract Tool class. The `run` method will be the one executed when the assistant detects it must use this Tool. And therefore, in this `run` method is where we define what we want this Tool to perform.
+
+```tsx
+export class CreateContactTool extends Tool {
+  constructor() {
+    super({
+      name: "CreateContact",
+      description:
+        "This tool creates a new contact in the database.",
+      parameters: {
+        type: "object",
+        properties: {
+          name: {
+            type: "string",
+            description:
+              "The name of the contact to be created.",
+          },
+          relation: {
+            type: "string",
+            description:
+              "The contact's relationship with the user. Example: 'Friend', 'Family', 'Work', etc.",
+          },
+          location: {
+            type: "string",
+            description:
+              "The contact's location. It can be a city, a country, etc. Examples: 'Madrid', 'Asturias', 'Argentina', etc.",
+          },
+        },
+        required: ["name"],
+      },
+    });
+  }
+
+  async run(parameters: CreateContactRunProps): Promise<string> {
+    try {
+      console.log("Creating contact...");
+      const { metadata, name, relation, location } = parameters;
+      
+      // Create contact in database
+      const contact = await prisma.contact.create({
+        data: {
+          name,
+          relation,
+          location,
+          userId: metadata.userId
+        }
+      });
+
+      // Generate text for embedding
+      const contactText = `Name: ${name}${relation ? `, Relation: ${relation}` : ''}${location ? `, Location: ${location}` : ''}`;
+      
+      // Generate embedding using OpenAI
+      const embeddings = new Embeddings();
+      const embeddingValue = await embeddings.generateEmbedding(contactText);
+      
+      // Index in Pinecone
+      await PineconeService.getInstance().upsertContact(
+        metadata.userId,
+        contact.id,
+        embeddingValue
+      );
+
+      return `I have created contact ${name} correctly. Its ID is ${contact.id}.`;
+    } catch (e) {
+      console.error(e);
+      return `The contact could not be created.`;
+    }
+  }
+}
+```
+
+Next, we create the text files `instructions.md` and `description.md` (markdown format), to define the description and instructions of our assistant. This is where we explain to our assistant how it should act to carry out its purpose.
+
+And finally, we create the `MemoMateAssistant` class, which will be responsible for creating and initializing the agent joining all the previous pieces and exposing a `sendMessage` method that allows sending a new message to this Agent using the user's thread in question.
+
+```
+export class MemoMateAssistant {
+  private agent: Agent;
+  private static instance: MemoMateAssistant;
+
+  private constructor() {
+    this.agent = new Agent({
+      id: process.env.OPENAI_ASSISTANT_ID,
+      name: "MemoMate Assistant",
+      description: path.join(__dirname, "description.md"),
+      instructions: path.join(__dirname, "instructions.md"),
+      model: "gpt-4o-mini",
+      tools: [
+        new CreateContactTool(),
+        new UpdateContactTool(),
+        new DeleteContactTool(),
+        new SearchContactTool(),
+        new CreateEventTool(),
+        new GetCurrentDateTool(),
+        new CreateReminderTool(),
+        new GetContactEventsTool(),
+      ],
+    });;
+  }
+
+  static getInstance(): MemoMateAssistant {
+    if (!MemoMateAssistant.instance) {
+      MemoMateAssistant.instance = new MemoMateAssistant();
+    }
+    return MemoMateAssistant.instance;
+  }
+
+  async init() {
+    try {
+      await this.agent.init();
+      console.log("Assistant successfully initialized");
+    } catch (error) {
+      console.error("Error initializing assistant:", error);
+      throw error;
+    }
+  }
+
+  async sendMessage(userId: string,threadId: string, message: string): Promise<string> {
+    try {
+      const thread = new Thread<ThreadMetadata>({
+        id: threadId,
+        agent: this.agent,
+        metadata: {
+          userId: userId,
+        },
+      });
+      await thread.init();
+      const response = await thread.send(message);
+      return response;
+    } catch (error) {
+      if (error instanceof Error) {
+        return error.message;
+      }
+      return "Error sending message";
+    }
+  }
+}
+```
+
+One thing to highlight is the agent initialization. As we can see, and in line with what we mentioned in the previous point, we already have the Assistant created and have its id in OpenAI, which we keep in an environment variable so it is directly retrieved and, if necessary, updated.
+
+### Connecting Bot with Assistant. MemoMateProcessor Class
+
+Once we have the assistant configured, the next step is to connect it to the Telegram bot so the user can interact with it. This is where the `MemoMateProcessor` class comes into play. This class is responsible for defining methods to be executed on different events that the Telegram bot emits, such as when the user starts a new conversation, or when they send a message. For each of these actions, we create a method in this class to handle it. For example, when the user triggers the `/help` command, we will make the `handleHelp` method of this class execute:
+
+```
+  public async handleHelp(ctx: Context) {
+    const message = helpTemplate();
+    ctx.reply(message, {
+      parse_mode: 'HTML'
+    });
+  }
+```
+
+This method simply defines an html with the message we want to give the user, in this case with help on how to use the bot. Through the Context object, we respond to the user by sending said message in html format.
+
+The most interesting method in this class is `handleMessage`, which will be executed with each new user message. Let's see a bit what is done here.
+
+```tsx
+  public async handleMessage(ctx: TextMessageContext) {
+    try {
+      const telegramUserId = ctx.message.from.id;
+      const chatId = ctx.message.chat.id;
+      const message = ctx.message.text;
+  
+      const user = await this._getOrCreateUser(telegramUserId, chatId);
+  
+      const canSend = user.stripeSubscriptionId || user.credits > 0;
+      
+      if (!canSend) {
+        const link = await this.createSessionUrl(user.id);
+        ctx.reply(limitMessageTemplate(link), {
+          parse_mode: 'HTML'
+        });
+        return;
+      }
+
+      await prisma.messageLog.create({
+        data: {
+          userId: user.id,
+          message: message,
+          direction: MessageLogDirection.INCOMING,
+        }
+      });
+
+      const response = await this.assistant.sendMessage(user.id, user.openaiThreadId, message);
+      
+      await prisma.messageLog.create({
+        data: {
+          userId: user.id,
+          message: response,
+          direction: MessageLogDirection.OUTGOING,
+        }
+      });
+      
+      if (!user.stripeSubscriptionId) {
+        await prisma.user.update({
+          where: { id: user.id },
+          data: {
+            credits: { decrement: 1 }
+          }
+        });
+      }
+      
+      ctx.reply(response);
+    } catch (error) {
+      console.error(error);
+    }
+  }
+```
+
+First, we retrieve through the `Context` the data we need to be able to identify the user and the message they send us. We call a private method `_getOrCreateUser` that is responsible for retrieving this user in our database, or creating it if it didn't exist.
+
+> It's interesting to see the implementation of this `_getOrCreateUser` method. When creating the user we also create the Thread that allows us to open a new conversation with the assistant. This way we will have everything ready for this new user to send messages to the assistant.
+
+The next step is to analyze whether the user can send messages to the assistant or not. Very simple, they can send if they are Premium or, failing that, if the number of credits is greater than 0. If they cannot send, we resolve this method by sending a standard message suggesting the user go to the Web platform to become Premium.
+
+Otherwise, all that remains is to send the user's message to the assistant, through the `sendMessage` of `MemoMateAssistant`. If the user is not Premium, we subtract credit. We save both messages (the user's and the response) in a message Log. And finally, we respond to the user with the assistant's response.
+
+### Crons for Reminders
+
+To handle both reminders and credit renewal for free users, we implemented a scheduled task system using the `cron` library. A `CronManager` class was created that manages two main jobs:
+
+1. **Reminder Processing**: Runs every minute to verify if there are pending reminders that should be sent to users. When it finds reminders whose notification date has arrived, it sends a Telegram message to the corresponding user.
+
+> The `telegramChatId` parameter we save in the user when we create them is what we need to be able to send a message to that user on Telegram
+
+```tsx
+async processReminders() {
+  const pendingReminders = await prisma.reminder.findMany({
+    where: {
+      completed: false,
+      remindAt: {
+        lte: new Date()
+      }
+    },
+    include: {
+      user: true,
+      contact: true
+    }
+  });
+
+  for (const reminder of pendingReminders) {
+    let message = `🔔 Reminder: ${reminder.message}`;
+    if (reminder.contact) {
+      message += `\nContact: ${reminder.contact.name}`;
+    }
+
+    await this.bot.telegram.sendMessage(
+      reminder.user.telegramChatId.toString(),
+      message
+    );
+    
+    await prisma.reminder.update({
+      where: { id: reminder.id },
+      data: { completed: true }
+    });
+  }
+}
+```
+
+1. **Credit Renewal**: Runs daily at 3 AM to renew credits for free users. Searches for users whose renewal date has arrived and assigns them their monthly credit quota again:
+
+```tsx
+async renewCredits(): Promise<void> {
+  const usersToRenew = await prisma.user.findMany({
+    where: {
+      stripeSubscriptionId: null,
+      renewAt: {
+        lt: new Date()
+      }
+    }
+  });
+
+  for (const user of usersToRenew) {
+    await prisma.user.update({
+      where: { id: user.id },
+      data: {
+        credits: DEFAULT_CREDITS,
+        renewAt: addMonths(new Date(), 1)
+      }
+    });
+  }
+}
+```
+
+The current implementation is simple but effective, although **there is room for improvement**. For example, both reminder processing and credit renewal are performed sequentially, which could be a problem if the number of users grows significantly. A future improvement would be to implement a batch processing system to handle large data volumes more efficiently.
+
+### Pinecone for Contact Search
+
+One of the most interesting challenges was implementing a system that would allow the assistant to correctly identify which contact the user is talking about, even when the reference is not exact. For example, if the user says "my friend Juan from Madrid", the system must be able to find the correct contact even though it's saved as "Juan García".
+
+To achieve this, we implemented semantic search using Pinecone, a vector database that allows us to search for similarity between texts. The process works like this:
+
+1. **Contact Indexing**: When a contact is created or updated, we generate an embedding (a vectorial representation of the text) that includes all relevant contact information:
+
+```tsx
+      // Inside CreateContactTool
+      
+      // Generate text for embedding
+      const contactText = `Name: ${name}${relation ? `, Relation: ${relation}` : ''}${location ? `, Location: ${location}` : ''}`;
+      
+      // Generate embedding using OpenAI
+      const embeddings = new Embeddings();
+      const embeddingValue = await embeddings.generateEmbedding(contactText);
+      
+      // Index in Pinecone
+      await PineconeService.getInstance().upsertContact(
+        metadata.userId,
+        contact.id,
+        embeddingValue
+      );
+```
+
+1. **Contact Search**: When the assistant needs to identify a contact, it uses the `SearchContactTool` tool that converts the query into an embedding and searches for matches in Pinecone:
+
+```tsx
+async run(parameters: SearchContactRunProps): Promise<string> {
+  const searchText = `Name: ${name}${relation ? `, Relation: ${relation}` : ''}${location ? `, Location: ${location}` : ''}`;
+  
+  const embeddings = new Embeddings();
+  const queryEmbedding = await embeddings.generateEmbedding(searchText);
+  
+  const results = await PineconeService.getInstance().searchSimilarContacts(
+    metadata.userId,
+    queryEmbedding,
+    1 // We only need the most similar
+  );
+
+  if (results.length > 0 && results[0].score && results[0].score > 0.7) {
+    return `Contact found with ID: ${results[0].id}`;
+  }
+  return "No matching contact was found...";
+}
+```
+
+The implementation is centralized in the `PineconeService` class, which handles all Pinecone interaction:
+
+```tsx
+export class PineconeService {
+  private indexName = 'memomate-contacts';
+  private dimension = 1024;
+
+  async init() {
+    try {
+      const pinecone = getPineconeClient();
+      
+      // Check if index exists
+      const existingIndexes = await pinecone.listIndexes();
+      
+      const indexExists = existingIndexes?.indexes?.some(
+        (index: IndexModel) => index.name === this.indexName
+      );
+      
+      if (!indexExists) {
+        // Create index if it doesn't exist
+        await pinecone.createIndex({
+          name: this.indexName,
+          dimension: this.dimension,
+          metric: 'cosine',
+          spec: {
+            serverless: {
+              cloud: 'aws',
+              region: 'us-east-1'
+            }
+          },
+        });
+        
+        console.log('Pinecone index successfully created');
+      }
+    } catch (error) {
+      console.error('Error initializing Pinecone:', error);
+      throw error;
+    }
+  }
+
+  async searchSimilarContacts(userId: string, queryEmbedding: number[], limit: number = 5) {
+    try {
+      const pinecone = getPineconeClient();
+      const index = pinecone.index(this.indexName);
+
+      const results = await index.query({
+        vector: queryEmbedding,
+        filter: {
+          userId: userId
+        },
+        topK: limit,
+        includeMetadata: true
+      });
+
+      return results.matches;
+    } catch (error) {
+      console.error('Error searching for similar contacts:', error);
+      return [];
+    }
+  }
+}
+```
+
+This implementation allows us a "fuzzy" contact search that goes beyond exact text matching. The system understands context and semantic relationships, allowing the assistant to correctly identify contacts even when the user mentions them informally or incompletely.
+
+### Next Web
+
+So far we have seen everything related to the bot or integration with OpenAI. Now let's see very briefly the implementation we have done on the Web side.
+
+MemoMate's Web application was implemented using Next.js 14, taking advantage of its Server Components and with the App Router. It's a relatively simple implementation that serves as a complement to the Telegram bot, allowing users to manage their account and view their data in a more structured way.
+
+The web consists of the following main sections:
+
+* **Landing Page**: An attractive homepage that presents the product, its main features and usage examples. Implemented with interactive components and modern design using Tailwind. Encourages the user to access the bot and, when it detects the user is authenticated, shows a link to access their dashboard.
+* **Dashboard**: Displays a summary of user activity, including statistics about their contacts and bot usage
+* **Contacts**: Allows viewing, editing and deleting contacts, as well as importing contacts via CSV
+* **Events**: Visualization and management of events registered for each contact
+* **Subscription**: Panel to manage Premium subscription via Stripe
+
+The most interesting thing about the web implementation is its authentication mechanism, which we already explained earlier. Instead of a traditional login/registration system, authentication is done through the Telegram bot, which generates temporary access links. This approach not only simplifies the user experience but also reinforces the integration between the bot and the web.
+
+The UI was built using Tailwind CSS along with Shadcn/ui components, which allowed us to create a modern and responsive interface quickly and maintainably.
+
+Being a fairly standard Next.js implementation, we won't delve further into technical details. The source code is available in the repository for those interested in exploring the complete implementation.
+
+### Subscriptions with Stripe
+
+Subscription management is a fundamental part of MemoMate, as it determines access to Premium functionalities. We implemented a subscription system using Stripe, which is managed from the Web platform and reflected in the database so the bot can know if a user is Premium or not and act accordingly.
+
+#### Subscription Interface
+
+The subscription page provides a clear interface for users to manage their plan. It will control whether the user has an active subscription or not, showing the corresponding UI. In any case, they can manage their subscription, both to activate it and to cancel it, always redirecting to Stripe checkout.
+
+#### Integration with the Bot
+
+The bot, in the `MemoMateProcessor`, verifies the subscription status before processing each message:
+
+```tsx
+public async handleMessage(ctx: TextMessageContext) {
+
+  // 
+
+  const user = await this._getOrCreateUser(telegramUserId, chatId);
+
+  // Check if user can send messages
+  const canSend = user.stripeSubscriptionId || user.credits > 0;
+  
+  if (!canSend) {
+    const link = await this.createSessionUrl(user.id);
+    ctx.reply(limitMessageTemplate(link), {
+      parse_mode: 'HTML'
+    });
+    return;
+  }
+  
+  // Process message...
+}
+```
+
+#### Stripe Webhooks
+
+To keep subscription status synchronized, we implemented a webhook that processes Stripe events. This is how we find out if the user decides to cancel the subscription and, consequently, we must remove Premium from the user. From that moment we assign them initial credits and mark the renewal date within a month.
+
+```tsx
+export default async function StripeWebhookRoute(req: Request) {
+  try {
+    const body = await req.text();
+    const signature = req.headers.get("stripe-signature")!;
+    const event = stripe.webhooks.constructEvent(
+      body,
+      signature,
+      process.env.STRIPE_WEBHOOK_SECRET!
+    );
+
+    if (event.type === "customer.subscription.deleted" || 
+        event.type === "customer.subscription.updated") {
+      const subscription = event.data.object as Stripe.Subscription;
+      
+      if (subscription.status !== "active") {
+        await prisma.user.updateMany({
+          where: {
+            stripeSubscriptionId: subscription.id as string,
+          },
+          data: {
+            stripeSubscriptionId: null,
+            renewAt: addMonths(new Date(), 1),
+            credits: DEFAULT_CREDITS,
+          },
+        });
+      }
+    }
+
+    return NextResponse.json({ received: true });
+  } catch (error) {
+    console.error(error);
+    if (error instanceof CustomError) return apiError(error);
+    return apiError(
+      new CustomError({
+        message: "Internal server error",
+        statusCode: 500,
+      }),
+    );
+  }
+} 
+```
+
+In summary, this system allows us:
+
+1. **Transparent Management**: Users can easily manage their subscription from the web
+2. **Automatic Update**: Subscription status is automatically updated in the database when events occur in Stripe
+3. **Access Control**: The bot verifies subscription status before processing each message
+4. **Graceful Degradation**: When a user cancels their subscription, they automatically return to the free plan with their monthly credits
+
+### Future Improvements and Conclusion
+
+During MemoMate's development, several ideas for future improvements have emerged that could further enrich the experience:
+
+1. **Batch Processing**: Implement a batch processing system to handle reminders and credit renewals more efficiently.
+2. **Integration with More Platforms**: Expand beyond Telegram, adding support for WhatsApp or Discord.
+3. **Search Improvements**: Refine the semantic search system to obtain even more accurate results.
+
+It's also important to highlight that the project is purely educational. That's why we haven't mentioned anything about deployments or putting it into production. If anyone finds this project interesting and wants to carry out the necessary actions to launch this product in the market, don't hesitate to contact me 😉
+
+MemoMate's development has been a fascinating journey that has allowed me to explore and combine different modern technologies. From OpenAI integration to implementing semantic searches with Pinecone, each part of the project has presented its own challenges and learnings.
+
+If you are interested in this project and want to know more, you can find me at:
+
+* Twitter: [@enolcasielles](https://twitter.com/enolcasielles)
+* LinkedIn: [Enol Casielles](https://www.linkedin.com/in/enolcasielles/)
+* Email: [enolcasielles@gmail.com](mailto:enolcasielles@gmail.com)
+
+I also leave here again the [complete code on GitHub](https://github.com/enolcasielles/memo-mate) so you can explore and try it.
+
+I hope this article has been useful and interesting for you! If you have any questions, suggestions or just want to share your experience, I'll be happy to hear from you. 🚀
+

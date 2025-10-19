@@ -4,9 +4,7 @@ import { Link } from 'next-view-transitions'
 import { notFound } from "next/navigation";
 import { ExternalLink, Code2, BookOpen, ArrowLeft } from 'lucide-react';
 import { Metadata } from "next";
-import { useTranslations } from "next-intl";
-import { use } from "react";
-import { setRequestLocale, getLocale } from "next-intl/server";
+import { setRequestLocale, getTranslations } from "next-intl/server";
 
 export async function generateMetadata({
   params,
@@ -58,11 +56,11 @@ interface Props {
   }>;
 }
 
-export default function ProjectPage({ params }: Props) {
-  const {id, locale} = use(params);
+export default async function ProjectPage({ params }: Props) {
+  const {id, locale} = await params;
   setRequestLocale(locale);
   
-  const t = useTranslations("ProjectDetail");
+  const t = await getTranslations("ProjectDetail");
   
   const localizedProjects = projects[locale];
   const project = localizedProjects.find((p) => p.id === id);

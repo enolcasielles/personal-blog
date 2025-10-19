@@ -1,18 +1,24 @@
 import Link from 'next/link';
 import { getBlogPosts } from 'app/db/blog';
 import PageTitle from 'app/components/page-title';
+import { getTranslations, setRequestLocale } from 'next-intl/server';
 
 export const metadata = {
   title: 'Blog',
   description: 'Colección de artículos sobre desarrollo web, IA y tecnología en general.',
 };
 
-export default function BlogPage() {
-  let allBlogs = getBlogPosts();
+export default async function BlogPage({params}: {params: Promise<{locale: string}>}) {
+  const {locale} = await params;
+  setRequestLocale(locale);
+
+  const t = await getTranslations("BlogPage");
+
+  let allBlogs = getBlogPosts({locale: locale});
 
   return (
     <section className="max-w-4xl mx-auto">
-      <PageTitle title="Blog" description='Artículos sobre desarrollo web, tecnologías emergentes y creación de productos digitales' />
+      <PageTitle title={t("title")} description={t("description")} />
 
       <div className="space-y-8">
         {allBlogs

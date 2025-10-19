@@ -3,20 +3,18 @@ import Image from "next/image";
 import { Link } from 'next-view-transitions'
 import PageTitle from "app/components/page-title";
 import ProjectCard from "app/components/project-card";
-import { useTranslations } from "next-intl";
-import { use } from "react";
-import { setRequestLocale } from "next-intl/server";
+import { setRequestLocale, getTranslations } from "next-intl/server";
 
 export const metadata = {
   title: 'Proyectos',
   description: 'Proyectos de desarrollo web que he realizado.',
 };
 
-export default function ProjectsPage({params}: {params: Promise<{locale: string}>}) {
-  const {locale} = use(params);
+export default async function ProjectsPage({params}: {params: Promise<{locale: string}>}) {
+  const {locale} = await params;
   setRequestLocale(locale);
   
-  const t = useTranslations("ProjectsPage");
+  const t = await getTranslations("ProjectsPage");
   
   const localizedProjects = projects[locale];
   const personalProjects = localizedProjects.filter(project => project.type === 'personal').sort((a, b) => a.order - b.order);

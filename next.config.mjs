@@ -3,9 +3,7 @@ import createNextIntlPlugin from 'next-intl/plugin';
 const withNextIntl = createNextIntlPlugin();
 
 const nextConfig = {
-  experimental: {
-    useLightningcss: true,
-  },
+  transpilePackages: ['next-mdx-remote'],
   headers() {
     return [
       {

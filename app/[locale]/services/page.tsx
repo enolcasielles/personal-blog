@@ -1,5 +1,5 @@
 import Link from "next/link";
-import SectionCard from "../components/section-card";
+import SectionCard from "../../components/section-card";
 
 export default function ServicesPage() {
   return (

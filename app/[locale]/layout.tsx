@@ -6,7 +6,7 @@ import { Navbar } from '../components/nav';
 import { Analytics } from '@vercel/analytics/react';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import { PreloadResources } from '../preload';
-import { SandpackCSS } from '../blog/[slug]/sandpack';
+import { SandpackCSS } from './blog/[slug]/sandpack';
 import { GoogleAnalytics } from '@next/third-parties/google'
 import Footer from '../components/footer';
 import { ViewTransitions } from 'next-view-transitions';
@@ -62,9 +62,9 @@ export default async function RootLayout({
   params
 }: {
   children: React.ReactNode;
-  params: {
+  params: Promise<{
     locale: string;
-  };
+  }>;
 }) {
   const {locale} = await params;
 

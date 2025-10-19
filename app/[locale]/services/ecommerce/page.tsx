@@ -1,4 +1,4 @@
-import EUFundsBanner from "../../components/eu-funds-banner";
+import EUFundsBanner from "../../../components/eu-funds-banner";
 
 export default function EcommercePage() {
   return (

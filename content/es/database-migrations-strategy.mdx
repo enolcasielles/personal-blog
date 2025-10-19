@@ -85,7 +85,7 @@ Vamos a ver como se podría afrontar este problema de forma segura y sin downtim
 
 La solución pasa por utilizar un conocido patrón llamado **expand → backfill → contract** para separar las migraciones en **fases seguras**:
 
-* **Expand**: hacer cambios no destructivos y compatibles hacia atrás (añadir columnas nuevas, índices, constraints en modo “NOT VALID”).
+* **Expand**: hacer cambios no destructivos y compatibles hacia atrás (añadir columnas nuevas, índices, constraints en modo "NOT VALID").
 * **Backfill**: rellenar los datos históricos en segundo plano, en lotes pequeños, sin bloquear.
 * **Contract**: una vez que todo está listo, aplicar los cambios destructivos (ej. poner la columna en NOT NULL, borrar lo viejo).
 
@@ -267,3 +267,4 @@ Puntos clave a recordar:
 * No todos los cambios requieren el flujo completo - adapta el patrón según la complejidad del cambio
 
 Este enfoque ha demostrado ser efectivo en entornos de producción reales, permitiendo evolucionar el esquema de datos de manera segura y controlada, sin comprometer la disponibilidad del sistema. Como con cualquier patrón arquitectónico, la clave está en entender los principios subyacentes y adaptarlos a las necesidades específicas de cada proyecto.
+

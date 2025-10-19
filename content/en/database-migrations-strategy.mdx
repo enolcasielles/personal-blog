@@ -1,0 +1,270 @@
+---
+title: 'Database Migrations. The Expand-Contract Pattern'
+publishedAt: '2025-08-30'
+summary: 'In this article I share my experience on how I manage database migrations in high-availability environments.'
+---
+
+Database migration management has evolved significantly with the complexity of modern systems. For years, the traditional approach was based on a simple but effective process: running migrations during the deployment of a new version. This methodology is suitable for small-scale projects, characterized by a single instance, limited data volume, and moderate traffic.
+
+However, when scaling to high-concurrency environments—characterized by multiple instances running simultaneously and tables containing millions of records—the initialization-time migration strategy presents critical limitations in terms of security, efficiency, and system availability.
+
+This article presents a robust methodology for managing migrations in systems that require high availability, based on practical experience in production environments. While it is not intended to be a universal solution, it offers a proven framework adaptable to the specific needs of each project.
+
+***
+
+## Article Objective
+
+The objective is to show an approach that allows you to apply migrations in a **safe, scalable, and zero-downtime** manner in distributed systems.
+
+As always, this is not a fixed rule: each project has its particularities. But I believe this pattern is a good foundation to iterate on and adapt to each case.
+
+***
+
+## Challenges of Initialization-Time Migration
+
+### Basic Scenario
+
+In a development or simple production environment, the migration process follows a linear and predictable sequence:
+
+1. Deploy new version
+2. Execute migrations
+3. Initialize application
+4. Verify synchronization with database
+
+This approach is viable because the period of inconsistency between the database schema and the running code is practically imperceptible.
+
+### Complexities in Production Environments
+
+However, in a distributed system with multiple instances and significant data volumes, critical technical challenges emerge:
+
+* **Race conditions**: Multiple instances attempting to execute migrations simultaneously
+* **Resource locks**: Long-duration operations (e.g., index creation) can impact availability
+* **Temporal desynchronization**: Time windows where running code is not aligned with the data schema
+
+Direct consequence: **Significant compromise of system availability and data integrity**.
+
+***
+
+## Practical Example: Adding `last_login_at`
+
+To illustrate the inherent complexity of migrations in distributed systems, let's analyze a representative practical case.
+
+### System Context
+
+Let's consider an environment with the following characteristics:
+
+* **Data volume**: `users` table with one million records
+* **Usage pattern**: High frequency of read/write operations
+* **Infrastructure**: Kubernetes cluster with multiple instances to manage high traffic
+* **Requirement**: Incorporate `last_login_at` field with `NOT NULL` constraint
+
+### Technical Challenge Analysis
+
+Adding the `last_login_at` field presents a fundamental complexity: the impossibility of adding a non-nullable column to existing records without a default value. An initial approach would suggest a sequence of three steps:
+
+1. Create the `last_login_at` column as nullable
+2. Update existing records with a default value (current date or creation date)
+3. Modify the column to apply `NOT NULL` constraint
+
+### Production Implications
+
+This apparently straightforward strategy presents significant risks in a production environment:
+
+* **Performance impact**: Massive update of one million records implies a long-duration operation
+* **Concurrency problems**: Multiple instances attempting to execute the migration simultaneously
+* **Operational risks**:
+  * Potential deadlocks due to prolonged locks
+  * Timeouts in Kubernetes pods due to excessive delays
+  * Significant performance degradation during migration
+
+***
+
+## Best Practices: The *expand → backfill → contract* Pattern
+
+Let's see how this problem could be addressed safely and without downtime.
+
+The solution involves using a well-known pattern called **expand → backfill → contract** to separate migrations into **safe phases**:
+
+* **Expand**: make non-destructive and backward-compatible changes (add new columns, indexes, constraints in "NOT VALID" mode).
+* **Backfill**: fill historical data in the background, in small batches, without blocking.
+* **Contract**: once everything is ready, apply destructive changes (e.g., set the column to NOT NULL, delete the old).
+
+This is combined with the **N/N-1** rule: the new version of the app must be compatible with the previous schema, and vice versa.
+
+Unlike the previous approach where we executed the migration in a single process, we will now invoke independent processes for each of the phases.
+
+Let's see how it would be applied in the example mentioned in the previous section.
+
+* In a first step, we would launch the `expand` migration, which simply adds the `last_login_at` column as nullable. Additionally, in this step, the new version of the application is launched. This version must ensure compatibility with both schemas. When a user logs in, the `last_login_at` field will be updated with the current date. When a service retrieves a user, it will consider that this field can be null, even though in the future we know it won't be.
+* Right after launching this new version, in a new process what is known as `backfill` will be executed. This process will be responsible for updating all existing values by adding a value to the `last_login_at` field. This process will be performed in small batches, without blocking the table, for example in batches of 500 records. Additionally, it does not run from the instances running the application, but will have its own instance responsible for performing this task.
+* When the backfill finishes, the last process is launched in which the `contract` migration is executed, which in our example means converting the `last_login_at` column to `NOT NULL`. Optionally in this step, a new version of the application could be launched that stops considering the case that the `last_login_at` field is null.
+
+In this example we are simply adding a new column to a table, which is a fairly simple case. In real projects, changes can be much more complex, such as changing relationships, renaming columns, etc. Each case will have its particularities and will require carefully analyzing the best way to apply the pattern, ensuring that the system is compatible with both versions.
+
+***
+
+## Orchestration in Kubernetes and CI/CD
+
+The practical implementation of the expand-contract pattern requires a robust infrastructure that automates and coordinates the different phases of the process. Below, we present a reference architecture based on Kubernetes and ArgoCD.
+
+### Technological Context
+
+The proposed solution is designed for the following technology stack:
+
+* **Framework**: NestJS with TypeORM
+* **Orchestration**: Kubernetes
+* **CD**: ArgoCD
+* **Architecture**: Microservices
+
+While the approach is optimized for these technologies, the principles are adaptable to other technology stacks.
+
+### Solution Architecture
+
+#### Migrations Project
+
+The first fundamental component is an independent project dedicated exclusively to migration management. This separation of responsibilities allows:
+
+* Independent management of the migration lifecycle
+* Clear code organization by phases (expand, backfill, contract)
+* Isolation of migration logic from application code
+
+#### Migration System Adaptation
+
+TypeORM, by default, generates monolithic migrations that don't align with the expand-contract pattern. To adapt this behavior:
+
+1. Automatic migration generation is maintained as a starting point
+2. The generated migration is refactored, separating it into corresponding phases
+3. Components are distributed in the expand, backfill, and contract folders of the new project dedicated to migrations.
+
+#### Execution System Configuration
+
+Migration execution requires specific configuration for each phase. We implement this through:
+
+* In the migrations project, we create 3 different `data-source` files, which maintain a common configuration but each one loading the migrations from its corresponding folder.
+
+```tsx
+import * as expandMigrations from './migrations/expand';
+
+export const datasource: DataSourceOptions = {
+    type: 'postgres',
+    host: configService.get<string>('DB_HOST'),
+    port: configService.get<string | undefined>('DB_PORT')
+      ? parseInt(configService.get<string>('DB_PORT'), 10)
+      : 5432,
+    username: configService.get<string>('DB_USERNAME'),
+    password: configService.get<string>('DB_PASSWORD'),
+    database: configService.get<string>('DB_DATABASE'),
+    schema: 'migrations',
+    migrations: Object.values(expandMigrations) as any,
+    entities: Object.values(entities) as any,
+};
+```
+
+* In the `package.json` of this same project, we create different scripts to launch migrations for each phase, using its corresponding `data-source`
+
+```
+{
+  "scripts": {
+    "migration:expand": "typeorm migration:run -d ./db/expand-ds.ts",
+    "migration:backfill": "typeorm migration:run -d ./db/backfill-ds.ts",
+    "migration:contract": "typeorm migration:run -d ./db/contract-ds.ts",
+  }
+}
+
+```
+
+#### Integration with ArgoCD and Kubernetes
+
+The orchestration of the different migration phases is implemented by leveraging ArgoCD and Kubernetes capabilities. Specifically, we use ArgoCD's `Resource Hooks` concept to execute migrations at precise moments in the deployment cycle.
+
+#### Job Definition
+
+We implement two main types of hooks:
+
+* **PreSync**: Executes expand migrations before deployment
+* **PostSync**: Manages the backfill process after deployment
+
+This separation guarantees an ordered and controlled sequence of migration operations.
+
+```
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: expand-migrations
+  annotations:
+    argocd.argoproj.io/hook: PreSync
+    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
+spec:
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: migration
+          image: your-registry/migrations-app:1.2.3
+          command: ["npm","run","migration:expand"]
+```
+
+```
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: backfill-migrations
+  annotations:
+    argocd.argoproj.io/hook: PostSync
+    argocd.argoproj.io/hook-delete-policy: HookSucceeded
+spec:
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: migration
+          image: your-registry/migrations-app:1.2.3
+          command: ["npm","run","migration:backfill"]
+```
+
+We configure ArgoCD to apply these Jobs in the application designated to execute migrations. And we configure our CI so that any change in the migrations project repo launches a new version. For the backfill Job, it's a good idea to configure a notification that triggers when it finishes, sending an email, Slack notification, or whatever is desired.
+
+Now, what about the contract? As we said in previous sections, the contract phase is a very good practice to perform manually, so that verifications can be carried out and ensure that everything is correct before proceeding. How do we fit this into the flow? We can do the following: we create a new application in ArgoCD, which will contain only the Job to execute the contract. Additionally, we configure this application not to synchronize automatically.
+
+```
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: contract-migrations
+spec:
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: migration
+          image: your-registry/migrations-app:1.2.3
+          command: ["npm","run","migration:contract"]
+```
+
+When you want to execute this Job, we can force a Sync from the ArgoCD UI.
+
+With this we have all the necessary pieces. Let's now see how it would work returning to the previous example of adding the `last_login_at` field to our users table.
+
+1. We create the necessary migrations, starting from the one generated by TypeORM or from scratch. We ensure we don't employ any migration that could block the database, especially in the backfill process. We save these migrations in the project dedicated to migrations.
+2. We deploy a new version to the migrations project repo. This will force the execution of the expand phases and, upon completion, backfill.
+3. We deploy the new version of the application, guaranteeing compatibility in its code with both schemas, the old and the new.
+4. When we know that the backfill has finished, we perform tests to ensure database integrity. From the ArgoCD UI we force a Sync in the app dedicated to the contract phase.
+5. Optionally, we can launch a new version of the app removing conditions we have put to ensure compatibility with both schemas. At this point we can ensure that only the new schema needs to be compatible.
+
+Finally, note that it is not mandatory to perform the complete flow for every change to the database schema. On many occasions we will encounter changes that don't need to ensure compatibility between schemas, such as creating a completely independent new table. For these cases, we can easily create the migration in the expand folder, deploy migrations to launch this phase. The backfill, having no new migrations, simply won't do anything. And we never launch the contract. Therefore, only expand is executed and, after finishing, we can upload the new version of the application.
+
+***
+
+## Conclusions and Final Considerations
+
+Database migration management is a critical aspect in the development of robust and highly available systems. The expand-contract pattern, combined with an automated CI/CD infrastructure, provides us with a robust framework to address this challenge.
+
+Key points to remember:
+
+* System security and availability must be priorities when designing migration strategies
+* Process automation is fundamental, but must maintain manual control points when necessary
+* Compatibility between versions (N/N-1) is a non-negotiable requirement
+* Not all changes require the complete flow - adapt the pattern according to the change's complexity
+
+This approach has proven effective in real production environments, allowing the data schema to evolve safely and in a controlled manner, without compromising system availability. As with any architectural pattern, the key is to understand the underlying principles and adapt them to the specific needs of each project.
+

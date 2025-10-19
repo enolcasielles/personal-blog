@@ -1,0 +1,286 @@
+---
+title: 'How I organize my NextJS projects and best practices'
+publishedAt: '2025-02-28'
+summary: 'In this article I share my personal approach on how I structure my NextJS projects, based on best practices and experience gained over time.'
+---
+
+Organizing a NextJS project efficiently is fundamental to maintaining code scalability and maintainability. In this article, I will share my personal approach on how I structure my NextJS projects, based on best practices and experience gained over time.
+
+## Objective
+I have tried many different ways of organizing code, applying different approaches, architectures and patterns. And this way I'm going to present is the one I like most for the balance it has between modularity and ease of maintenance. It is important to mention that this structure is not a fixed rule that I apply in 100% of projects. In fact, it's normal for each project to end up having its own structure since, depending on the type of project, scope and other factors, the structure must adapt. In any case, I think it's interesting to keep it as a reference and iterate on it according to the specific requirements of the project.
+
+
+## Folder structure
+
+The folder structure I use is as follows:
+
+```
+/app
+  /[only Next special files, like pages, layouts, routes, etc.]
+/modules
+  /[module-name]
+    /pages
+    /components
+    /contexts
+    /actions
+    /services
+    /requests
+    /responses
+/core
+  /components
+  /contexts
+  /lib
+  /api-responses
+  /errors
+  /[anything that is not specific to a module but is relevant to the project]
+```
+
+The idea is to divide the code into 3 main folders. The `app` folder will contain only NextJS special files, such as pages or layouts. This is a NextJS restriction and therefore cannot be avoided. The idea is that in these files the minimum possible implementation is performed and that, instead, we delegate the implementation to the respective modules.
+
+The `core` folder will contain those files that define more generic functionalities that are reusable in different parts of the project. Normally I already start this `core` folder with several files that I know with very high probability I will need in any project. For example, the `CustomError` class that I use to handle errors consistently throughout the application or the `ErrorsContext` context, which gives me a simple but robust way to handle errors on the client.
+
+Finally, the `modules` folder is where we actually implement the application. I call a module a part of the application. This corresponds to one or more screens or Api Routes that are related to each other, for example Authentication, Products, Orders, etc. Each module has its own folder in which all those elements that said module needs to implement are defined.
+
+In the following sections we will see each of these parts in more detail as well as the way I work with them.
+
+### `app` Folder
+
+As we said, I reserve this folder for Next special files. And I always delegate implementation to the corresponding module. If for example I have to create a new page at the `/orders/create` route, what I will do is create the file `app/orders/create/page.tsx` and do the following:
+
+```tsx
+import OrderCreatePage from "@/modules/orders/pages/OrderCreatePage";
+
+export default OrderCreatePage;
+```
+
+The implementation of this page's code I will delegate to the corresponding module. This allows me to have the code totally centralized in the `modules` folder and in the way I like to organize it, but making it totally compatible with the approach NextJS requires.
+
+### `core` Folder
+
+This folder will contain those files that are generic and reusable in any part of the application. Normally, the files I define in this folder are those I consider most generic and that, therefore, are independent of any module. We previously mentioned the `CustomError` class that I use to handle errors consistently throughout the application or the `ErrorsContext` context, which gives me a simple but robust way to handle errors on the client.
+
+I also include in this folder the component library used as a base to define the application UI. The `core/components` folder will contain these components and, in turn, will be divided into folders according to component type. For example, I could have `core/components/base` folders for UI components like buttons, inputs, etc. and `core/components/modals` for modal components, etc. This way I keep UI components well organized and allowing their reuse in any part of the application.
+
+Since I usually use shadcn, I modify shadcn's `components.ts` file so the cli generates components in the `core/components/base` folder.
+
+The `core` folder is also the place where I define any integration I make with an external library or service. For this, in the `core/lib` folder I include files that perform integration with the external library or service. Also, the `core/utils` folder will contain those *helper* methods I may need in any part of the application.
+
+### `modules` Folder
+
+Each module represents a part of the application and is defined in its own folder. The internal folder organization of the module doesn't follow an exact rule, since each module may need some things or others. But, as a general rule and analyzing a fairly typical module, it could have the following structure:
+
+- `pages` Defines the module's page components. In the previous example, the `OrderCreatePage` would be in this folder. Page components, in most cases, I try to make them Server Components. Their main objective will be to load the necessary data that page needs, handle possible errors and load the necessary components to render said page.
+
+- `routes` If the module has Api Routes, like pages, I define them in this folder. It's rare for me to use this folder because I usually perform client-server communication through Server Actions. But there are cases where it's necessary to use Api Routes.
+
+- `contexts` In those pages (or components) that require interactivity, it's usual for me to define a Context and Provider to abstract business logic and possible states that can be used by components of that page/component. I will define necessary contexts in this folder.
+
+- `components` In this folder will be the React components the module needs. But be careful, only those components that are specific to the module, such as page sections or components that are not reusable outside the module. As we already mentioned, components that are reusable in any part of the application will be defined in the `core/components` folder.
+
+- `actions` I reserve this folder for Server Actions. These files will always use the "use server" directive and will be the entry point for logic executed on the server.
+
+- `services` Depending on module complexity, business logic that needs to be performed on the server side, I delegate to specific services that would go in this folder. If it's simple, I usually do it directly in the server action file.
+
+- `requests` and `responses`. I use these folders to define the types of requests and responses that server actions or Api Routes must comply with. It's also a good place to perform validations or data mappings.
+
+- `schemas` If the module has forms, for validation I usually use `react-hook-form` and `zod`. I define zod validation schemas in this folder.
+
+
+
+## Use of Server Side Rendering (SSR)
+
+In most applications, I use Server Side Rendering (SSR) to load the necessary data for the page to render. The approach I usually apply is as follows:
+
+- In the `PageComponent`, I call the service or action on the server to return the data I need.
+- I manage the possible error that may occur, loading an error component if necessary.
+- If everything goes well, I render the page UI from the obtained response.
+
+Below, an example of what a `PageComponent` could look like:
+
+```tsx
+export default async function ContactsPage() {
+  const userId = await getUserId();
+  const [error, contacts] = await getContactsAction(userId);
+
+  if (error) return <Error message={error.message} />;
+
+  return (
+    <ContactsProvider initialContacts={contacts}>
+      <div className="container mx-auto px-4 py-8 max-w-6xl">
+        {/* Page UI implementation */}
+        <SomeComponent />
+        <SomeOtherComponent />
+      </div>
+    </ContactsProvider>
+  );
+}
+```
+
+## Use of Server Actions
+
+I use Server Actions as the entry point for server logic. If the logic is simple, such as retrieving data from the database, I implement it directly in the server action file. If the logic is more complex, I delegate it to services that will go in the module's `services` folder. What is certain is that Server Actions must be responsible for performing validations on input data and/or mapping responses returned to the client.
+
+I never throw exceptions in Actions if something goes wrong. There is a clear reason for this. For security reasons, Next removes error messages in production environment, to prevent messages that may contain sensitive backend information from reaching the client. This is a problem when you want the backend to throw the error and the client to simply display it. That's why, I always return an Array with two elements: the first will be a custom `CustomError` error and the second the response the action gives if everything went well.
+
+Below, an example of what a Server Action could look like:
+
+```tsx
+export async function createContactAction(
+  userId: string,
+  data: CreateContactRequest,
+): Promise<ActionResponse<ContactResponse>> {
+  try {
+    await validateCreateContactRequest(data);
+    const contact = await prisma.contact.create({
+      data: {
+        relation: data.relationship,
+        location: data.location,
+        name: data.name,
+        userId,
+      },
+    });
+    return [null, mapContactEntityToContactResponse(contact)];
+  } catch (error) {
+    if (error instanceof CustomError) return [buildCustomError(error), null];
+    return [{ message: "Error creating contact" }, null];
+  }
+}
+```
+
+`ActionResponse` is a generic response type I have in core that forces always returning this array structure with possible error in the first element and possible response in the second.
+
+
+## Error Management
+
+I always manage errors with my `CustomError` class that I have in core. Any helper method, service or, in general, any piece of code must throw this type of error if something goes wrong. The main application functions, such as Server Actions, must try to catch errors and return the custom error, ensuring that an error different from `CustomError` is never thrown.
+
+In Api Routes, I apply a very similar approach but relying on `apiSuccess` and `apiError` functions that convert `CustomError` into the Rest API response. Below, an example of what a standard Api Route would look like:
+
+```ts
+export default async function SubscriptionSuccessRoute(request: Request) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const sessionId = searchParams.get("session_id");
+
+    if (!sessionId) throw new CustomError({
+      message: "Session id not provided",
+      statusCode: 400,
+    });
+
+    await verifySubscription(sessionId);
+
+    return apiSuccess({
+      message: "Subscription verified successfully",
+    });
+  } catch (error) {
+    if (error instanceof CustomError) return apiError(error);
+    return apiError(
+      new CustomError({
+        message: "Internal server error",
+        statusCode: 500,
+      }),
+    );
+  }
+}
+```
+
+## Requests and Responses
+
+I try to type every object used in the application. I consider it a very good practice that makes code more robust and easy to maintain. For example, an action or service will have typed input parameters and responses. For this, I create interfaces in the `requests` and `responses` folders of each module, representing each possible request and response. For example:
+
+```ts
+export interface CreateContactRequest {
+  name: string;
+  relationship: string;
+  location: string;
+}
+```
+
+```ts
+export interface ContactResponse {
+  id: string;
+  name: string;
+  relationship: string;
+  location: string;
+}
+```
+
+These files are also a good place to perform data mappings or validations. Requests must be validated to comply with the expected type. For this, I use the `zod` library and usually create a schema in the same Request file. As for Responses, it's common to have to perform data mappings, for example, converting the database response to the Response type. For this, I usually create a method in the Response file that is responsible for performing the mapping.
+
+## Client Interactivity
+
+In general, I try to use SSR whenever possible and minimize the use of Client Components. But, obviously, this is not possible in many cases. When a page requires interaction, I usually apply the pattern I define below:
+
+- In the `PageComponent`, I call the service or action on the server to return the data I need, which will serve for the initial interface load.
+- In the `PageComponent`, I load a Provider whose context will contain all the logic the client needs: states, methods, etc.
+- This Provider will receive the initial data it needs for its state. This mechanism allows carrying data from the server side to the client in a simple and efficient way.
+- Any page component can use the Provider's context to obtain the data and methods it needs.
+
+Below, an example of what a Provider could look like:
+
+```tsx
+interface IContext {
+  subscription: Subscription | null;
+  manageSubscription: () => Promise<void>;
+  activateSubscription: () => Promise<void>;
+}
+
+const Context = createContext<IContext>(null);
+
+export const useSubscriptionContext = () => useContext(Context);
+
+interface Props {
+  subscription: Subscription | null;
+}
+
+export default function SubscriptionProvider({
+  subscription: initialSubscription,
+  children,
+}: PropsWithChildren<Props>) {
+  const { showError } = useError();
+
+  const manageSubscription = async () => {
+    const [error, result] = await createPortalSessionAction();
+    if (error) showError(error);
+    else window.location.href = result.url;
+  };
+
+  const activateSubscription = async () => {
+    const [error, result] = await createCheckoutSessionAction();
+    if (error) showError(error);
+    else window.location.href = result.url;
+  };
+
+  const value: IContext = {
+    subscription: initialSubscription,
+    manageSubscription,
+    activateSubscription,
+  };
+
+  return <Context.Provider value={value}>{children}</Context.Provider>;
+}
+```
+
+The `PageComponent` will load `SubscriptionProvider` passing the `subscription` object it will obtain in its initialization. Any page component can use `useSubscriptionContext` to obtain the context and its methods. In the previous example there are only methods but, usually, there could also be state variables.
+
+
+## Styles
+
+For style management, I use **Tailwind CSS** along with **Shadcn**. Tailwind CSS allows me to apply styles quickly and efficiently using utility classes, while Shadcn provides predefined components that facilitate creating attractive and functional interfaces. This combination helps me maintain a consistent design and accelerate the development process.
+
+
+## Form Management
+
+For form management, `react-hook-form` and `zod` is an excellent combination. I usually implement [the proposal](https://ui.shadcn.com/docs/components/form) from shadcn for form definition. In `onSubmit`, the server action is launched and errors and possible responses are managed.
+
+
+## Conclusion
+
+Organizing a NextJS project may seem like a challenge, but with a clear structure and good practices, clean and maintainable code can be achieved. In this article I have tried to give a general approach on how I organize my projects. As I said at the beginning, this structure is not a fixed rule and each project will have its particularities. If you want to see in more depth some practical example, I encourage you to take a look at the [repository](https://github.com/enolcasielles/memo-mate) of the MemoMate project I developed a few months ago and explained in [this article](https://enolcasielles.com/blog/memomate). The project is a monorepo, but the `web` application is a NextJS project that has a structure similar to what I explained in this article.
+
+As always, I hope this article is helpful to you. If you have any questions or suggestions, don't hesitate to contact me.
+
+* [Email](mailto:enolcasielles@gmail.com)
+* [LinkedIn](https://www.linkedin.com/in/enolcasielles/)
+* [X](https://x.com/enolcasielles)
+

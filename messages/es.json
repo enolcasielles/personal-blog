@@ -44,5 +44,9 @@
     "viewWebsite": "Ver sitio web",
     "viewCode": "Ver código",
     "readMore": "Leer más"
+  },
+  "BlogPage": {
+    "title": "Blog",
+    "description": "Artículos sobre desarrollo web, tecnologías emergentes y creación de productos digitales"
   }
 }

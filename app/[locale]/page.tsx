@@ -4,16 +4,14 @@ import CertificationsSection from "../components/certifications-section";
 import { experiences } from "../data/experience";
 import { certifications } from "../data/certifications";
 import SectionCard from "../components/section-card";
-import { useTranslations } from "next-intl";
-import { use } from "react";
-import { setRequestLocale } from "next-intl/server";
+import { setRequestLocale, getTranslations } from "next-intl/server";
 
-export default function Page({params}: {params: Promise<{locale: string}>}) {
-  const {locale} = use(params);
+export default async function Page({params}: {params: Promise<{locale: string}>}) {
+  const {locale} = await params;
  
   setRequestLocale(locale);
 
-  const t = useTranslations("HomePage");
+  const t = await getTranslations("HomePage");
 
   return (
     <section className="max-w-4xl mx-auto">

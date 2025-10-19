@@ -2,11 +2,13 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { CustomMDX } from 'app/components/mdx';
 import { getBlogPosts } from 'app/db/blog';
+import { locales } from 'i18n/routing';
 
 export async function generateMetadata({
   params,
 }): Promise<Metadata | undefined> {
-  let post = getBlogPosts().find((post) => post.slug === params.slug);
+  const {locale, slug} = await params;
+  let post = getBlogPosts({locale: locale}).find((post) => post.slug === slug);
   if (!post) {
     return;
   }
@@ -43,11 +45,17 @@ export async function generateMetadata({
 }
 
 export async function generateStaticParams() {
-  let posts = getBlogPosts();
-  return posts.map((post) => ({
-    slug: post.slug,
-  }))
+  const result: {slug: string, locale: string}[] = [];
+  for (const locale of locales) {
+    let posts = getBlogPosts({locale: locale});
+    result.push(...posts.map((post) => ({
+      slug: post.slug,
+      locale: locale,
+    })));
+  }
+  return result;
 }
+
 
 function formatDate(date: string) {
   if (!date.includes('T')) {
@@ -64,8 +72,10 @@ function formatDate(date: string) {
   return `${fullDate}`;
 }
 
-export default function Blog({ params }) {
-  let post = getBlogPosts().find((post) => post.slug === params.slug);
+export default async function Blog({ params }) {
+  const _params = await params;
+  console.log(_params);
+  let post = getBlogPosts({locale: _params.locale}).find((post) => post.slug === _params.slug);
 
   if (!post) {
     notFound();
